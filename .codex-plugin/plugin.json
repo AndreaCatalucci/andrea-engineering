@@ -1,0 +1,25 @@
+{
+  "name": "andrea-engineering",
+  "version": "3.19.0-fork.1+codex.20260713104344",
+  "description": "Personal Codex-native fork of the Compound Engineering skill suite",
+  "author": {
+    "name": "Andrea Catalucci"
+  },
+  "license": "MIT",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Andrea Engineering",
+    "shortDescription": "Personal engineering workflows for Codex",
+    "longDescription": "Andrea Engineering provides a personal Codex workflow for strategy, ideation, planning, implementation, debugging, review, shipping, and durable project learnings. Forked from Compound Engineering 3.19.0 under the MIT License.",
+    "developerName": "Andrea Catalucci",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Help me take an engineering task from idea to a maintainable implementation."
+    ]
+  }
+}
