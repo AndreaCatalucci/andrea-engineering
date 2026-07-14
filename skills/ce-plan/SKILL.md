@@ -9,21 +9,21 @@ description: "Create structured plans for multi-step work, including software an
 
 `ce-brainstorm` defines **WHAT** to build by creating a requirements-only unified plan. `ce-plan` enriches that same artifact with **HOW** to build it. `ce-work` executes implementation-ready plans. A prior brainstorm is useful context but never required — `ce-plan` works from any input: a requirements-only unified plan, a legacy requirements doc, a bug report, a feature idea, or a rough description.
 
+When input is a selected-idea capsule from `ce-ideate`, plan directly when it states the direction, constraints, and success criteria. If any remains product-defining and unresolved, recommend `ce-brainstorm` instead of inventing it.
+
 **When directly invoked, always plan.** Never classify a direct invocation as "not a planning task" and abandon the workflow. If the input is unclear, ask clarifying questions or use the planning bootstrap (Phase 0.4) to establish enough context — but always stay in the planning workflow.
 
 This workflow produces a durable implementation plan. It does **not** implement code, run tests, or learn from execution-time results. If the answer depends on changing code and seeing what happens, that belongs in `ce-work`, not here.
 
 ## Mandatory Completion Contract
 
-Every normal interactive `ce-plan` branch that produces a plan artifact or checkpoint is incomplete until its owning handoff question is presented. For software implementation-plan runs that continue past Phase 0.1b, that boundary is Phase 5.4's post-generation handoff menu. Non-software plan-seeking and approach-altitude branches use the terminal handoff in the reference workflow they route to; do not force those branches through Phase 5.4 after they have been told to skip subsequent phases. Answer-seeking is the exception: it may end after delivering the answer unless the universal-planning reference says to offer save/share.
+Each branch completes when its requested artifact or answer is delivered and its required checks pass. Do not require a separate handoff choice.
 
-For software implementation-plan runs, writing the plan file, running the confidence check, and running or skipping `ce-doc-review` are intermediate milestones, not completion. This remains true when the user's prompt says only "create a plan", "write the doc", "run `ce-doc-review`", or similar. The only exception is pipeline mode (LFG or any `disable-model-invocation` context), where the caller owns the next step after the plan file, confidence check, and headless document review are complete.
-
-Before any response that could end a software implementation-plan run, verify that the plan path is known, the headless review state or documented skip state is summarized, and the user has been asked: "Plan ready at `<absolute path to plan>`. What would you like to do next?" If the menu fits the platform's blocking-question tool, ask it there; otherwise render the numbered handoff options in chat and wait. If the user selects an action, execute the Phase 5.4 routing for that selection before treating the skill as complete.
+Before ending a software implementation-plan run, verify that the plan path is known, confidence and document review completed or were explicitly skipped by format, and the review state is summarized. Offer optional next steps without waiting for or executing one.
 
 ## Interaction Method
 
-When asking the user a question, use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension). Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
+When a blocking choice is necessary, use `request_user_input` when available; otherwise ask in chat and wait.
 
 Ask one question at a time. Prefer a concise single-select choice when natural options exist.
 
@@ -76,7 +76,7 @@ Resolution steps:
 
 1. **In-prompt request.** Reason over the user's prompt for this run for a request about *this document's* output format, expressed either as the `output:` shorthand or in plain language ("make the plan a webpage", "I want this in HTML"). On an explicit format, match it case-insensitively to `md`/`html`, and ignore the `output:` shorthand token when reading the rest of the prompt as the feature description. Distinguish a request about the document's format from a format named as subject matter: "add an HTML export feature" or "plan the CSV importer" is the work, not a doc-format request — do not switch on it.
    - `output:` alone (no value) → no-op, fall through to step 2.
-   - `output:<unknown>` (e.g., `output:pdf`) → drop the token, fall through to step 2, and remember to emit a one-line note above the post-generation menu after final resolution: `Ignored unknown output: value '<value>' — using <resolved_format> instead.` where `<resolved_format>` is the value `OUTPUT_FORMAT` actually resolved to after the remaining precedence steps. Do not hardcode `md` in the note — that misleads users when config has set HTML.
+   - `output:<unknown>` (e.g., `output:pdf`) → drop the token, fall through to step 2, and emit one final note: `Ignored unknown output: value '<value>' — using <resolved_format> instead.`
 2. **User-stated preference.** If this prompt holds no format request, honor an output-format preference (markdown vs HTML) the user established earlier — earlier in this session, in your memory, or written into their active instructions — that is already in your context (match `md`/`html` case-insensitively). A remembered preference is more current than the rarely-edited config, so it **overrides** the config in step 3. Do not open or search instruction files to find it — act only on a preference already present in your context; if none is, fall through to the config.
 3. **Config.** If steps 1-2 did not resolve and the config file read above has an **active (non-commented)** `plan_output:` key whose value matches `md` or `html` (case-insensitive), use it. Missing, invalid, or commented values fall through silently. Critical: lines starting with `#` are YAML comments and must be ignored — the shipped config template includes commented examples like `# plan_output: html` to document the option, and matching those as active settings would silently force HTML mode on every run without the user having opted in.
 4. **Default.** Otherwise `OUTPUT_FORMAT=md`.
@@ -89,7 +89,7 @@ Resolution steps:
 - When `OUTPUT_FORMAT=md`, read `references/markdown-rendering.md` for format principles.
 - When `OUTPUT_FORMAT=html`, read `references/html-rendering.md` for format principles.
 
-**Resolve the scoping-confirmation setting.** Also before any gate fires, determine `SKIP_SCOPING_CONFIRM` (boolean, default `false`) — whether the pre-plan scoping-synthesis confirmation gates (Phase 0.7 solo, Phase 5.1.5 brainstorm-sourced) proceed without waiting for the user. This skips **only** that scoping confirmation; it never suppresses genuine blocking questions (Phase 0.4 routing, Phase 0.5 product blockers, Phase 2 architecture questions, source-doc disambiguation) or the Phase 5.4 post-generation menu. Precedence mirrors output mode:
+**Resolve the scoping-confirmation setting.** Before any gate fires, determine `SKIP_SCOPING_CONFIRM` (boolean, default `false`). It skips only the pre-plan scoping-synthesis confirmation, never genuine blocking questions. Precedence mirrors output mode:
 
 1. **In-prompt request.** `confirm:auto` skips the gate for this run; `confirm:ask` forces it on for this run. Honor an equivalent plain-language instruction the same way ("just write it, don't ask me to confirm" → skip; "ask me before writing the plan" → ask). Consume and strip the token **only** for the two recognized values `confirm:auto` and `confirm:ask`. A bare `confirm:` or any other value (e.g., `confirm:delete-account`) is **not** a flag — leave it verbatim in the feature description and fall through (this is narrower than `output:`, which strips unknown values: `confirm` has only two valid values, and a description can legitimately begin with a word like "confirm:").
 2. **User-stated preference.** Honor a scoping-confirmation preference the user established earlier — earlier in this session, in your memory, or written into their active instructions — that is already in your context (e.g., a remembered "stop asking me to confirm plan scope"). A remembered preference overrides the config key. Do not open or search instruction files to find it — act only on a preference already present in your context.
@@ -261,7 +261,7 @@ If depth is unclear, ask one targeted question and then continue.
 
 #### 0.7 Solo-Mode Scoping Synthesis
 
-Surface call-outs to the user — the specific forks in scope or approach where user input materially changes the plan — so scope can be corrected **before Phase 1 research is spent**. Sub-agent dispatch (repo-research-analyst, learnings-researcher, etc.) is the expensive next step this phase guards against wasted effort on.
+Surface call-outs to the user—the forks where input materially changes the plan—so scope can be corrected before Phase 1 research is spent.
 
 Fires **only in solo invocation** — when Phase 0.2 found no upstream Product Contract source (no requirements-only unified plan and no legacy `*-requirements` doc; `product_contract_source: ce-plan-bootstrap`) AND Phase 0.4 stayed in ce-plan (did not route to ce-debug, ce-work, or universal-planning) AND Phase 0.5 cleared (no unresolved blockers) AND not on Phase 0.1 fast paths (resume normal, deepen-intent). Each guard is an explicit conditional. Skip Phase 0.7 entirely when any guard fails — upstream-sourced invocations (unified-plan enrichment or legacy brainstorm) defer to Phase 5.1.5 instead.
 
@@ -271,59 +271,48 @@ Fires **only in solo invocation** — when Phase 0.2 found no upstream Product C
 
 **Blocking decision:** auto-proceed — announce without waiting — only when plan depth is **Lightweight AND zero call-outs survive**. Standard and Deep always fire the confirmation gate, even with zero call-outs.
 
-**Headless / opt-in skip:** in headless mode, or when `SKIP_SCOPING_CONFIRM` resolved to skip in Phase 0.0, do not block — compose the internal draft, skip the chat-time confirmation, and route Inferred bets to a `## Assumptions` section at plan-write (Phase 5.2). The skip covers only this scoping confirmation; Phase 0.4 routing, Phase 0.5 blockers, Phase 2 questions, source-doc disambiguation, and the Phase 5.4 menu still fire. Announcement wording and full routing: `references/synthesis-summary.md` ("Headless mode", "When to skip the blocking confirmation").
+**Headless / opt-in skip:** compose the internal draft, skip this confirmation, and route inferred bets to `## Assumptions`. Other genuine blockers still apply.
 
 ### Phase 1: Gather Context
 
-All specialist research and deepening prompts used in this phase are skill-local prompt assets under `references/agents/`. When dispatching one, read the matching file and seed a generic subagent with that prompt content plus the task-specific context below. Do not dispatch standalone agents by type/name.
-
-Model tiering lives in this caller, not in prompt assets. Local prompt files have no frontmatter. Use the platform's mid-tier model for external/organizational research prompts such as `slack-researcher` and `web-researcher` when the current harness exposes a known override; otherwise omit the override and inherit. Use inherited model for high-judgment architecture, migration, and planning-deepening prompts unless the harness has an established cheaper capable tier.
+Run routine research in the root agent. Dispatch at most one specialist only for a bounded, genuinely independent unfamiliar topic; seed it with the matching prompt under `references/agents/`.
 
 #### 1.1 Local Research (Always Runs)
 
-Prepare a concise planning context summary (a paragraph or two) to pass as input to the research agents:
+Prepare a concise planning context summary:
 - If an origin document exists, summarize the problem frame, requirements, and key decisions from that document
 - Otherwise use the feature description directly
 - If `STRATEGY.md` exists, read it and include the relevant pieces (target problem, approach, active tracks) in the summary so downstream research and planning decisions are anchored to product strategy
 - If `CONCEPTS.md` exists at repo root, read it — its definitions are the canonical names for domain entities, named processes, and status concepts. Plan with those terms rather than synonyms.
 
-**Resolve the project profile from the shared cache first.** The agnostic profile (stack, deps, conventions, structure) is identical at this commit, so reuse it instead of having `repo-research-analyst` re-derive `technology`/`architecture`/`conventions` every run. Set `SKILL_DIR` to this skill's directory and run the helper (protocol in `references/repo-profile-cache.md`):
+**Resolve the project profile from the shared cache first.** Reuse the commit-stable stack, dependencies, conventions, and structure. Set `SKILL_DIR` to this skill's directory and run the helper in `references/repo-profile-cache.md`:
 
 ```bash
 SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>";
 python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
 ```
 
-On `HIT`, load the profile JSON as your agnostic grounding. On `MISS`, dispatch a generic subagent with `references/agents/repo-profiler.md` to derive it, write its JSON to a file, then `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` (re-set `SKILL_DIR` in that call — shell vars don't persist between Bash invocations). On `NO-CACHE` — or if the call errors or returns nothing — derive it inline and skip the `put`; never block on the cache. Pass the resulting profile to `repo-research-analyst` below so it skips the agnostic scopes. The cached profile covers only *root* conventions — if the work targets a subdirectory with its own scoped instruction file (a nested `AGENTS.md`/`CLAUDE.md`), read that fresh; subdirectory-scoped instructions are deliberately excluded from the cache.
+On `HIT`, load the profile JSON. On `MISS`, `NO-CACHE`, or failure, derive the project shape inline; never dispatch a profiler. Read any scoped instruction file in the target subdirectory fresh.
 
-Run these agents in parallel:
-
-- `references/agents/repo-research-analyst.md` — scope: **patterns** (the question-specific slice; the agnostic `technology`/`architecture`/`conventions` grounding comes from the cached profile passed in its context — the profile's `stack`/`topology`/`conventions` keys cover those analyst scopes). Pass the planning context summary and the cached profile.
-- `references/agents/learnings-researcher.md` — pass the planning context summary.
-
-**Agent-native planning triage** (conditional) — consider broadly, dispatch selectively. Dispatch a generic subagent with `references/agents/agent-native-planning-strategist.md` in parallel with the local research agents when the request, origin document, or repo research indicates any of:
+Inspect repository patterns, relevant files and tests, and `docs/solutions/` directly. Apply agent-native planning when any of these signals appears:
 
 - agent, assistant, chat, workflow automation, MCP, plugin, skill, tool registry, prompt, or autonomous-loop work
 - a codebase with an existing agent surface where this feature changes user-visible capabilities
 - a primary domain action that is repetitive, high-volume, complex, naturally language-shaped, or likely to need automation access
 - a risk that the plan will widen the gap between UI/API actions and agent-accessible tools or context
 
-Do **not** dispatch for cosmetic, layout-only, animation-only, brand, low-value preference, or narrow work in a product with no agent surface. If the signal is borderline, do not dispatch; carry only a short future parity consideration when it affects a high-value domain action. Include any resulting findings in consolidation as planning inputs, not as a standalone advice appendix.
+Skip agent-native analysis for cosmetic or narrow work with no agent surface. Include useful findings as planning inputs, not a standalone appendix.
 
 Collect:
 - Technology stack and versions (used in section 1.2 to make sharper external research decisions)
 - Architectural patterns and conventions to follow
 - Implementation patterns, relevant files, modules, and tests
-- AGENTS.md guidance that materially affects the plan, with CLAUDE.md used only as compatibility fallback when present
+- AGENTS.md guidance that materially affects the plan
 - Institutional learnings from `docs/solutions/`
 - Product strategy context when `STRATEGY.md` is present — flag any plan decisions that pull away from the active tracks or the stated approach
-- Agent-native planning findings when the conditional triage dispatched: action/context parity decisions, tool/workspace/execution-lifecycle choices, scope boundaries, and verification scenarios
+- Agent-native planning findings when applicable: action/context parity, tool/workspace/execution-lifecycle choices, scope boundaries, and verification scenarios
 
-**Slack context** (opt-in) — never auto-dispatch. Route by condition:
-
-- **Tools available + user asked**: Dispatch a generic subagent with `references/agents/slack-researcher.md` and the planning context summary in parallel with other Phase 1.1 agents. If the origin document has a Slack context section, pass it verbatim so the researcher focuses on gaps. Include findings in consolidation.
-- **Tools available + user didn't ask**: Note in output: "Slack tools detected. Ask me to search Slack for organizational context at any point, or include it in your next prompt."
-- **No tools + user asked**: Note in output: "Slack context was requested but no Slack tools are available. Install and authenticate the Slack plugin to enable organizational context search."
+**Slack context** (opt-in) — when requested and available, gather it directly with the root agent's Slack tools. Otherwise do not query Slack; if requested but unavailable, record the gap.
 
 #### 1.1b Detect Execution Direction Signals
 
@@ -358,15 +347,15 @@ Based on the origin document, user signals, and local findings, decide **whether
 - **Topic risk** — Security, payments, external APIs warrant more caution regardless of user signals.
 - **Uncertainty level** — Is the approach clear or still open-ended?
 
-**Leverage the repo research prompt's technology context:**
+**Use the repository's technology context:**
 
-The cached project profile's stack/versions (or, when uncached, the `repo-research-analyst` Technology & Infrastructure summary) gives you the technology context. Use it to make sharper external research decisions:
+Use the cached or directly observed stack and versions to make sharper external research decisions:
 
-- If specific frameworks and versions were detected (e.g., Rails 7.2, Next.js 14, Go 1.22), pass those exact identifiers to the `framework-docs-researcher` local prompt so it fetches version-specific documentation
+- If specific frameworks and versions were detected (e.g., Rails 7.2, Next.js 14, Go 1.22), use those exact identifiers in documentation research
 - If the feature touches a technology layer the scan found well-established in the repo (e.g., existing Sidekiq jobs when planning a new background job), lean toward skipping external research -- local patterns are likely sufficient
 - If the feature touches a technology layer the scan found absent or thin (e.g., no existing proto files when planning a new gRPC service), lean toward external research -- there are no local patterns to follow
-- If the scan detected deployment infrastructure (Docker, K8s, serverless), note it in the planning context passed to downstream agents so they can account for deployment constraints
-- If the scan detected a monorepo and scoped to a specific service, pass that service's tech context to downstream research agents -- not the aggregate of all services. If the scan surfaced the workspace map without scoping, use the feature description to identify the relevant service before proceeding with research
+- If the scan detected deployment infrastructure (Docker, K8s, serverless), account for its constraints
+- In a monorepo, research only the relevant service's technology context
 
 **Always lean toward external research when:**
 - The topic is high-risk: security, payments, privacy, external APIs, migrations, compliance
@@ -391,15 +380,11 @@ Announce the decision and the intent briefly before continuing. Examples:
 
 #### 1.3 External Research (Conditional)
 
-If Step 1.2 indicates external research is useful, dispatch by the **intent** classified in Stage 2, using the platform's subagent primitive (`Agent`/`Task` in Claude Code, `spawn_agent` in Codex) where available; otherwise run the work inline or serially. Read the selected prompt asset from `references/agents/` and seed a generic subagent with it. For `web-researcher.md`, pass a focus hint plus the planning context summary and do **not** pass codebase content — it operates externally.
+Run external research in the root agent according to the classified intent. Implementation guidance uses official, version-specific documentation; landscape research maps relevant options and prior art; mixed research maps the landscape before investigating shortlisted choices.
 
-- **Implementation-guidance** — run in parallel:
-  - `references/agents/best-practices-researcher.md` with the planning context summary.
-  - `references/agents/framework-docs-researcher.md` with the planning context summary and exact frameworks/versions from Phase 1.1 where available.
-- **Landscape / option-discovery** — `references/agents/web-researcher.md` with the focus hint and planning context summary. When the request targets projects on a code host (e.g., "competitors on GitHub"), name the discovery dimensions in the focus hint: project names and URLs, release recency and activity, CLI/UX shape, install path, docs and examples, plugin/extension surfaces, recurring issue themes, and license — treating star counts as a weak signal only.
-- **Mixed** — **sequential, not parallel**: run the `web-researcher` local prompt first to map the landscape and produce a shortlist; then run the `framework-docs-researcher` and/or `best-practices-researcher` local prompts against the shortlisted technologies only when their details materially shape the plan.
+Dispatch at most one specialist only when a bounded topic is both genuinely independent and unfamiliar, and its result can be synthesized from a short handoff. Otherwise keep all research inline. For code-host landscape research, inspect project URLs, release activity, UX, installation, documentation, extension surfaces, issue themes, and license; treat stars as weak evidence.
 
-**Tool-unavailable handling.** `web-researcher` self-checks for web tools and stops if they are missing. Never block on this: if it reports research unavailable, or any researcher fails, warn and proceed, and carry the gap into Phase 1.4 so the plan records it honestly — especially when the user explicitly requested external research, where a silent skip would leave the plan looking evidence-based when it is not.
+If research tools are unavailable, warn and proceed. When research was explicitly requested, record the gap in the plan.
 
 #### 1.4 Consolidate Research
 
@@ -672,9 +657,7 @@ Fires **whenever Phase 0.2 resolved an upstream Product Contract source** — a 
 
 #### 5.2 Write Plan File
 
-**Reasoning elevation (Claude Code only).** Before authoring the plan, if positively Claude Code (`CLAUDECODE=1`, not Cursor/Codex), load `references/reasoning-elevation.md` and follow it — it may dispatch the interpret-findings-then-author step to a higher-reasoning model when the user has opted in, and it owns the completion-time discoverability tip. On any non-Claude host, skip it entirely — proceed on the session model with no mention. If a prompt names a model this skill does not recognize on this harness, proceed on the session model without comment.
-
-**REQUIRED: Write the plan file to disk before presenting any options.**
+**REQUIRED: Write the plan file to disk before responding.**
 
 HTML note: `ce-doc-review` is markdown-only today. HTML plans still render the
 unified artifact, but the Phase 5.3.8 document-review autofix pass is skipped
@@ -699,7 +682,7 @@ Write the unified plan artifact according to `references/plan-sections.md`.
 - If this is direct planning, create a complete unified plan in `docs/plans/` with `product_contract_source: ce-plan-bootstrap`.
 - Set `artifact_contract: ce-unified-plan/v1`, `artifact_readiness: implementation-ready`, and `execution: code` for software implementation plans.
 - Do not set `artifact_contract: ce-unified-plan/v1` on universal-planning outputs, answer-seeking outputs, or approach-plans unless they include the full software implementation contract.
-- Do not write a launch prompt into the doc. The launch prompt is generated at handoff (Phase 5.4 menu — `/goal` copy-paste on Claude Code, `create_goal` on Codex) from the plan's current content, so it never goes stale; it points to Goal Capsule, Verification Contract, Definition of Done, and U-IDs rather than duplicating them.
+- Do not write an execution prompt into the plan. Execution is a separate explicit request.
 
 **HTML composition timing.** When `OUTPUT_FORMAT=html`, Phase 5.3 deepening runs before this write completes its final form, but `ce-doc-review` is skipped in HTML mode (its mutation mechanics are markdown-only today — see Phase 5.3.8 format gate in `references/plan-handoff.md`). The HTML artifact reflects deepening synthesis but not doc-review autofixes; this is a known gap until ce-doc-review gains HTML-aware mutation.
 
@@ -754,54 +737,23 @@ Build a risk profile. Treat these as high-risk signals:
 - **Thin local grounding override:** If Phase 1.2 triggered external research because local patterns were thin (fewer than 3 direct examples or adjacent-domain match), always proceed to scoring regardless of how grounded the plan appears. When the plan was built on unfamiliar territory, claims about system behavior are more likely to be assumptions than verified facts. The scoring pass is cheap — if the plan is genuinely solid, scoring finds nothing and exits quickly
 - **Load-bearing external research override:** If Phase 1.4 marked external research as load-bearing (it materially shaped a KTD, Alternative, Scope boundary, or Risk), always proceed to scoring — **even when local implementation patterns are strong**. A landscape or prior-art finding can shape recommendations the local codebase cannot verify, and the thin-grounding override above would miss it. This enters the scoring pass only; it does not force deepening
 
-If the plan already appears sufficiently grounded and neither the thin-grounding nor the load-bearing-external-research override applies, report "Confidence check passed — no sections need strengthening", then **load `references/plan-handoff.md` now and execute 5.3.8 → 5.3.9 → 5.4 in sequence**. Document review is mandatory for markdown plans — do not skip it because the confidence check passed. The two tools catch different classes of issues. For HTML plans (`OUTPUT_FORMAT=html`), the plan-handoff 5.3.8 format gate skips ce-doc-review since its mutation mechanics are markdown-only today; the menu summary surfaces that limitation explicitly.
+If the plan already appears sufficiently grounded and neither override applies, report "Confidence check passed — no sections need strengthening", then load `references/plan-handoff.md` and execute 5.3.8 → 5.3.9 → 5.4. Document review remains mandatory for Markdown plans; HTML plans report the current review limitation.
 
 ##### 5.3.3–5.3.7 Deepening Execution
 
 When deepening is warranted, read `references/deepening-workflow.md` for confidence scoring checklists, section-to-agent dispatch mapping, execution mode selection, research execution, interactive finding review, and plan synthesis instructions. Execute steps 5.3.3 through 5.3.7 from that file, then return here for 5.3.8.
 
-##### 5.3.8–5.4 Document Review, Final Checks, and Post-Generation Options
+##### 5.3.8–5.4 Document Review, Final Checks, and Optional Next Steps
 
-**STOP. Load `references/plan-handoff.md` now before continuing.** It carries the full instructions for 5.3.8 (document review), 5.3.9 (final checks and cleanup), and 5.4 (post-generation handoff, including the Publish to Proof flow and Issue Creation branching). **This load is non-optional** — without it, the agent renders the post-generation menu, captures the user's selection, and stops without firing the routed action. Document review at 5.3.8 runs unconditionally for `OUTPUT_FORMAT=md` regardless of whether the confidence check already ran; for `OUTPUT_FORMAT=html`, plan-handoff's 5.3.8 format gate skips ce-doc-review because its mutation mechanics are markdown-only today. The default mode for markdown is headless (`mode:headless`) — `safe_auto` fixes apply silently, remaining findings surface contextually above the menu, and a deeper interactive review is opt-in via free-form prompt.
+Load `references/plan-handoff.md`. Run headless document review for Markdown, final checks, and the concise non-blocking handoff.
 
-After document review and final checks, print a one-line summary of the headless review state above the menu (e.g., `Doc review applied 3 fixes. 2 decisions, 1 proposed fix, 4 FYI observations remain (1 at P1).`; for HTML plans where 5.3.8 was skipped, print `Doc review skipped — ce-doc-review is markdown-only today; the HTML plan was not reviewed.`), then present the menu. Options 1 (`Start /ce-work`) and 2 (`Run it as a /goal`) render only for implementation-ready code plans, and option 2 only when the host has goal capability: Codex has goal capability when `create_goal` is in the available tool list, while Claude Code has goal capability through the user-typed `/goal` command. Do not require Codex to expose a literal slash command. The `Decide on the review's open items` option renders only when actionable findings remain (`proposed_fixes_count + decisions_count > 0`) — the FYI-only and HTML-skip (`skipped_reason: output_format_html`) cases hide it because the walkthrough is gated to actionable markdown findings. See `references/plan-handoff.md` for the full rule. For menu rendering, account for each platform's question-tool option cap instead of trimming choices: Claude Code `AskUserQuestion` supports up to 4 explicit options, and Codex `request_user_input` supports only 2-3 explicit options. When the visible menu exceeds the current platform's cap, render it as a numbered list in chat with the hint "Pick a number or describe what you want." When the visible menu fits the cap, use the platform's blocking tool (`AskUserQuestion` in Claude Code — call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded; `request_user_input` in Codex), with the same numbered-list fallback if the tool is unavailable or errors. Renumber the visible options 1-N. Never silently skip the question.
-
-**Question:** "Plan ready at `<absolute path to plan>`. What would you like to do next?" (use absolute path so the reference is clickable in modern terminals)
-
-**Options.** Option 5's label matches the artifact's format. Under exclusive output mode, exactly one of "Publish to Proof" or "Open in browser" applies per run — `OUTPUT_FORMAT=md` shows Proof; `OUTPUT_FORMAT=html` shows browser. Proof operates on markdown and cannot ingest HTML; the browser option opens the local `.html` file. Render the option matching the format produced this run.
-
-1. **Start `/ce-work`** - Build and ship the plan in this session — subagent-driven development with simplification, code review, and commits. Implementation-ready code plans only.
-2. **Run it as a `/goal`** - Choose this if you'd rather run the plan through your harness's autonomous goal mode instead of ce-work's build-and-ship flow. The alternative to option 1, not an add-on — pick one. Implementation-ready code plans only, and only where the host has goal capability (Codex `create_goal` in the available tool list, or a user-typed `/goal` in Claude Code). Where it can start directly, it does; otherwise it hands over a copy-paste prompt.
-
-**Recommended marker:** `ce-work` (option 1) always carries *(recommended)* and option 2 stays unmarked. `ce-work` is the correctly-layered execution entry point — it owns engine selection and reaches goal or dynamic-workflow engines itself when a plan's shape warrants, so recommending it never forecloses goal mode. Exactly one option carries the marker.
-3. **Decide on the review's open items** - Confirm or skip the suggested edits, and settle the judgment calls the auto-pass left for you. (Safe, mechanical fixes were already applied; you can also defer items into Open Questions.)
-4. **Create Issue** - Create a tracked issue from this plan in your configured issue tracker (e.g., GitHub Issues, Linear, Jira)
-5. **Publish to Proof — shareable link** - Publish the plan to Every's Proof editor and get a shareable link to read, comment on, or share with others. One-way: the local plan file stays canonical. **Render only when `OUTPUT_FORMAT=md`.**
-5. **Open in browser** - Open the HTML plan file locally for review and sharing. **Render only when `OUTPUT_FORMAT=html`.**
-
-**Routing.** Act on the user's selection — do not just announce it. Elaborate sub-flows (Issue Creation tracker detection) live in `references/plan-handoff.md`.
-
-- **Start `/ce-work`** — Offered only when the artifact is `artifact_readiness: implementation-ready` and `execution: code` (not for requirements-only, universal-planning, answer-seeking, or approach-plan outputs). Invoke the `ce-work` skill via the platform's skill-invocation primitive (`Skill` in Claude Code and Codex, the equivalent on Gemini/Pi), passing the plan path as the skill argument; `ce-work` owns engine selection and the tail. If no skill-invocation primitive exists, print the `ce-work` fallback prompt for the user to run. Do not merely tell the user to type `/ce-work` when a skill invocation primitive is available.
-- **Run it as a `/goal`** — Offered on the implementation-ready-code gate, and only where the host has goal capability. In Codex, the presence of `create_goal` in the available tool list is sufficient; do not look for a literal `/goal` slash command. In Claude Code, the capability is user-typed `/goal`. **`ce-work` does not also run.** Build a **thin** objective from the plan here (not from a doc section), pointing to the plan's sections — do **not** copy its resolved decisions, exact commands, or requirements into the prompt (deletion test: if the draft names a specific command, file path, U-ID dependency, stop condition, or DoD item, cut it — it should read the same for any plan except the path), and carry the PR-precedence line instead of a hardcoded open/don't-open directive: implement `<plan-path>` to its Definition of Done; scan headings, don't read the whole doc; read the Goal Capsule then work units in dependency order with their cited R/F/AE/KTD; run the plan's Verification Contract gates and satisfy each unit's test scenarios; track progress outside the plan file; follow the plan's PR/landing strategy if it defines one, with repo conventions and user preferences overriding it; surface a genuine blocker (changes scope or contradicts the plan) instead of guessing, using judgment on details the plan leaves open. If `create_goal` is available, call it with that objective — the session works toward the DoD; do not call `update_goal` (the goal session completes itself). Otherwise (user-typed `/goal` only, e.g. Claude Code), print that objective as a copyable `/goal` prompt for the user to paste, and best-effort copy it to the OS clipboard — hand the prompt off as data (write it to a temp file via a quoted-sentinel here-doc so the shell never evaluates its backticks/`$`, then pipe that file to the first available tool: `pbcopy`/`wl-copy`/`xclip -selection clipboard`/`xsel --clipboard --input`/`clip.exe`; never interpolate the prompt into the command). Only claim it copied when the clipboard command exits 0, say "this machine's clipboard" (a remote/sandboxed session copies to the wrong machine), and keep the printed block as the source of truth. See `references/plan-handoff.md` for the exact snippet. Then return to the menu.
-- **Decide on the review's open items** — Re-invoke the `ce-doc-review` skill on the plan path **without** `mode:headless` so the interactive routing question and walkthrough fire. After it returns, re-render this menu with refreshed counts so the user can pick a next-stage action.
-- **Create Issue** — Detect the project tracker from the project instructions already in your context and create the issue from the plan file as described under "Issue Creation" in `references/plan-handoff.md`. Create the issue through whatever interface the tracker actually exposes — `gh` for GitHub when it's installed and authenticated, otherwise GitHub's connector/MCP tool or API; for Linear, a connector/MCP tool, documented API/GraphQL, or a documented CLI (no guaranteed `linear` CLI). Do not treat a missing binary, env var, or unloaded MCP tool as proof the tracker is unavailable. After creation, display the issue URL and ask whether to proceed to `/ce-work` via the platform's blocking question tool.
-- **Publish to Proof — shareable link** — Load the `ce-proof` skill to publish the plan: create a shared Proof doc from the plan file (title = plan title; identity `ai:andrea-engineering` / `Andrea Engineering`), surface the share URL to the user, then return to this menu. One-way publish — the local plan file stays canonical, nothing syncs back. If the upload fails, see the graceful-fallback note in `references/plan-handoff.md`.
-- **Open in browser** — Display the absolute path to the `.html` plan file so the user can open it locally. Where the platform exposes a browser-opening primitive (e.g., `open` on macOS, `xdg-open` on Linux, `start` on Windows), the agent may use it; otherwise print the absolute path and let the user open it. Do not invoke `ce-work` from this option — the user picked HTML for review/sharing, not handoff.
-
-If the user types free-form prompts targeting the findings (e.g., "review", "walk through", "deep review"), route as if they picked `Decide on the review's open items` — fire the skill rather than looping back to the menu. For other free-text revisions, accept the input and loop back to this menu after applying the revision.
+After document review and final checks, return the absolute plan path and one concise review summary. Mention appropriate optional next steps without presenting a blocking menu or invoking them.
 
 **Final pre-response checklist:** Before sending any response that could end `ce-plan`, verify:
 - Plan file exists on disk
 - Confidence check ran or was intentionally skipped by the interactive re-deepen no-accepted-findings path
 - `ce-doc-review` ran in headless mode, or the documented HTML format gate / interactive re-deepen no-accepted-findings path skipped it
-- Headless review state or documented skip state was summarized above the menu
-- Phase 5.4 menu was presented for software implementation-plan runs, even if the user only asked to create the plan or run doc review, unless pipeline mode returned control to the caller
-- If the user selected an action, the selected routing was executed
+- Headless review state or documented skip state was summarized
+- No downstream action ran without an explicit user request
 
-**Completion check:** This skill is not complete until the post-generation menu above has been presented, the user has selected an action, and the inline routing for that selection has been executed. Presenting the menu and stopping at the user's selection is not completion — fire the routed action.
-
-Incorrect final response: "Created the plan and ran doc review."
-
-Correct terminal handoff: "Created the plan and ran doc review. Plan ready at `<absolute path to plan>`. What would you like to do next?" followed by the numbered handoff options or the platform's blocking question.
-
-**Pipeline mode exception:** In LFG or any `disable-model-invocation` context, skip the interactive menu and return control to the caller after the plan file is written, confidence check has run, and `ce-doc-review` has run in headless mode (per `references/plan-handoff.md`). Pipeline mode forces `OUTPUT_FORMAT=md` at Phase 0.0, so the 5.3.8 format gate never selects the HTML skip path in pipeline runs.
+**Completion check:** The skill is complete when the plan exists, confidence checking and required document review have finished, final checks pass, and the result has been returned. Pipeline mode returns the same completed artifact to its caller.

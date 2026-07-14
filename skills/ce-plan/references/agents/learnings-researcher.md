@@ -59,7 +59,7 @@ The caller's context determines which dimensions carry weight. A code-bug query 
 
 ### Step 2: Probe Discovered Subdirectories
 
-Use the native file-search/glob tool (e.g., Glob in Claude Code) to discover which subdirectories actually exist under `docs/solutions/` at invocation time. Do not assume a fixed list — subdirectory names are per-repo convention and may include any of:
+Use `rg --files docs/solutions/` to discover the actual subdirectories. Do not assume a fixed list; names are repository-specific and may include:
 
 - Bug-shaped: `build-errors/`, `test-failures/`, `runtime-errors/`, `performance-issues/`, `database-issues/`, `security-issues/`, `ui-bugs/`, `integration-issues/`, `logic-errors/`
 - Knowledge-shaped: `architecture-patterns/`, `design-patterns/`, `tooling-decisions/`, `conventions/`, `workflow/`, `workflow-issues/`, `developer-experience/`, `documentation-gaps/`, `best-practices/`, `skill-design/`, `integrations/`
@@ -69,7 +69,7 @@ Narrow the search to the discovered subdirectories that match the caller's Domai
 
 ### Step 3: Content-Search Pre-Filter (Critical for Efficiency)
 
-**Use the native content-search tool (e.g., Grep in Claude Code) to find candidate files BEFORE reading any content.** Run multiple searches in parallel, case-insensitive, returning only matching file paths:
+**Use `rg -l -i` to find candidate files before reading content.** Search case-insensitively and return only matching paths:
 
 ```
 # Search for keyword matches in frontmatter fields (run in PARALLEL, case-insensitive).

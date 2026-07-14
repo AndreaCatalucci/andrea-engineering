@@ -25,7 +25,7 @@ This is not a software plan template (no implementation units / test scenarios) 
 
 ## Stage 3: Checkpoint
 
-Hold at the approach. Use the platform's blocking question tool (`AskUserQuestion` in Claude Code — call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded; `request_user_input` in Codex; `ask_question` in Antigravity CLI (`agy`)/Pi). Fall back to numbered options in chat only when no blocking tool exists or the call errors — never silently skip.
+Hold at the approach. Use `request_user_input` when available; otherwise ask in chat and wait.
 
 **Sequence orthogonal axes** rather than cramming them into one menu (per the "split orthogonal decisions" rule and the 4-option cap):
 
@@ -42,7 +42,7 @@ Hold at the approach. Use the platform's blocking question tool (`AskUserQuestio
 
 1. Write the marker `execution: knowledge-work` into the plan frontmatter.
 2. **Persist** the marked plan to `docs/plans/` (the marker needs a file to live in so it can travel — R7's file-optional governs the user keeping a chat-only copy, but non-code *execution* forces a persist).
-3. Fire the `ce-work` skill, passing the plan path, via the platform's skill-invocation primitive (`Skill` in Claude Code). Do not merely tell the user to run it — fire it so execution happens in this session.
+3. Return the saved plan path. Run `ce-work` only after a later explicit user request.
 
 `ce-plan` itself does not execute the deliverable in any path — it produces the approach-plan and hands off. The portable plan is also runnable by any other agent without `ce-work`.
 

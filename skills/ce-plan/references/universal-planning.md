@@ -82,13 +82,13 @@ Evaluate two things before planning:
 | Research need | Signals | Action |
 |--------------|---------|--------|
 | **None** | Generic, timeless, or conceptual plan (study curriculum methodology, project management approach, personal goal breakdown) | Skip research. Model knowledge is sufficient. After structuring the plan, offer: "I based this on general knowledge. Want me to search for [specific thing research would improve]?" — e.g., sourced recipes, current product recommendations, expert frameworks. Only if the user accepts. |
-| **Recommended** | Plan references specific locations, venues, dates, prices, schedules, seasonal availability, or current events — anything where stale information would break the plan (closed restaurants, changed prices, cancelled events, wrong seasonal dates). | Research before planning. Decompose into 2-5 focused research questions and dispatch parallel web searches. In Claude Code, use the Agent tool with `model: "haiku"` for each search to reduce cost. Collate findings before structuring the plan. |
+| **Recommended** | Plan references specific locations, venues, dates, prices, schedules, seasonal availability, or current events — anything where stale information would break the plan. | Research before planning with the root agent, then collate findings before structuring the plan. |
 
 When research is recommended, do it — don't just offer. Stale recommendations (closed restaurants, rethemed attractions, outdated prices) are worse than no recommendations. The user invoked `/ce-plan` because they want a good plan, not a disclaimer about training data.
 
 **Research decomposition pattern:**
 1. Identify 2-5 independent research questions based on the task. Good questions target facts the model is least confident about: current prices, hours, availability, recent changes, seasonal specifics.
-2. Dispatch parallel research. Prefer user-named surfaces first per Core Principle 8 in SKILL.md; fall back to web search for questions those surfaces don't cover.
+2. Research the questions in the root agent. Prefer user-named surfaces first; use web search for gaps.
 3. Collate findings into a brief research summary before proceeding to planning.
 
 Example for "plan a date night in Seattle this Saturday":
@@ -98,7 +98,7 @@ Example for "plan a date night in Seattle this Saturday":
 
 ## Step 1b: Focused Q&A
 
-Ask up to 3 questions targeting the unknowns that would most change the plan. Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension). Fall back to numbered options in chat only when no blocking tool exists or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
+Ask up to 3 questions targeting the unknowns that would most change the plan. Use `request_user_input` when available; otherwise ask in chat and wait.
 
 **How to ask well:**
 - Offer informed options, not open-ended blanks. Instead of "When are you going?", try "Mid-week visits have 30-40% shorter lines — are you flexible on timing?" The question should give the user a frame of reference, not just extract information.
@@ -145,24 +145,6 @@ Example: A date night plan should present 2-3 restaurant options, 2-3 activity o
   - Research plan for investigations (questions, methods, sources)
   - Options menu for preference-driven tasks (curated picks per category)
 
-## Step 3: Save or Share
+## Step 3: Deliver
 
-After structuring the plan, ask the user how they want to receive it using the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension). Fall back to numbered options in chat only when no blocking tool exists or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
-
-**Question:** "Plan ready. How would you like to receive it?"
-
-**Options:**
-
-1. **Save to disk** — Write the plan as a markdown file. Ask where:
-   - `docs/plans/` (only show if this directory exists)
-   - Current working directory
-   - `/tmp`
-   - A custom path
-   - Use filename convention: `YYYY-MM-DD-<descriptive-name>-plan.md`
-   - Start the document with a `# Title` heading, followed by `Created: YYYY-MM-DD` on the next line. No YAML frontmatter.
-
-2. **Publish to Proof — shareable link** — Publish the doc to Every's Proof editor and get a shareable link to read, comment on, or share with others. Load the `ce-proof` skill to create the shared document and return the URL. One-way: nothing syncs back to disk.
-
-3. **Save to disk AND publish to Proof** — Do both: write the markdown file to disk and publish a shareable Proof copy for review. The local file stays canonical.
-
-Do not offer `/ce-work` (software-only) or issue creation (not applicable to non-software plans).
+Return the completed plan in chat. Save or publish it only when the user explicitly requested that output.

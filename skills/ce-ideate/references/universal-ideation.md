@@ -57,7 +57,7 @@ Record the axes (or skip-reason) at the head of generation. Generation will dist
 
 ## How to generate
 
-Generate the full candidate list before critiquing any idea. Use the same six frames as software ideation, described in domain-agnostic language. Each frame is a **starting bias, not a constraint** — follow promising threads across frames. When dispatching frames as parallel sub-agents (Full depth), follow SKILL.md Model Tiers: evidence-driven frames (pain, inversion, leverage) on the generation tier; ceiling frames (assumption-breaking, analogy, constraint-flipping) on the ceiling tier.
+Generate the full candidate list before critiquing any idea. Use the same six frames as software ideation, described in domain-agnostic language. Each frame is a **starting bias, not a constraint** — follow promising threads across frames. At Full depth, dispatch the six frames in parallel using the inherited Codex model.
 
 - **Pain and friction** — what is consistently annoying, slow, or broken in the current state of the topic? Generate ideas that remove or reduce that friction.
 - **Inversion, removal, automation** — what would happen if a step were inverted, removed entirely, or automated away? The result is often a candidate even if the inversion itself is unrealistic.
@@ -70,38 +70,28 @@ Aim for 5-8 ideas per frame. **When axes are present, distribute ideas across ax
 
 **Axis-coverage check (when axes are present).** After merging, count ideas per axis. If any axis has zero ideas, generate one additional small batch (3-5 ideas) targeting the empty axis with the frame whose lens best fits — Pain & friction for usability gaps, Cross-domain analogy for distribution or compounding gaps, etc. Cap recovery at 2 axes; beyond that, accept thin coverage rather than fan out. Note any axis that was not recovered in the rejection summary so the gap is visible.
 
-**Per-idea output contract (mirrors the software-mode contract in `references/divergent-ideation.md`):** each idea carries title, summary, **axis** (when decomposition produced an axis list — pick the one this idea most centrally targets; omit when skipped), **basis** (required, tagged `direct:` quoted evidence / `external:` named prior art or domain research / `reasoned:` written-out first-principles argument), why-it-matters connecting the basis to the move's significance, and a one-line meeting-test self-check (waived when tactical focus signals were detected in Phase 0.5). Basis is required, not optional — unjustified speculation does not surface.
+**Compact candidate contract (mirrors `references/divergent-ideation.md`):** return title, a one-sentence concrete move, **axis** when decomposition produced one, a required tagged **basis** (`direct:`, `external:`, or `reasoned:`), and one line of significance. Do not pre-write final-artifact prose for raw candidates. The root agent develops only survivors after verification.
 
 **Generation rules:**
 
 - Every idea carries an articulated basis. The failure mode to prevent is plausible-sounding speculation that lacks any basis the user can verify.
 - Aim past the obvious. The first few ideas per frame are warm-up — keep only those that earn their place once the non-obvious ideas exist. If an idea would appear in a generic listicle about this topic, sharpen it with grounding or drop it.
 - Bias toward the basis type your frame naturally produces — pain/inversion/leverage tend toward `direct:`; analogy and constraint-flipping tend toward `reasoned:` — but don't exclude other types. When a frame produces a reasoned basis, write the argument out, don't gesture at it.
-- Apply the meeting-test as a default floor: would this idea warrant the equivalent of team discussion (or whatever maps to "worth talking through" in this topic's native domain)? If not, it's below the floor and does not surface. The floor is relaxed only when Phase 0.5 detected tactical focus signals.
+- Apply the meeting-test internally as a default floor, but do not emit a self-attestation field; the independent verifier judges it. The floor is relaxed only when Phase 0.5 detected tactical focus signals.
 - Stay within the subject's identity. Expansions, new surfaces, new directions, retirements are fair game when the basis supports them. Subject-replacement moves (abandoning the subject, pivoting to an unrelated domain) are out regardless of basis.
 
 **Surprise-me mode in this reference.** When Phase 0.2 routed to surprise-me, there is no user-specified subject. Through each frame's lens, explore the Phase 1 grounding (user-context synthesis + web research) and identify the subject(s) you find most interesting for that lens. Different frames finding different subjects is the feature. The basis may include identification of the subject itself — why this subject is worth ideating on through this lens, citing what in the Phase 1 material signals it.
 
 ## How to converge
 
-Before the final cut, dispatch one fresh-context basis verifier (generation tier — see SKILL.md Model Tiers) whose payload is only the grounding summary and the candidate list, prompted to refute: bases that don't support the claimed move, prior art that isn't real or relevantly analogous, reasoned arguments that don't hold. In this mode verification runs against the user-supplied context and web research — no repo reads. Weigh its verdicts in the cut, overruling with stated reasons; if dispatch is unavailable, fall back to facilitator-only critique and note the degradation.
+Before the final cut, dispatch one fresh-context basis verifier using the inherited Codex model. Its payload is only the grounding summary and candidate list, and it attempts to refute bases that do not support the claimed move, prior art that is not real or relevantly analogous, and reasoned arguments that do not hold. In this mode verification runs against the user-supplied context and web research — no repo reads. Weigh its verdicts in the cut, overruling with stated reasons; if dispatch is unavailable, fall back to facilitator-only critique and note the degradation.
 
 Apply adversarial critique. For each candidate, write a one-line reason if rejected. **Basis-integrity check:** reject any idea lacking an articulated basis, any idea whose stated basis does not actually support the claimed move (speculation dressed as ambition), and any idea that replaces the subject rather than operating on it. Score survivors using a consistent rubric weighing: groundedness in stated context, **basis strength** (`direct:` > `external:` > `reasoned:`; none excluded, but direct-evidence ideas score higher all else equal), expected value, novelty, pragmatism, leverage, implementation burden, overlap with stronger candidates, and **axis spread** (when axes were defined) — survivor sets that cover the topic's surface outscore sets that cluster on one axis, all else equal. Axis spread is a list-level concern, not a per-idea reject reason; apply it after per-idea filtering when choosing among comparable candidates.
 
 Target 5-7 survivors by default. If too many survive, run a second stricter pass. If fewer than five survive, report that honestly rather than lowering the bar.
 
+After the cut, expand only the survivors into the final artifact fields: concrete description, rationale, downsides, confidence, and complexity. Preserve their verified basis and axis; do not invent support while polishing.
+
 ## When to wrap up
 
-Wrap up with the same flow as `references/post-ideation-workflow.md` Phases 4–5 — the mechanics are identical in this mode:
-
-- **Auto-write the deliverable** (Phase 4.1). The full per-idea detail (title, description, axis, basis, rationale, downsides, confidence, complexity) and the rejection summary go in the **file** — persistence is automatic, not opt-in. Location: `docs/ideation/` when it already exists, otherwise the run's CE temp area (`/tmp/andrea-engineering/ce-ideate/<run-id>/`) — never the user's CWD. `OUTPUT_FORMAT` (SKILL.md Phase 0.0; default `html`) sets the extension.
-- **Present a concise summary** (Phase 4.2) — the ranked list (title · axis · confidence · complexity), counts, the path, and any zero-survivor axis. Do not reprint the full detail in the session; the rich file is what the user engages with. For HTML, best-effort open it in the browser (Phase 4.3).
-
-Then offer the Phase 5 next-steps menu via the platform's blocking question tool (`AskUserQuestion` in Claude Code — call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded; `request_user_input` in Codex; `ask_question` in Antigravity CLI (`agy`) / Pi). Fall back to a numbered list only when no blocking tool exists or the call errors. Never silently skip. Four options, option 1 format-keyed:
-
-1. **Open in browser** *(html)* / **Publish to Proof** *(md)* — open the HTML deliverable, or publish the markdown to Proof for a shareable link (per §5.1). On Proof failure the auto-written local file stays intact.
-2. **Brainstorm one idea with `ce-brainstorm`** — go deeper on one chosen idea (asks which). In universal mode this is **not** the first step of an implementation chain — there is no `ce-plan` → `ce-work` after; `ce-brainstorm` develops the idea further (a name into a brand brief, a plot into an outline, a decision into a weighed framework) and ends there. Seed it with the idea's substance + a provenance pointer (per §5.2) — not the whole file.
-3. **Discuss or refine the ideas first** — stay here to think across the set before committing: adjust or interrogate one idea, compare several, or combine/merge them (per §5.3). Adjustments and merges rewrite the file; Q&A and comparison do not.
-4. **Done — keep the file and stop.**
-
-Discard is a free-text escape ("say 'discard' to delete it"), create-only — never deletes a resumed or pre-existing doc.
+Load `references/post-ideation-workflow.md` and follow Phase 4 to write and deliver the artifact. End after the compact summary; do not open, publish, commit, delete, or present an action menu. If the user later selects an idea, use that reference's compact handoff and route it to `ce-brainstorm` for further development.

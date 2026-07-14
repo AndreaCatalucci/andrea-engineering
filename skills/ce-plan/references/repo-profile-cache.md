@@ -11,7 +11,7 @@ A single JSON object, versioned by `profile_schema_version`:
 - **Stack & versions** — languages, major frameworks + versions, build/test tooling.
 - **Dependency surface** — manifest + lockfile paths, top-level dependencies, project license + dependency licenses.
 - **Topology** — monorepo/workspace map, deployment model, API styles, data stores, module layout.
-- **Conventions & instruction files** — paths + digests of the *root* `AGENTS.md`/`CLAUDE.md`/`GEMINI.md`/`ARCHITECTURE.md`/`README.md`/`CONTRIBUTING.md`/`STRATEGY.md`.
+- **Conventions & instruction files** — paths and digests of root `AGENTS.md`, `ARCHITECTURE.md`, `README.md`, `CONTRIBUTING.md`, and `STRATEGY.md`.
 - **Vocabulary** — `CONCEPTS.md` canonical terms.
 
 ## What is NOT cached (always re-globbed fresh)

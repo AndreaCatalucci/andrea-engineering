@@ -16,13 +16,9 @@ This file contains the shipping workflow (Phase 3-4). It is loaded when all Phas
    # Use linting-agent before pushing to origin
    ```
 
-2. **Simplify** (conditional — separate from code review)
+2. **Confirm simplification coverage**
 
-   Before code review, invoke **`ce-simplify-code`** when the diff is non-mechanical and large enough to benefit (default: **>=30 changed lines**). Skip when the diff is purely mechanical (formatting, dependency bumps, lint-only fixes, generated artifacts).
-
-   This step refines reuse, quality, and efficiency on the **current diff** so any later review sees cleaner code. It is not a substitute for code review.
-
-   Pass `plan:<path>` or a scope hint when the plan or user narrowed what changed. If the skill is unavailable on the harness, skip or do a brief manual pass for obvious duplicate/dead code — code review (step 3) still runs regardless.
+   Follow the cadence in `ce-work`'s **Simplify as You Go** step. Do not repeat a completed three-reviewer pass unless production code changed materially afterward.
 
 3. **Code Review**
 
@@ -117,7 +113,7 @@ Before creating PR, verify:
 - [ ] Validation/evidence context passed to `ce-commit-push-pr` when the change has observable behavior
 - [ ] Commit messages follow conventional format
 - [ ] PR description includes Post-Deploy Monitoring & Validation section (or explicit no-impact rationale)
-- [ ] Simplify: `ce-simplify-code` when diff >=30 lines (or skipped with reason)
+- [ ] Simplification cadence satisfied; the latest pass covered reuse, quality, and efficiency
 - [ ] Code review: `ce-code-review` ran (self-sized), or skipped (mechanical diff / unavailable — noted in summary); residuals handled via the Residual Work Gate
 - [ ] PR description includes summary, testing notes, and evidence when captured
 - [ ] PR description includes Compound Engineered badge with accurate model and harness

@@ -22,31 +22,11 @@
 # pulse_excluded_metrics: "north_star"                  # comma-separated strategy metrics intentionally not in pulse
 
 # --- Output format ---
-# Per-skill output format default. Selects the exclusive format the artifact
-# is written in: `md` produces a markdown file, `html` produces a single
-# self-contained HTML file. The two are mutually exclusive -- there is no
-# sibling artifact. See DESIGN.md or your agent instructions to influence
-# HTML styling. Precedence: a format request in your prompt for that run wins
-# (e.g. "output:html" or "make it HTML"); a preference you established earlier
-# (in-session, saved to memory, or in your agent instructions) overrides these
-# keys (this config is the persisted fallback); pipeline contexts (e.g., LFG,
-# disable-model-invocation) always force `md`.
+# Persisted output defaults for skills that support them. A format request in
+# the current prompt wins. Each run writes one format, not sibling artifacts.
 
 # plan_output: html              # md | html (default: md)
 # brainstorm_output: html        # md | html (default: md)
-# ideate_output: md              # md | html (default: html -- ideation docs are human-facing, so HTML is the default; set md to opt out)
-
-# --- Fable elevation (Claude Code only) ---
-# Claude Code ONLY; silently ignored on every other harness (Codex, Cursor, ...).
-# When on, /ce-plan and /ce-brainstorm dispatch their reasoning-heavy step (plan
-# authoring; approach generation) to the Fable model via a subagent, so you get
-# higher-reasoning output even when your session model is cheaper -- no session
-# switch. Per-skill so you can enable one without the other. You can also just
-# say "use fable" in a prompt for a one-off. Invalid/commented/missing -> off.
-
-# plan_use_fable: true           # true | false (default: false)
-# brainstorm_use_fable: true     # true | false (default: false)
-# fable_nudge: false             # true | false (default: true -- one-time tip when elevation is available but off)
 
 # --- PR concept teaching (ce-commit-push-pr) ---
 # When a PR introduces a concept new to the codebase, the generated PR
@@ -71,9 +51,8 @@
 # summary and wait for you to confirm scope. Set this to skip that wait: ce-plan
 # composes the summary for itself, records any inferred scope under an
 # Assumptions section, announces that it's proceeding, and keeps going. It skips
-# only that confirmation -- genuine blocking questions and the post-plan menu
-# still appear. Override per run with `confirm:auto` (skip) or `confirm:ask`
-# (force the gate on for one run).
+# only that confirmation; genuine blocking questions still apply. Override per
+# run with `confirm:auto` (skip) or `confirm:ask` (force the gate on).
 
 # plan_skip_scoping_confirm: true   # true | false (default: false)
 

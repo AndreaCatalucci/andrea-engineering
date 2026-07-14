@@ -7,27 +7,19 @@ set -o pipefail
 # =====================================================
 #  Optional capability config
 # =====================================================
-# Format: name|install_cmd|url|capability
+# Format: name|capability
 
 deps=(
-  "agent-browser|CI=true npm install -g agent-browser --no-audit --no-fund --loglevel=error && agent-browser install|https://github.com/vercel-labs/agent-browser|browser testing, dogfood QA, and visual polish inspection"
-  "gh|NONINTERACTIVE=1 HOMEBREW_NO_AUTO_UPDATE=1 brew install -q gh|https://cli.github.com|GitHub PR, issue, and review workflows"
-  "jq|NONINTERACTIVE=1 HOMEBREW_NO_AUTO_UPDATE=1 brew install -q jq|https://jqlang.github.io/jq/|JSON inspection in shell-based workflows"
-  "ast-grep|NONINTERACTIVE=1 HOMEBREW_NO_AUTO_UPDATE=1 brew install -q ast-grep|https://ast-grep.github.io|syntax-aware structural code search"
-  "ffmpeg|NONINTERACTIVE=1 HOMEBREW_NO_AUTO_UPDATE=1 brew install -q ffmpeg|https://ffmpeg.org/download.html|media chunking and screenshot extraction for Riffrec analysis"
+  "agent-browser|browser testing, dogfood QA, and visual polish inspection"
+  "gh|GitHub PR, issue, and review workflows"
+  "jq|JSON inspection in shell-based workflows"
+  "ast-grep|syntax-aware structural code search"
+  "ffmpeg|media chunking and screenshot extraction for Riffrec analysis"
 )
 
 # =====================================================
 #  Args
 # =====================================================
-
-plugin_version=""
-while [ $# -gt 0 ]; do
-  case "$1" in
-    --version) [ -n "$2" ] && plugin_version="$2" && shift 2 || shift ;;
-    *) shift ;;
-  esac
-done
 
 # =====================================================
 #  Helpers
@@ -36,10 +28,8 @@ done
 ok()      { echo "  🟢  $1"; }
 warn()    { echo "  🟡  $1"; }
 skip()    { echo "  ➖  $1"; }
-detail()  { echo "       $1"; }
 section() { echo ""; echo " $1"; }
 
-has_brew=$(command -v brew >/dev/null 2>&1 && echo "yes" || echo "no")
 in_repo=$(git rev-parse --is-inside-work-tree >/dev/null 2>&1 && echo "yes" || echo "no")
 
 # =====================================================
@@ -52,14 +42,13 @@ capability_missing=0
 results=()
 
 for entry in "${deps[@]}"; do
-  IFS='|' read -r name install_cmd url capability <<< "$entry"
+  IFS='|' read -r name capability <<< "$entry"
   capability_total=$((capability_total + 1))
   if command -v "$name" >/dev/null 2>&1; then
     capability_ok=$((capability_ok + 1))
-    results+=("$name|ok|$install_cmd|$url|$capability")
   else
     capability_missing=$((capability_missing + 1))
-    results+=("$name|missing|$install_cmd|$url|$capability")
+    results+=("$name|$capability")
   fi
 done
 
@@ -105,26 +94,16 @@ fi
 # =====================================================
 
 echo ""
-if [ -n "$plugin_version" ]; then
-  ok "Plugin version v${plugin_version}"
-fi
-
 section "Optional capabilities  ${capability_ok}/${capability_total}"
 
-for result in "${results[@]}"; do
-  IFS='|' read -r name status install_cmd url capability <<< "$result"
-  if [ "$status" = "ok" ]; then
-    ok "$name -- $capability"
-  else
-    warn "$name -- unavailable: $capability"
-    if [[ "$install_cmd" == *"brew install"* ]] && [ "$has_brew" != "yes" ]; then
-      detail "$url"
-    else
-      detail "$install_cmd"
-      detail "$url"
-    fi
-  fi
-done
+if [ "$capability_missing" -eq 0 ]; then
+  ok "All optional tools available"
+else
+  for result in "${results[@]}"; do
+    IFS='|' read -r name capability <<< "$result"
+    warn "$name missing -- affects $capability"
+  done
+fi
 
 if [ "$in_repo" = "yes" ]; then
   section "Project config"
@@ -132,30 +111,23 @@ if [ "$in_repo" = "yes" ]; then
   if [ "$legacy_cfg" = "present" ]; then
     warn "Obsolete andrea-engineering.local.md exists"
     project_issues=$((project_issues + 1))
-  else
-    ok "No obsolete andrea-engineering.local.md"
   fi
 
-  if [ "$local_cfg" = "present" ]; then
-    ok ".andrea-engineering/config.local.yaml exists"
-    if [ "$repo_cfg_gitignore" = "ok" ]; then
-      ok "Local config is gitignored"
-    else
-      warn "Local config is not safely gitignored"
-      project_issues=$((project_issues + 1))
-    fi
-  else
-    skip "No local config yet (.andrea-engineering/config.local.yaml)"
+  if [ "$local_cfg" = "present" ] && [ "$repo_cfg_gitignore" != "ok" ]; then
+    warn "Local config is not safely gitignored"
+    project_issues=$((project_issues + 1))
   fi
 
-  if [ "$example_cfg" = "ok" ]; then
-    ok "Example config is current"
-  elif [ "$example_cfg" = "missing" ]; then
+  if [ "$example_cfg" = "missing" ]; then
     warn "Example config missing (.andrea-engineering/config.local.example.yaml)"
     project_issues=$((project_issues + 1))
   elif [ "$example_cfg" = "outdated" ]; then
     warn "Example config outdated (new settings available)"
     project_issues=$((project_issues + 1))
+  fi
+
+  if [ "$project_issues" -eq 0 ]; then
+    ok "Project config healthy"
   fi
 else
   section "Project config"

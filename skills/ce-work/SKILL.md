@@ -126,7 +126,7 @@ Determine how to proceed based on what was provided in `<input_document>` (after
    - You plan to switch between branches frequently
 
 3. **Create Task List** _(skip if Phase 0 already built one, or if Phase 0 routed as Trivial)_
-   - Use the platform's task tracking tool (`TaskCreate`/`TaskUpdate`/`TaskList` in Claude Code, `update_plan` in Codex, or the equivalent on other harnesses) to break the plan into actionable tasks
+   - Use `update_plan` to break the plan into actionable tasks
    - Derive tasks from the plan's implementation units, dependencies, files, test targets, and verification criteria
    - When the plan defines U-IDs for Implementation Units, preserve the unit's U-ID as a prefix in the task subject (e.g., "U3: Add parser coverage"). This keeps blocker references, deferred-work notes, and final summaries anchored to the same identifier the plan uses, so progress and traceability remain unambiguous across plan edits
    - Carry each unit's `Execution note` into the task when present
@@ -138,60 +138,46 @@ Determine how to proceed based on what was provided in `<input_document>` (after
    - Include testing and quality check tasks
    - Keep tasks specific and completable
 
-4. **Choose Execution Engine, then Strategy**
+4. **Choose Execution Strategy**
 
-   For an implementation-ready unified code plan, first pick the **engine** that runs implementation: inline/subagent (default and only callable engine on Claude Code), goal-mode, or dynamic-workflow. Goal-mode and dynamic-workflow are usable only when the host exposes a callable primitive for them — Codex exposes `create_goal` (a skill can start a goal directly), while Claude Code exposes no goal tools, so on Claude Code they are prompt-emission only (never invoked from inside this skill). Prefer dynamic-workflow over goal-mode for large fan-out plans (many independent U-IDs, codebase-wide sweeps, migrations, adversarial cross-checking). Read `references/execution-engines.md` for the host-capability probe, the plan-shape selection table, the copyable goal-mode/`ultracode:` prompts, and the resume-tail rules. An engine choice never changes tail ownership — after implementation, resume standalone quality gates in normal use, or return the return-to-caller envelope when invoked by `lfg`. Legacy and bare-prompt work skip this and use the inline/subagent engine directly.
+   Execute inline by default. Delegate only substantial, independent units with clear ownership and independent verification. Use the plan's `Dependencies` and `Files` to batch delegated units safely.
 
-   For the inline/subagent engine, **prefer subagents for any structured multi-unit plan** — each worker gets a fresh context window for one unit. **Parallelize independent units whenever it is safe**; fall back to serial only when parallel isn't safe or the harness can't isolate concurrent writes. Let the plan's `Dependencies` and `Files` drive batching: run an independent dependency layer together, then the next.
+   Use `create_goal` only when the user explicitly requests goal execution. Otherwise, do not start a goal.
 
    | Strategy | When to use |
    |----------|-------------|
-   | **Inline** | Trivial work (1-2 files, no real decomposition), work needing user interaction mid-flight, or bare prompts that lack structured units |
-   | **Serial subagents** | The default for structured multi-unit plans whose units are dependent, few, or whose parallel-safety is uncertain. Fresh context per unit, executed in dependency order |
-   | **Parallel subagents** | Independent units (per the Parallel Safety Check) when you want the speed and the harness can isolate concurrent work. Run a dependency layer at once, then the next |
+   | **Inline** | Default, including dependent or cross-cutting units |
+   | **Serial subagents** | Substantial self-contained units that benefit from fresh context but must execute in order |
+   | **Parallel subagents** | Substantial independent units with clear ownership and independent verification; follow the Parallel Safety Check |
 
    **Parallel Safety Check** — before dispatching a batch in parallel:
 
    1. Map files to units from each candidate unit's `Files:` section (Create/Modify/Test paths).
    2. **File overlap is necessary but not sufficient.** Also serialize units that contend on things absent from `Files:`: shared types/APIs/interfaces, DB migrations, generated artifacts or clients, lockfiles, snapshots, shared config/schema — or an **environment singleton** (one dev server/port, a shared database, browser sessions, package installs, MCP rate limits). Reason about these; don't just diff paths.
    3. **No contention:** dispatch the batch in parallel.
-   4. **Contention with harness-native isolation:** parallel is *recoverable* (isolated workers don't lose each other's writes) but **not automatically safe** — overlapping edits still need a real merge. Serialize contending units by default; run them parallel-isolated only when the expected merge is trivial. Log the predicted overlap.
-   5. **Contention without isolation (shared workspace):** serialize — in a shared directory only the last writer survives.
-   6. **Cap concurrency** at a bounded batch (~3-5 workers) even when more units are independent; over-parallelizing costs more in contention, merge, and integration than it saves.
-   7. **Abort criteria:** if a batch produces broad unplanned edits, out-of-scope test failures, or repeated conflicts, stop parallelizing and finish the rest serially.
+   4. **Contention:** serialize — Codex subagents share the working directory, so only the last writer survives overlapping edits.
+   5. **Cap concurrency** at a bounded batch even when more units are independent; over-parallelizing costs more in contention and integration than it saves.
+   6. **Abort criteria:** if a batch produces broad unplanned edits, out-of-scope test failures, or repeated conflicts, stop parallelizing and finish the rest inline.
 
-   **Isolation is the harness's job, never ce-work's** — never run `git worktree add` yourself. Probe what your subagent mechanism provides and pick the parallel path:
-   - **Harness-native isolated workers** — each worker edits an isolated workspace the harness manages: Claude Code `Agent` tool (`isolation: "worktree"` + `run_in_background: true`; worktree under a gitignored `.claude/worktrees/`), Codex `spawn_agent` (a coding **worker** edits its forked workspace), Cursor `best-of-n-runner`. Parallelize freely here, including overlapping-file units (subject to the Safety Check's merge-cost judgment). This works even when you are *already* inside a worktree — harness worktrees are peers of one repo, not nested, branched from your current HEAD.
-   - **Shared workspace only** — subagents run in your working directory (Cursor `Task` default, or any harness without isolation). Parallelize **disjoint-file units only**, under the shared-workspace constraints below; contending units run serial.
-   - **No subagent mechanism:** run inline.
-
-   **Dispatch** uses your harness's subagent/worker mechanism. Give each worker:
+   Dispatch with `spawn_agent`; if unavailable, execute inline. Give each worker:
    - The plan path plus a **bounded unit packet** — Goal Capsule, Definition of Done, the unit's section, the Verification Contract entries relevant to it, and any referenced R/F/AE/KTD excerpts. Do not send "read the whole plan" as the worker prompt. (For a legacy non-unified plan, the plan path for reference is acceptable.)
    - The unit's Goal, Files, Approach, Execution note, Patterns, Test scenarios, Verification, and any resolved deferred questions for it.
    - Instruction to check whether the unit's test scenarios cover all applicable categories (happy paths, edge cases, error paths, integration) and supplement gaps before writing tests.
    - **Instruction to choose the unit's evidence strategy and gather the evidence** (see Evidence Strategy in Phase 2) — for behavior-bearing changes, honor the Execution note and default to proof-first or characterization-first: create/update/strengthen the test and observe the red failure or characterization baseline **before** changing production code. The worker is the only party that witnesses this, so it must capture it as it goes.
-   - **Instruction to report, in its final message, both (a) the file paths it changed and (b) the unit's verification evidence** — `behavior_changed`, existing tests inspected, tests added/changed or used unchanged, the red failure or characterization observed (when applicable), the verification run and result, and any deliberate no-test exception with its reason. The handoff is a text summary on most harnesses with no guaranteed diff, so reported paths are the orchestrator's starting hint (it still verifies the actual tree); the evidence fields are **not** reconstructable from the tree afterward, so a worker that omits them forces the orchestrator to re-derive or leave `verification_evidence` incomplete.
-   - **Do not commit.** Workers implement and may run their *own unit's* focused tests in isolation as a self-check, but the **orchestrator owns staging, committing, and the authoritative test runs**. (Capability note: a harness that *reaps* the isolated workspace on worker completion — none of our current targets do — would instead require the worker to commit to its branch; confirm before assuming it.)
+   - **Instruction to report, in its final message, both (a) the file paths it changed and (b) the unit's verification evidence** — `behavior_changed`, existing tests inspected, tests added/changed or used unchanged, the red failure or characterization observed (when applicable), the verification run and result, and any deliberate no-test exception with its reason. Reported paths are a hint; the orchestrator verifies the actual tree. Evidence that exists only in the worker's observation cannot be reconstructed afterward.
+   - **Do not commit.** Workers may run their unit's focused tests, but the orchestrator owns staging, commits, and authoritative test runs.
 
-   **Shared-workspace constraints** — when subagents share your working directory (no isolation): they must not `git add`, commit, or run the full test suite concurrently (index corruption + test interference); the orchestrator does all of that after the batch. A worker may run a single focused unit test only if it touches no shared state.
-
-   **Permission mode:** Omit the `mode` parameter when dispatching subagents so the user's configured permission settings apply. Do not pass `mode: "auto"` — it overrides user-level settings like `bypassPermissions`.
+   **Shared-workspace constraints:** workers must not `git add`, commit, or run the full test suite concurrently. A worker may run a focused unit test only when it touches no shared state.
 
    **After each serial unit:** review the diff against the unit's scope and `Files:`, run the relevant tests, fix before dispatching the next (never on a broken tree), record the unit's verification evidence from the worker's return (for the Phase 2 `verification_evidence` roll-up), update the task list (never edit the plan body — progress lives in commits), and commit. Then dispatch the next unit.
 
    **After a parallel batch — the orchestrator integrates; never trust the handoff summary alone:**
    1. Wait for every worker in the batch to finish.
    2. **Inspect the actual tree, not reported paths.** Determine what each worker really changed (`git status`/diff in its workspace or the shared dir). Reported paths are a hint; declared `Files:` are often incomplete — workers create/modify files the plan didn't anticipate.
-   3. **Detect real collisions** — 2+ workers that actually modified the same file. In a shared workspace only the last writer survived: commit the non-colliding work first, then re-run the colliding units serially so each builds on the other's committed result. With harness-native isolation the collision surfaces as a merge conflict at integration instead (see the per-harness note).
+   3. **Detect real collisions** — 2+ workers that modified the same file. Commit the non-colliding work first, then re-run colliding units inline so each builds on the other's committed result.
    4. **Review, test, and commit each unit in dependency order — the orchestrator owns commits.** Stage only that unit's files, commit with a message derived from its Goal, run the relevant tests, and fix before the next. Capture each worker's returned verification evidence into the run's `verification_evidence` roll-up — if a worker omitted it, re-derive what the tree allows and mark the rest as unverified rather than fabricating a red-before-implementation observation the worker never reported.
    5. Update the task list (progress lives in the commits).
-   6. **Release the workers** — close/clean up each worker handle so it stops holding a concurrency slot or leaving orphans (e.g., Codex `close_agent`; for a Claude per-worker worktree: `git worktree unlock <path>` → `git worktree remove <path>` → `git branch -d <branch>`). These isolated worktrees are peers invisible to any outer orchestrator (e.g., Orca), so cleanup is entirely ce-work's.
-   7. Dispatch the next dependency layer.
-
-   **Per-harness integration (examples — the universal flow above is the contract):**
-   - **Claude `Agent` `isolation:"worktree"`:** each worker is on its own branch. Integrate by merging each branch into the orchestrator's branch in dependency order; on conflict, `git merge --abort` and re-run that unit serially against the merged tree (hand-resolving silently discards one unit's intent).
-   - **Codex `spawn_agent` worker:** integrate the worker's "uploaded changes," then `close_agent`.
-   - **Cursor `Task` (shared workspace):** edits are already in your tree — review and commit per step 4; **`best-of-n-runner`:** integrate its worktree.
+   6. Dispatch the next dependency layer.
 
 ### Phase 2: Execute
 
@@ -295,9 +281,7 @@ Determine how to proceed based on what was provided in `<input_document>` (after
 
    **Note:** Incremental commits use clean conventional messages without attribution footers. The final Phase 4 commit/PR includes the full attribution.
 
-   **Parallel subagent mode:** Commit ownership is split by isolation mode (see Phase 1 Step 4):
-   - **Worktree-isolated:** subagents may stage and commit inside their own worktree branch; the orchestrator merges those branches in dependency order after the batch.
-   - **Shared-directory fallback:** subagents do not commit; the orchestrator stages and commits each unit after the entire parallel batch completes.
+   **Parallel subagent mode:** subagents do not commit; the orchestrator stages and commits each unit after the batch.
 
 3. **Follow Existing Patterns**
 
@@ -317,11 +301,7 @@ Determine how to proceed based on what was provided in `<input_document>` (after
 
 5. **Simplify as You Go**
 
-   After completing a cluster of related implementation units (or every 2-3 units), review recently changed files for simplification opportunities — consolidate duplicated patterns, extract shared helpers, and improve code reuse and efficiency. This is especially valuable when using subagents, since each agent works with isolated context and can't see patterns emerging across units.
-
-   Don't simplify after every single unit — early patterns may look duplicated but diverge intentionally in later units. Wait for a natural phase boundary or when you notice accumulated complexity.
-
-   If **`ce-simplify-code`** is available, invoke it at phase boundaries (especially before Phase 3 when the diff is >=30 lines). Otherwise, review the changed files yourself for reuse and consolidation opportunities.
+   Run the full three-reviewer simplification after a major implementation milestone when substantial work remains. Run it again before final review only if production code changed materially afterward. Every pass covers reuse, quality, and efficiency. If **`ce-simplify-code`** is unavailable, apply those three lenses inline.
 
 6. **Figma Design Sync** (if applicable)
 
@@ -382,12 +362,8 @@ Return:
 
 Return `status: complete` only when behavior-bearing work has verification evidence or a deliberate exception. If a previous return-to-caller run implemented code but omitted evidence, a later same-plan return-to-caller run should use the idempotency check to inspect the existing work, complete the evidence, and return without reimplementing.
 
-Engine selection (`references/execution-engines.md`) still applies in this mode,
-but only for implementation. In return-to-caller mode do not emit a copyable
-goal/workflow prompt — a manual paste step strands the caller; run
-inline/subagents or return a blocker instead. Any goal/workflow engine used here
-must not open a PR, run the owner workflow tail, or bypass the caller-owned
-gates.
+In return-to-caller mode, execute inline or with selective subagents. Do not
+start a goal; the caller owns the remaining lifecycle.
 
 ## Key Principles
 
@@ -428,4 +404,4 @@ gates.
 - **Forgetting to track progress** - Update task status as you go or lose track of what's done
 - **80% done syndrome** - Finish the feature, don't move on early
 - **Skipping review without reason** — review every non-mechanical diff with `ce-code-review`; skip only for a purely mechanical diff or when it is genuinely unavailable, and document the skip reason
-- **Re-scoping the plan into human-time phases** - The plan's Implementation Units define the scope of execution. Do not estimate human-hours per unit, propose multi-day breakdowns, or ask the user to pick a subset of units for "this session". Agents execute at agent speed, and context-window pressure is addressed by subagent dispatch (Phase 1 Step 4), not by phased sessions. If a plan-file input is genuinely too large for a single execution, say so plainly and suggest the user return to `/ce-plan` to reduce scope — don't invent session phases as a workaround. For bare-prompt input, Phase 0's Large routing already handles oversized work
+- **Re-scoping the plan into human-time phases** - The plan's Implementation Units define the scope of execution. Do not invent session-sized phases. Delegate only under Phase 1 Step 4; if a plan remains too large, suggest returning to `/ce-plan` to reduce scope.
