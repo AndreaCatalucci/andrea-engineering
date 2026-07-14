@@ -1,13 +1,16 @@
 # Decision-Discovery Rubric
 
-Use this internally after grounding. It finds missing decisions and creative opportunities; it is not a visible phase or a script of questions.
+Use this internally after grounding. It strengthens the scope thesis; it is not a visible phase, a script of questions, or a coverage checklist.
+
+There is no requirement to ask about every lens. Assess, research, infer, or default first. A missing detail becomes a question only when plausible answers cross the parent skill's consequential-decision threshold. Do not ask merely to make the final artifact look complete.
 
 For every candidate gap:
 
 1. Research it if it is discoverable.
-2. Ignore it if it cannot materially change scope, behavior, architecture, or acceptance.
-3. Record a minor default when the choice is low-impact.
-4. Otherwise place the decision in the dependency map and ask it at the right time, with a recommendation.
+2. Infer the best answer from the scope thesis and evidence when confidence is sufficient.
+3. Record a visible default or assumption when reversal is cheap.
+4. Ignore it when it cannot materially change scope, value, risk, or rework.
+5. Only otherwise place the decision in the dependency map and ask it at the right time, with a recommendation.
 
 ## Lightweight
 
@@ -25,8 +28,8 @@ Include Lightweight, then check:
 - **Product shape:** Which user-visible behavior or mechanism delivers the outcome?
 - **Smallest valuable form:** What can be removed without losing the real value?
 - **Boundaries:** What adjacent work is deliberately excluded or deferred?
-- **Failure and edge cases:** Which failures materially alter expected behavior?
-- **Success:** What observable signals establish that the work is acceptable or valuable?
+- **Failure and edge cases:** Infer ordinary behavior from product conventions; escalate only failures that could change the product boundary or risk posture.
+- **Success:** Derive observable acceptance from the desired outcome when possible; ask only when competing definitions would change the product direction.
 - **Dependencies:** Which choices unlock or constrain later choices?
 - **Combined consequences:** Do accepted decisions interact in a way the user has not approved?
 

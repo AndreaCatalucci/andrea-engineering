@@ -15,12 +15,13 @@ Do not implement code. Do not write a plan, invoke a handoff, or take downstream
 
 1. **One question per turn.** Ask it, wait, and use the answer before asking another. Never bundle related questions.
 2. **Facts are researched.** If a fact can be established from the filesystem, repo, tools, or supplied material, look it up instead of asking the user. Verify before claiming, especially absence claims.
-3. **Decisions belong to the user.** Put every material choice to them and wait. Do not silently convert a recommendation into a decision.
+3. **Consequential decisions belong to the user.** Put choices to them when preference defines the product or a wrong answer materially changes value, risk, or rework. Use visible defaults for lower-cost choices.
 4. **Recommend an answer.** Every decision question includes one clear recommendation and a short reason. Add up to two genuinely distinct alternatives only when they improve the choice.
 5. **User-held facts stay open.** Goals, preferences, observed behavior, and lived experience may require a specific open-ended question. Do not recommend or fabricate these answers.
 6. **Be proactive, not sprawling.** Surface overlooked constraints, opportunities, risks, edge cases, and downstream effects. Turn each into the next decision only when it materially changes scope, behavior, architecture, or acceptance.
-7. **Default minor choices.** Do not interrogate the user about inconsequential details. Record a sensible default and expose it in the final synthesis so it can be corrected.
+7. **Default with judgment.** When one option is strongly supported and cheap to reverse, adopt it as a visible default even if it affects behavior. Expose defaults in the final synthesis so they can be corrected.
 8. **Confirm the whole.** Individual answers are provisional parts of a whole. End with a concise synthesis and wait for explicit confirmation before any artifact or handoff.
+9. **Define scope before dialogue.** Do not begin the decision interview until research supports a manageable scope thesis. Push back on work too broad for one coherent brainstorm.
 
 Use `request_user_input` when it cleanly presents 2–3 real choices; otherwise ask directly in chat. Either way, ask exactly one question. A useful decision turn normally has this shape:
 
@@ -50,9 +51,50 @@ Classify the work silently as **Lightweight**, **Standard**, or **Deep**. Depth 
 
 For Deep work, distinguish an extension of an established product from work that must establish the actor, core outcome, positioning, or primary flows. The latter requires product-level decisions.
 
-## Ground the Interview
+## Assess Scope Before Questions
 
-Explore before asking substantive questions.
+Use the prompt, available context, and an initial environment scan to assess **problem breadth before asking substantive questions**. Judge conceptual coherence, not implementation effort.
+
+Consider:
+
+- how many distinct actors and outcomes are involved;
+- whether the request spans independent product surfaces or problem areas;
+- whether one product thesis and boundary can organize the work;
+- how many high-impact unknowns depend on unrelated decisions;
+- whether one requirements artifact could remain coherent and actionable.
+
+A technically large feature may still be manageable when it serves one actor, outcome, and product shape. A request combining several independent outcomes or product theses is not manageable merely because they share a codebase.
+
+If the scope is too broad for one conversation:
+
+1. Explain the competing problem areas and why combining them would produce shallow or contradictory decisions.
+2. Recommend the highest-leverage coherent slice to brainstorm first.
+3. Offer at most two meaningfully different slices when useful.
+4. Ask the user to choose one and wait. Do not begin detailed questioning until a slice is selected.
+
+If the scope is manageable, form an internal **scope thesis** before dialogue:
+
+- problem and desired outcome;
+- primary actor;
+- recommended product shape or direction;
+- smallest valuable scope and major exclusions;
+- highest-risk assumptions;
+- why this is one coherent brainstorm.
+
+Use best judgment to fill low-risk gaps and record them as defaults or assumptions. Ask a scope question only when no coherent thesis can be chosen without the user selecting between materially different problem boundaries.
+
+Before the decision interview, show the user a compact working scope:
+
+```text
+Working scope: <problem, primary actor, desired outcome, and proposed boundary in 2–4 sentences>
+Out of scope: <only the major exclusions needed to make the boundary legible>
+```
+
+This is a proposal, not a routine confirmation gate. When evidence strongly supports one coherent boundary, state it and continue to the highest-impact unresolved decision in the same turn. Ask the user to confirm scope only when two or more materially different boundaries remain genuinely plausible.
+
+## Ground the Scope Thesis
+
+Complete enough exploration to support or revise the scope thesis before asking substantive questions.
 
 ### Repo orientation
 
@@ -80,6 +122,8 @@ Read-only research and user-approved temporary probes are part of reaching under
 
 ## Build the Decision Map
 
+Begin only after a manageable scope thesis exists. Candidate questions refine or challenge that thesis; they do not precede it.
+
 Maintain a compact internal ledger throughout the conversation:
 
 - **Facts:** verified, user-supplied, or explicitly uncertain.
@@ -102,9 +146,11 @@ Discover candidate decisions across:
 - adjacent or inverted ideas with meaningfully higher upside;
 - for Deep-product work: positioning, durability, and product identity.
 
-Remove questions that research can answer. Collapse coupled choices into the upstream decision when possible. Order what remains by dependency: ask the highest-upstream unresolved decision whose prerequisites are known. Prefer high-impact and hard-to-reverse decisions when several are ready.
+Remove questions that research can answer. Default choices when one answer is strongly supported and reversal is cheap. A question earns a turn only when user preference defines the product, plausible answers materially change scope or value, a wrong choice creates substantial rework or risk, or evidence cannot distinguish credible directions. Merely affecting behavior is not enough. Collapse coupled choices into the upstream decision when possible. Order what remains by dependency: ask the highest-upstream unresolved decision whose prerequisites are known. Prefer high-impact and hard-to-reverse decisions when several are ready.
 
 ## Run the Decision Interview
+
+Do not enter this section until scope assessment, grounding, the scope thesis, and the user-facing working scope are complete.
 
 For each turn:
 
