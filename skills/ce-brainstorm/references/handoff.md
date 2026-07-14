@@ -1,13 +1,13 @@
 # Handoff
 
-This content is loaded when Phase 4 begins — after the requirements-only
+This content is loaded when handoff begins — after the requirements-only
 unified plan is written.
 
 ---
 
 #### 4.1 Present Next-Step Options
 
-The Phase 4 menu's visible option count varies by state: no unified plan
+The handoff menu's visible option count varies by state: no unified plan
 artifact hides the review and Proof options, `OUTPUT_FORMAT=html` also hides
 the review option (ce-doc-review is markdown-only today), unresolved `Resolve
 Before Planning` hides both `Create the implementation plan` and `Ship it
@@ -15,8 +15,8 @@ autonomously with lfg`, and the lfg option is also hidden for non-software
 brainstorms (`execution` other than `code`). Count the visible options for the
 current state and choose the rendering mode accordingly:
 
-- **Visible count fits the current platform's option cap:** use the platform's blocking question tool (`AskUserQuestion` in Claude Code — call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded; `request_user_input` in Codex; `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension)). Claude Code `AskUserQuestion` supports up to 4 explicit options, and Codex `request_user_input` supports only 2-3 explicit options.
-- **Visible count exceeds the current platform's option cap:** render as a numbered list in chat. This is the narrow option-overflow fallback; trimming would hide legitimate choices (plan, ship, review, Proof/browser, refine are all distinct destinations). Include a hint that free-form input is accepted ("Pick a number or describe what you want.") so the numbered list retains the blocking tool's open-endedness.
+- **Up to three visible options:** use `request_user_input` when available.
+- **More than three options, or the tool is unavailable:** render a numbered list in chat and wait. Do not trim legitimate destinations. Include: "Pick a number or describe what you want."
 
 Never silently skip the question.
 
@@ -71,7 +71,7 @@ Selections may be the literal option label (when the user types the label or a c
 
 Immediately load the `ce-plan` skill in the current session. Pass the unified
 plan artifact path when one exists; otherwise pass a concise summary of the
-finalized brainstorm decisions. When the Phase 1.1 grounding scout produced a
+finalized brainstorm decisions. When the conditional grounding scout produced a
 dossier and the file still exists, also pass its path
 (`/tmp/andrea-engineering/ce-brainstorm/<run-id>/grounding.md`) — it gives
 planning verified quotes with `file:line` pointers to start from instead of
@@ -80,7 +80,7 @@ re-scanning the repo. Do not print the closing summary first.
 **If user selects "Pressure-test the requirements":**
 
 Load the `ce-doc-review` skill, passing the unified plan path as the argument.
-When ce-doc-review returns "Review complete", return to the Phase 4 options
+When ce-doc-review returns "Review complete", return to the handoff options
 and re-render the menu (the requirements may have changed, so re-evaluate
 `Resolve Before Planning`, the lfg software gate, and residual findings). If
 residual P0/P1 findings remain unaddressed, include the post-review nudge
@@ -88,7 +88,7 @@ above the menu. Do not show the closing summary yet.
 
 **If user selects "Ship it autonomously with `lfg`":**
 
-Immediately invoke the `lfg` skill in the current session via the platform's
+Immediately invoke the `lfg` skill in the current session through Codex's
 skill-invocation primitive, passing the unified plan artifact path as its
 argument so `lfg`'s `ce-plan` step enriches *this* requirements-only artifact in
 place rather than bootstrapping a new plan. `lfg` then owns the full pipeline
@@ -104,7 +104,7 @@ open a PR from this artifact.
 
 Do not print the closing summary first.
 
-**If user selects "More clarifying questions to sharpen the doc":** Return to Phase 1.3 (Collaborative Dialogue) and continue asking the user clarifying questions one at a time to further refine scope, edge cases, constraints, and preferences. Continue until the user is satisfied, then return to Phase 4. Do not show the closing summary yet.
+**If user selects "More clarifying questions to sharpen the doc":** Return to the dependency-ordered decision interview and continue one question at a time. Re-present the complete shared-understanding synthesis and get explicit confirmation before updating the artifact or returning to the handoff menu. Do not show the closing summary yet.
 
 **If user selects "Publish to Proof — shareable link":**
 
@@ -117,20 +117,20 @@ Load the `ce-proof` skill to publish the markdown unified plan. Pass:
 ce-proof creates a shared Proof doc from the markdown plan file (Create and
 Share workflow), binds the display name, and returns the share URL. Surface
 the URL to the user — they can open it to read, comment, or share with others
-— then return to the Phase 4 options and re-render the menu. This is a one-way
+— then return to the handoff options and re-render the menu. This is a one-way
 publish: the local doc stays canonical and nothing syncs back, so option
 eligibility is unchanged (no need to re-evaluate `Resolve Before Planning`,
 the lfg software gate, or residual findings on account of Proof).
 
-If the upload fails (network error, Proof API down), retry once after a short wait. If it still fails, tell the user the upload didn't succeed and briefly explain why, then return to the Phase 4 options — don't leave them wondering why the option did nothing.
+If the upload fails (network error, Proof API down), retry once after a short wait. If it still fails, tell the user the upload didn't succeed and briefly explain why, then return to the handoff options — don't leave them wondering why the option did nothing.
 
-**If user selects "Open in browser":** Display the absolute path to the `.html` unified plan so the user can open it locally. Where the platform exposes a browser-opening primitive (e.g., `open` on macOS, `xdg-open` on Linux, `start` on Windows), the agent may invoke it directly; otherwise print the absolute path and let the user open it. After the path is displayed (or the browser is opened), return to the Phase 4 options so the user can pick a follow-up action.
+**If user selects "Open in browser":** Display the absolute path to the `.html` unified plan. Use Codex's in-app browser when available; otherwise let the user open the path. Then return to the handoff options.
 
 **If the user indicates they're finished** (says "done"/"that's all", or dismisses the menu without picking an option): display the closing summary (see 4.3) and end the turn.
 
 #### 4.3 Closing Summary
 
-Use the closing summary only when this run of the workflow is ending or handing off, not when returning to the Phase 4 options.
+Use the closing summary only when this run of the workflow is ending or handing off, not when returning to the handoff options.
 
 In both templates below, substitute `<absolute path to unified plan>` with the
 actual file path written this run — `.md` for `OUTPUT_FORMAT=md`, `.html` for

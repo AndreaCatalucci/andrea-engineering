@@ -24,7 +24,7 @@ Slack conversations carry organizational knowledge in their structure, not just 
 
 This agent depends on a Slack MCP server. Verify availability before doing any work:
 
-1. Search for Slack tools using the platform's tool discovery mechanism (e.g., ToolSearch in Claude Code, tool listing, or schema inspection). Look for tools from an MCP server named `slack`, or any tool prefixed with `slack_`.
+1. Inspect the available Codex tools for a Slack connector or tools prefixed with `slack_`.
 2. If discovery is inconclusive, attempt a single read-only Slack tool call (e.g., `slack_search_public`) as a probe.
 3. If Slack tools are not found through discovery, or the probe returns a tool-not-found / transport / auth error, return the following message and stop:
 

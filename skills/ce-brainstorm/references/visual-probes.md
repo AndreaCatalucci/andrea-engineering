@@ -16,9 +16,9 @@ Do not use a visual probe for product goals, scope boundaries, success criteria,
 
 ## The gate (when the offer must fire)
 
-When the Phase 0.3 tripwire flagged an inherently-visual topic, the offer must fire before the **first** decision about shape, behavior, state, layout, flow, or a diagram is raised in *any* form — plain chat or a blocking question.
+When grounding identifies an inherently visual topic, the offer must fire before the **first** decision about shape, behavior, state, layout, flow, or a diagram is raised in *any* form — plain chat or a blocking question.
 
-**Timing is state-based, not memory-based.** Anchor the check to the decision you are about to raise, not to a "pending gate" remembered since Phase 0.3: offer unless this specific decision has already been through the offer (the user already chose text or visual for it). This gate takes precedence over the default blocking-question path — do not raise the shape decision as an `AskUserQuestion`/`request_user_input` menu, or as a plain-chat shape question, until the user has declined visual (or visual feedback has returned to chat).
+**Timing is state-based, not memory-based.** Anchor the check to the decision you are about to raise: offer unless this specific decision has already been through it. Do not raise the shape decision through `request_user_input` or chat until the user declines visual or visual feedback returns.
 
 **An ASCII preview or text mockup embedded inside the question's choices does NOT satisfy the offer** — that shortcut is exactly what this gate exists to stop. The offer is its own prior question with two options (sketch vs describe); only after the user chooses does the shape decision proceed.
 
@@ -26,7 +26,7 @@ When the Phase 0.3 tripwire flagged an inherently-visual topic, the offer must f
 
 Ask once at the decision point. Do not enable a session-wide mode.
 
-Use the platform's blocking question tool for the opt-in when available (`AskUserQuestion`, `request_user_input`, `ask_user`, or equivalent). Use a plain chat question only when no interactive question tool exists or the tool errors. The opt-in should have two clear options:
+Use `request_user_input` for the opt-in when available. Otherwise ask in chat and wait. Use two clear options:
 
 - Visual sketch — create rough options in a local browser
 - Text description — keep the decision in chat
@@ -66,7 +66,7 @@ Label the artifact as directional. State what the user should judge and what the
 
 ## Display Helper
 
-Use the bundled display-only helper when the current platform can run a bundled skill script. Invoke it via the `SKILL_DIR` anchor: set `SKILL_DIR` to the absolute path of the directory containing the `ce-brainstorm` `SKILL.md` you loaded (the Bash tool's cwd is the user's project, not the skill dir), and re-set it in the same command on each call since shell vars don't persist between Bash invocations. Do not resolve the helper from the user's project CWD.
+Use the bundled display-only helper when Codex can run the script and display its local URL. Invoke it via the `SKILL_DIR` anchor: set `SKILL_DIR` to the absolute path of the directory containing the `ce-brainstorm` `SKILL.md` you loaded, and re-set it in the same command on each call. Do not resolve the helper from the user's project CWD.
 
 Start (detached):
 
@@ -87,22 +87,18 @@ If `SKILL_DIR` cannot be resolved to a concrete skill directory, do not guess fr
 
 The helper creates `screens/` and `state/`, serves the newest `.html` file in `screens/`, writes `state/display-info.json`, and exposes `/version` so the browser can poll for screen changes. The browser reloads only when the newest screen changes; it must not continually reload on a timer. `/version` polling does not count as activity, so an abandoned browser tab cannot keep the server alive forever. Detached servers monitor the owning harness process when it can be resolved, and all servers exit after an idle timeout. The helper has no click tracking or browser-to-agent event path.
 
-If the helper path is unavailable or the platform cannot display a local URL cleanly, say so briefly and use the text path. Do not build a custom event system or long-lived server to compensate during the brainstorm.
+If the helper path is unavailable or Codex cannot display a local URL cleanly, say so briefly and use the text path. Do not build a custom event system or long-lived server to compensate.
 
-## Launch Mode by Platform
+## Launch in Codex
 
-The server is the same everywhere; only the launch mode changes.
-
-- **Claude Code / Claude desktop app:** detached `start` is the default path. If the app opens localhost URLs, show the returned URL and continue. If the browser surface is unavailable, use the text path.
-- **Codex CLI / Codex app:** if detached processes are reaped or the URL dies after the tool call, use `start --foreground` through the platform's long-running/background terminal mechanism. If there is no stable browser surface, use the text path.
-- **Plain terminal UI:** print the returned URL for the user to open manually. If opening a browser would interrupt the flow, keep the decision in chat.
+In the Codex app, use the in-app browser when available. If detached processes are reaped or the URL dies after the tool call, run `start --foreground` through a long-running terminal session. In Codex CLI, print the returned URL for the user to open. If no stable browser surface exists, use the text path.
 - **Remote or containerized sessions:** if `localhost` is not reachable from the user's browser, start with `--host 0.0.0.0` and tell the user which host/port to open. If that cannot be made clear, use the text path.
 
-Never force the visual path because a local server exists. The user chose visual to understand the decision faster; if the platform plumbing gets in the way, switch back to text.
+Never force the visual path because a local server exists. If the Codex browser flow gets in the way, switch back to text.
 
 ## Post-Artifact Feedback
 
-After showing the visual artifact, use the platform's blocking question tool for bounded artifact feedback when available. This is still chat-based feedback, not browser event capture.
+After showing the visual artifact, use `request_user_input` for bounded feedback when available; otherwise ask in chat. Feedback remains chat-based, not browser event capture.
 
 Use a bounded interactive question when the expected response is a small choice set:
 
@@ -143,4 +139,4 @@ Use OS temp by default because visual probes are disposable scratch:
     display-info.json
 ```
 
-Use `.context/andrea-engineering/ce-brainstorm-visual/<run-id>/` only when the user explicitly wants to inspect, preserve, or curate the sketches after the session. The probe is disposable scratch; the durable artifact is the Phase 3 requirements-only unified plan under `docs/plans/`.
+Use `.context/andrea-engineering/ce-brainstorm-visual/<run-id>/` only when the user explicitly wants to inspect, preserve, or curate the sketches after the session. The probe is disposable scratch; after confirmation, the durable software artifact is the requirements-only unified plan under `docs/plans/`.

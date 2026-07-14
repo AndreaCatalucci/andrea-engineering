@@ -47,7 +47,7 @@ Reader Index — consumers wayfind by scanning headings. It also omits empty
 `Definition of Done` sections — empty placeholders make requirements-only docs
 look executable and waste downstream tokens. `ce-plan` adds those sections when
 it enriches the same file in place. The next step (planning) is conveyed by the
-Phase 4 handoff menu, not by a section in the doc.
+handoff menu, not by a section in the doc.
 
 Historical `docs/brainstorms/*-requirements.*` files remain valid legacy
 inputs. Do not migrate or rewrite them when creating new artifacts.

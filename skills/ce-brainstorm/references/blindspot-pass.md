@@ -33,7 +33,7 @@ Two options: **Map the territory first** / **Proceed with questions** (defaults 
 
 Ground it before writing it:
 
-- **In-repo territory** (a module, subsystem, or pattern in this codebase): use the Phase 1.1 grounding — the scout's dossier and targeted reads. If the scout has not returned yet, wait for it or read the relevant area directly; do not map in-repo territory from model knowledge alone.
+- **In-repo territory** (a module, subsystem, or pattern in this codebase): use the brainstorm grounding — its dossier and targeted reads. If a conditional scout has not returned yet, wait for it or read the relevant area directly; do not map in-repo territory from model knowledge alone.
 - **External domain** (a technology, practice, or field outside the repo): research with whatever web tools are reachable. When none are, model knowledge is allowed, but label each such item **Unverified — from model knowledge, not checked against current sources**.
 
 **The territory closes questions the user should never be asked.** Before an item goes on the map, check whether the codebase or sources already answer it — if so, it is not a decision: show the question and the found answer with its citation as settled ground, not as an option menu. The map holds only what genuinely needs the user's judgment. But a question closed off-screen isn't closed — territory-answered items are shown, never silently resolved.

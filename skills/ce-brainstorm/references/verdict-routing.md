@@ -1,6 +1,6 @@
 # Verdict Routing — offer the ce-pov handoff
 
-Read this when the opening request (or a request the dialogue clarifies) matches the verdict shape described at Phase 0.1c. A brainstorm scopes **what to build** once a direction is chosen. Deciding **whether to adopt, switch to, or replace** a *specific external candidate* — a named technology, library, pattern, platform, or architecture — judged against this project is a different job: a decisive, project-grounded verdict, which is `ce-pov`'s purpose.
+Read this when the opening request (or a request the dialogue clarifies) asks whether to adopt, switch to, or replace a specific external candidate. A brainstorm scopes **what to build** once a direction is chosen. Judging a named technology, library, pattern, platform, or architecture against this project is a decisive project-grounded verdict, which is `ce-pov`'s purpose.
 
 ## Confirm the shape — all three hold
 
@@ -12,14 +12,14 @@ Open-ended design or scoping where *you'd* have to invent the options ("how shou
 
 ## Offer — do not silently switch
 
-It is one simple choice: do they want a `/ce-pov` verdict, or not? Make it an *interactive* offer via the platform's blocking question tool, and map the content onto its fields:
+It is one simple choice: do they want a `/ce-pov` verdict, or not? Use `request_user_input` when available and map the content onto its fields:
 
 - The **question prompt** carries the justification, so the user chooses on the merits, not on trust: name the candidate(s); say in one line *why* this is a decision rather than a scoping exercise (you'd be committing to a specific outside thing, not shaping something you've already chosen to build); and state what `/ce-pov` gives them — a decisive, project-grounded verdict on the candidate, weighing fit, migration cost, and whether it's worth it here.
 - The **options are asymmetric, not two co-equal pitches**: **yes** → hand off to `/ce-pov` for that verdict; **no** → stay here and the normal brainstorm simply continues. The decline needs no selling of its own — it is the default path resuming, so keep it a plain "no, keep brainstorming."
 
-Name `/ce-pov` by what it does for the user (it gives you a project-grounded verdict on the candidate), never as internal machinery — not "a sibling workflow," not "another skill I have." Where the harness has no blocking tool, fall back to the same content as numbered options in chat (per the Interaction Rules), never a bare prose paragraph.
+Name `/ce-pov` by what it does for the user (it gives a project-grounded verdict on the candidate), never as internal machinery. If `request_user_input` is unavailable, present the same content as numbered choices in chat and wait.
 
-On accept, **invoke the `ce-pov` skill** — the same way the Phase 4 handoff invokes `ce-plan` — passing the candidate(s), the framed question, and any links the user supplied as its input. `ce-pov` inherits this live session (it runs warm), so pass the crisp **frame** — candidate, intent, links — rather than re-summarizing the discussion. It reads the prior dialogue as *hypotheses to verify*, never as grounding, and re-grounds independently; so the session seeds the *question*, not the *verdict*. Do **not** merely tell the user to type `/ce-pov`; an accepted offer is an actual handoff, not a textual suggestion. **On decline, drop the offer and continue the normal workflow (Phase 0.2 onward) unchanged** — do not re-offer on the same framing. One offer at a time, and the justification lives in the prompt — not a bare "route to ce-pov, yes/no?"
+On accept, **invoke the `ce-pov` skill**, passing the candidate(s), framed question, and any links the user supplied. `ce-pov` inherits the live session, so pass the crisp frame rather than re-summarizing the discussion. It treats prior dialogue as hypotheses and grounds independently. Do not merely tell the user to type `/ce-pov`; acceptance authorizes the handoff. On decline, continue the decision interview and do not re-offer on the same framing.
 
 ## Not only at intake — throughout
 

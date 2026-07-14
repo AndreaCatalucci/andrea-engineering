@@ -1,42 +1,62 @@
-# Product Pressure Test — rigor-gap lenses
+# Decision-Discovery Rubric
 
-Read this at Phase 1.2, before generating approaches. This is agent-internal analysis, not a user-facing checklist. Read the opening, note which gaps actually exist, and raise only those as questions during Phase 1.3 — folded into the normal flow of dialogue, not fired as a pre-flight gauntlet. A fuzzy opening may earn three or four probes; a concrete, well-framed one may earn zero because no scope-appropriate gaps were found.
+Use this internally after grounding. It finds missing decisions and creative opportunities; it is not a visible phase or a script of questions.
 
-Match depth to the Phase 0.3 scope.
+For every candidate gap:
+
+1. Research it if it is discoverable.
+2. Ignore it if it cannot materially change scope, behavior, architecture, or acceptance.
+3. Record a minor default when the choice is low-impact.
+4. Otherwise place the decision in the dependency map and ask it at the right time, with a recommendation.
 
 ## Lightweight
 
-- Is this solving the real user problem?
-- Are we duplicating something that already covers this?
-- Is there a clearly better framing with near-zero extra cost?
+- Does this solve the actual problem?
+- Does existing behavior already cover it?
+- Is there a simpler framing with equal value?
 
-## Standard — scan for these gaps
+## Standard
 
-- **Evidence gap.** The opening asserts want or need, but doesn't point to anything the would-be user has already done — time spent, money paid, workarounds built — that would make the want observable. When present, ask for the most concrete thing someone has already done about this.
+Include Lightweight, then check:
 
-- **Specificity gap.** The opening describes the beneficiary at a level of abstraction where the agent couldn't design without silently inventing who they are and what changes for them. When present, ask the user to name a specific person or narrow segment, and what changes for that person when this ships.
+- **Evidence:** What observable behavior, workaround, cost, or user-held evidence supports the need? Ask only when the evidence belongs to the user and cannot be researched.
+- **Actor and outcome:** Is the beneficiary specific enough, and is the change for them clear?
+- **Current alternative:** What happens today, and what happens if nothing ships?
+- **Product shape:** Which user-visible behavior or mechanism delivers the outcome?
+- **Smallest valuable form:** What can be removed without losing the real value?
+- **Boundaries:** What adjacent work is deliberately excluded or deferred?
+- **Failure and edge cases:** Which failures materially alter expected behavior?
+- **Success:** What observable signals establish that the work is acceptable or valuable?
+- **Dependencies:** Which choices unlock or constrain later choices?
+- **Combined consequences:** Do accepted decisions interact in a way the user has not approved?
 
-- **Counterfactual gap.** The opening doesn't make visible what users do today when this problem arises, nor what changes if nothing ships. When present, ask what the current workaround is, even if it's messy — and what it costs them.
+## Deep
 
-- **Attachment gap.** The opening treats a particular solution shape as the thing being built, rather than the value that shape is supposed to deliver, and hasn't been examined against smaller forms that might deliver the same value. When present, ask what the smallest version that still delivers real value would look like.
+Include Standard, then check:
 
-Plus these synthesis questions — not gap lenses, product-judgment the agent weighs in its own reasoning:
-- Is there a nearby framing that creates more user value without more carrying cost? If so, what complexity does it add?
-- Given the current project state, user goal, and constraints, what is the single highest-leverage move right now: the request as framed, a reframing, one adjacent addition, a simplification, or doing nothing?
+- Does the direction improve the broader system rather than create a local patch?
+- Which decisions are costly to reverse?
+- Which assumptions could invalidate the direction?
+- What adjacent or inverted framing offers substantially more value without disproportionate carrying cost?
 
-Favor moves that compound value, reduce future carrying cost, or make the product meaningfully more useful or compelling. Use the result to sharpen the conversation, not to bulldoze the user's intent.
+## Deep Product
 
-## Deep — Standard lenses and synthesis questions plus
+Include Deep, then check:
 
-- Is this a local patch, or does it move the broader system toward where it wants to be?
+- Who is the primary actor, and what core outcome defines the product?
+- What is inside versus outside the product's identity?
+- How is it positioned against current alternatives?
+- Does the value proposition survive plausible near-term shifts?
+- What adjacent product might accidentally be built instead?
+- What must be true in the world for this direction to succeed or fail?
 
-## Deep — product — Deep plus
+## Creativity Pass
 
-- **Durability gap.** The opening's value proposition rests on a current state of the world that may shift in predictable ways within the horizon the user cares about. When present, ask how the idea fares under the most plausible near-term shifts — and push past rising-tide answers every competitor could make.
+For Standard and Deep work, deliberately test at least one lens before convergence:
 
-- What adjacent product could we accidentally build instead, and why is that the wrong one?
-- What would have to be true in the world for this to fail?
+- **Inversion:** would the opposite framing reveal a better shape?
+- **Constraint removal:** is an assumed limitation hiding the best option?
+- **Analogy:** does another domain solve the underlying problem more cleanly?
+- **Adjacent value:** is there a low-carrying-cost addition with disproportionate upside?
 
-These questions force an explicit product thesis and feed the Scope Boundaries subsections ("Deferred for later" and "Outside this product's identity") and Dependencies / Assumptions in the Product Contract.
-
-Phase 1.3 owns how these gaps fire as probes: each scope-appropriate gap found here becomes a separate open-ended probe (the "when present, ask..." line is the probe), surfaced progressively but all probed before Phase 2.
+Promote the result into the decision map only if it is credible and materially distinct. Creativity should improve the choice, not increase the option count.
