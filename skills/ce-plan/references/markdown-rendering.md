@@ -148,9 +148,10 @@ specific artifact's content needs.
 
 ## Diagrams
 
-When the section contract calls for a diagram (architecture, sequence,
-flowchart, state machine, swim lane, data-flow), markdown renders it as
-a fenced mermaid block:
+When a diagram is materially clearer than prose or a short numbered flow,
+render it as a fenced mermaid block. Do not infer a diagram requirement from
+component or stage count alone, and do not create multiple diagrams merely to
+cover different trigger categories.
 
 ```markdown
 ` ``mermaid
