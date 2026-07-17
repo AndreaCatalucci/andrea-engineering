@@ -168,6 +168,12 @@ present. They carry the contracts downstream consumers depend on.
 - **Goal Capsule** — objective, authority hierarchy, stop conditions, execution
   profile, and tail ownership. This is the fastest way for an executor to
   avoid drifting from the plan.
+- **Source-to-Outcome summary** — within the first 25 lines, state Source,
+  Input, Operation, and Outcome. For external-data work, name the exact
+  authority, artifact or endpoint, operator-facing processing surface, and
+  observable success condition. A compact
+  `Source -> Import -> Transform -> Apply -> Publish -> Verify` flow may replace
+  longer lifecycle prose.
 - **Product Contract** — product scope and behavior. Contains Summary, Problem
   Frame, Requirements with stable R-IDs, and any material Actors, Flows,
   Acceptance Examples, Success Criteria, Scope Boundaries, Dependencies,
@@ -176,10 +182,13 @@ present. They carry the contracts downstream consumers depend on.
 - **Planning Contract** — the implementation-facing decisions: Key Technical
   Decisions, high-level design, assumptions, implementation constraints,
   sequencing, and research that shapes how the Product Contract will be built.
-- **Implementation Units** (with stable U-IDs) — discrete work packets sized so
-  each is independently executable. Each unit names Goal, Requirements,
-  Files, Approach, Test Scenarios, and Verification. `ce-work` and goal-mode
-  executors consume these units.
+- **Implementation Units** (with stable U-IDs) — outcome-sized work packets,
+  each independently understandable and executable. Group supporting codecs,
+  receipts, lifecycle handling, orchestration, readiness, rollback, and docs
+  into the outcome they serve unless one is independently valuable. Each unit
+  names Goal, Requirements, implementation and test Files, Patterns, Approach,
+  Test Scenarios, and Verification. `ce-work` and goal-mode executors consume
+  these units.
   - **Unit Index (large plans only, ~10+ units).** When the plan has roughly
     ten or more units, open the section with a compact navigation table — one
     row per unit: **U-ID · one-line title · files touched · depends-on**. It
@@ -198,11 +207,10 @@ present. They carry the contracts downstream consumers depend on.
   measurable threshold as the exit criterion (e.g., "p95 latency < 200ms",
   "build time reduced 30%") and consider routing to `ce-optimize` — a metric
   target is a sharper done signal for a long-running goal than a boolean check.
-- **Definition of Done** — global and per-unit done criteria. This is the
-  completion contract for `/goal` or equivalent long-running workflows. Include
-  a cleanup criterion: a long autonomous run accumulates dead-end and
-  experimental code from approaches that did not pan out; declaring done
-  requires that abandoned-attempt code is removed, not left in the diff.
+- **Definition of Done** — a concise completion summary, not a restatement of
+  requirements, units, and verification. Include global and per-unit done
+  signals only when they add a boundary not already obvious from Verification,
+  plus cleanup of abandoned experimental code.
 
 ## Include when material
 
@@ -213,10 +221,11 @@ a section with placeholder prose is worse than omitting it.
 
 - **High-Level Technical Design** — include when the technical approach has
   shape that prose alone doesn't carry well: architecture across components,
-  sequencing across processes, state machines, branching gates.
-  Visualizations (component topology, sequence, swim lane, flowchart,
-  data-flow) typically live here. Skip when the approach is a one-paragraph
-  pattern application that the prose itself conveys.
+  sequencing across processes, state machines, or branching gates. Prefer a
+  paragraph or numbered flow when it is equally clear. Component/stage count
+  alone never requires a diagram. Compact plans normally use zero or one small
+  visual; every additional diagram must resolve a distinct load-bearing
+  ambiguity.
 
 - **Scope Boundaries** — include when scope is contested, when there are
   tempting non-goals worth naming explicitly, or when "deferred for later"
@@ -283,6 +292,14 @@ earns length through coverage (more units, more traced requirements, real
 risks), never through wordiness around that coverage.
 
 Hold every kept section to these:
+
+- **One fact, one home.** Requirements own behavior; KTDs own load-bearing
+  rationale; units own where and how work lands; Verification owns proof; Done
+  owns only the final completion boundary. Reference an ID instead of
+  restating its content elsewhere.
+- **Focused means capped.** A feature with at most four outcome units stays at
+  or below 1,500 words unless the review records the P0/P1 correctness reason
+  for exceeding it. External-data and high-risk labels do not waive the cap.
 
 - **Lead with the decision or outcome.** Put the conclusion first, then the
   reason, then background; keep one claim plus its support per paragraph. Don't

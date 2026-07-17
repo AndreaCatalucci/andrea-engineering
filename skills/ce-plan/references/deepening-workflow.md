@@ -229,6 +229,12 @@ If findings were accepted and the plan was modified, proceed through 5.3.7 and 5
 
 Strengthen only the selected sections. Keep the plan coherent and preserve its overall structure.
 
+Record the plan's pre-deepening word count and implementation-unit count.
+Deepening must preserve the selected depth budget. Prefer replacement,
+clarification, consolidation, and deletion. A new section, KTD, diagram,
+abstraction, or unit is allowed only when a documented P0/P1 correctness gap
+would otherwise leave the plan unimplementable.
+
 **In interactive mode:** Only integrate findings the user accepted in 5.3.6b. If some findings from different agents touch the same section, reconcile them coherently but do not reintroduce rejected findings.
 
 Deepening may tighten, not only grow. A section can be strengthened by cutting as well as adding — collapse multi-idea sentences, drop hedges, and delete superseded text outright rather than leaving it as strikethrough or stacking a separate "resolutions" layer on top of it. A shorter, contradiction-free section is a stronger one. This is distinct from "rewrite the entire plan from scratch" below, which stays forbidden.
@@ -257,3 +263,7 @@ If research reveals a product-level ambiguity that should change behavior or sco
 - Do not silently decide it here
 - Record it under `Open Questions`
 - Recommend `ce-brainstorm` if the gap is truly product-defining
+
+After synthesis, recalculate words and units. Growth above 10% requires the
+specific P0/P1 reason in the review summary. Without that reason, compress the
+accepted improvements into the existing structure before continuing.

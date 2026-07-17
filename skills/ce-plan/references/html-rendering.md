@@ -372,9 +372,9 @@ specific artifact's content needs.
 
 ## Diagrams
 
-When the section contract calls for a diagram (architecture, sequence,
-flowchart, state machine, swim lane, data-flow, quantitative
-comparison), HTML renders it as **inline SVG**. The agent picks the
+When a diagram—such as architecture, sequence, flowchart, state machine,
+swim lane, data-flow, or quantitative comparison—is materially clearer than
+prose or a short numbered flow, HTML renders it as **inline SVG**. The agent picks the
 shape that conveys the content fastest — there is no fixed catalog of
 "approved" diagram types. If the content is quantitative comparison
 across categories, a bar chart is the right shape; if it's component
