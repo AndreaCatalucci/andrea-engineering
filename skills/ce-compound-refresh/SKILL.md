@@ -5,6 +5,9 @@ description: "Refresh docs/solutions learnings against the current codebase. Use
 
 # Compound Refresh
 
+Immediately before writing user-facing text, read and follow
+[`references/plain-language.md`](references/plain-language.md).
+
 Keep `docs/solutions/` accurate, searchable, and non-redundant as the codebase changes. Review individual learnings before any pattern documents derived from them.
 
 Before asking the user for input, read [`references/codex-interaction.md`](references/codex-interaction.md).

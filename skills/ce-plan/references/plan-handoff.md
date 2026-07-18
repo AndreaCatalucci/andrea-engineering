@@ -15,9 +15,9 @@ Capture:
 - any P0/P1 findings.
 
 Give the reviewer the pre-review `scripts/plan-metrics.py` word and
-implementation-unit counts and the
+step counts and the
 selected depth budget. Review fixes should replace, clarify, consolidate, or
-delete. New sections, KTDs, diagrams, abstractions, or units require evidence
+delete. New sections, technical decisions, diagrams, abstractions, or steps require evidence
 that a P0/P1 issue would otherwise leave the plan unimplementable.
 
 Address P0/P1 findings before returning from a pipeline run. Otherwise preserve remaining findings in the final summary so the user can request an interactive review later.
@@ -29,7 +29,7 @@ Verify:
 - the plan is stronger, not merely longer;
 - post-review word growth is at most 10%, unless the summary records the P0/P1
   correctness reason for exceeding it;
-- implementation-unit count did not grow without that same justification;
+- step count did not grow without that same justification;
 - the planning boundary remains intact;
 - origin decisions were preserved;
 - the artifact exists at one canonical path.

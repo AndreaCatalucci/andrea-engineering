@@ -54,13 +54,14 @@ Choose at most one plan:
 
 Wrong-plan matching is worse than no plan. Verify existence. Tag explicit paths/PR links as `explicit`; keyword discovery as `inferred`.
 
-For unified plans, read metadata first:
+For plans, read metadata first:
 
-- `requirements-only`: product intent only; do not create implementation-unit completeness findings;
-- `implementation-ready` + `execution: code`: extract Requirements and Implementation Units;
+- `requirements-only`: product intent only; do not create work-step completeness findings;
+- `implementation-ready` + `execution: code`: extract Requirements and Work Steps;
 - invalid progress-like readiness values are contract errors.
 
-Extract requirements from unified Product Contract `### Requirements`, legacy `## Requirements`, or `## Requirements Trace`. Extract U-IDs from `## Implementation Units`. HTML uses the same visible headings/IDs.
+Extract requirements from `### Requirements` under What We're Building and
+W-IDs from `## Work Steps`. HTML uses the same visible headings and IDs.
 
 Completeness routing happens during merge:
 

@@ -5,6 +5,9 @@ description: "Draft launch or promotion copy for a shipped feature. Use when the
 
 # $ce-promote
 
+Immediately before writing user-facing text, read and follow
+[`references/plain-language.md`](references/plain-language.md).
+
 Turn a feature that just shipped into copy-pasteable, user-facing announcement copy — right inside the engineering workflow.
 
 ## Purpose

@@ -713,7 +713,7 @@ def write_requirements_kickoff(
         "",
         f"# {title}",
         "",
-        "## Problem Frame",
+        "## Problem",
         "",
         f"A product feedback source for `{session.get('url', 'the product surface')}` produced evidence of product friction. The raw source has been converted into transcript, selected moments when video is available, screenshots when frames can be extracted, and candidate findings so the team can decide what product behavior should change before planning implementation.",
         "",
@@ -1114,7 +1114,7 @@ def main() -> int:
     print(f"Source materials: {display_path(source_materials_md, repo_root)}")
     print(f"Problem statements: {display_path(problem_analysis_md, repo_root)}")
     print(f"Brainstorm handoff: $andrea-engineering:ce-brainstorm {display_path(kickoff_md, repo_root)}")
-    print("Brainstorm should first confirm whether the captured requirements are complete and correctly grouped, then write the durable unified plan under docs/plans/.")
+    print("Brainstorm should first confirm whether the captured requirements are complete and correctly grouped, then write the durable plan under docs/plans/.")
     return 0
 
 

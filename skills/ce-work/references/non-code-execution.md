@@ -7,7 +7,7 @@ Loaded from Phase 0 Input Triage when the plan carries `execution: knowledge-wor
 Do **not** run any of the code-shipping machinery — it does not fit knowledge work:
 
 - No branch/worktree setup (Phase 1 Step 2).
-- No task-list-from-implementation-units, no execution-strategy/subagent dispatch keyed on `Files:`.
+- No task-list-from-work-steps, no execution-strategy/subagent dispatch keyed on `Files:`.
 - No Test Discovery, no test-scenario completeness, no system-wide test check.
 - No incremental code commits, and none of `references/shipping-workflow.md` (no PR, no CI).
 

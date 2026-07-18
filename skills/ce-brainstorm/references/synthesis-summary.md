@@ -2,7 +2,7 @@
 
 Read this only after the decision interview has no material unresolved decision.
 
-The synthesis is the final alignment gate. It proves that individually resolved decisions form a coherent whole. It is not a preview of the full Product Contract and contains no implementation design.
+The synthesis is the final alignment gate. It proves that individually resolved decisions form a coherent whole. It is not a preview of the full What We're Building and contains no implementation design.
 
 ## Compose
 
@@ -80,14 +80,15 @@ On revision:
 
 ## Route After Confirmation
 
-Only after confirmation may the workflow write or hand off. Route synthesis content into the Product Contract rather than adding a `Synthesis` section:
+Only after confirmation may the workflow write or hand off. Put the confirmed
+summary under What We're Building instead of adding a `Synthesis` section:
 
-| Synthesis content | Product Contract destination |
+| Synthesis content | What We're Building destination |
 |---|---|
-| What we're building | Summary and Problem Frame |
+| What we're building | Summary and Problem |
 | Key decisions | Key Decisions and Requirements |
-| Scope boundaries | Scope Boundaries |
-| Success | Acceptance Criteria / Success Criteria |
+| Scope boundaries | Scope |
+| Success | Acceptance Criteria / Success Measures |
 | Defaults and assumptions | Dependencies / Assumptions |
 | Open non-blockers | Deferred to Planning or Outstanding Questions |
 

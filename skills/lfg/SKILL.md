@@ -29,8 +29,8 @@ Before planning, run `git remote`. If no remote exists, stop immediately: LFG ca
 
 If LFG's input references a readable plan, inspect it first. Reuse it without invoking `ce-plan` only when it is under `docs/plans/` and has:
 
-- `artifact_contract: ce-unified-plan/v1`
-- `artifact_readiness: implementation-ready`
+- `plan_format: andrea-plan/v1`
+- `plan_readiness: implementation-ready`
 - `execution: code`
 
 Otherwise invoke `ce-plan` in pipeline mode with LFG's original request and require it to produce a plan with those fields.

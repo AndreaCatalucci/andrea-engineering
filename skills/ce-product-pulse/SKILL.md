@@ -5,6 +5,9 @@ description: "Generate time-windowed product pulse reports from configured signa
 
 # Product Pulse
 
+Immediately before writing user-facing text, read and follow
+[`references/plain-language.md`](references/plain-language.md).
+
 `ce-product-pulse` queries the product's data sources for a given time window and produces a compact, single-page report covering usage, performance, errors, and followups. The report is saved to `docs/pulse-reports/` and the key points are surfaced in chat.
 
 The skill does not mutate the product, the database, or any external system. Its only writes are pulse settings appended to `.andrea-engineering/config.local.yaml` (the unified CE local config, gitignored, machine-local) and the report file (`docs/pulse-reports/...`). MCP and other data-source tools are invoked read-only; if a tool offers write modes, do not use them.

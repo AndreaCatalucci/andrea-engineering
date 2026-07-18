@@ -5,6 +5,9 @@ description: Commit, push, and open a PR. Use when asked to ship/open a PR, or f
 
 # Git Commit, Push, and PR
 
+Immediately before writing user-facing text, read and follow
+[`references/plain-language.md`](references/plain-language.md).
+
 **Asking the user:** When this skill says "ask the user", read and follow [`references/codex-interaction.md`](references/codex-interaction.md).
 
 ## Mode

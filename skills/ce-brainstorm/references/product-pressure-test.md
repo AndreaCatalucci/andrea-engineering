@@ -1,13 +1,15 @@
 # Decision-Discovery Rubric
 
-Use this internally after grounding. It strengthens the scope thesis; it is not a visible phase, a script of questions, or a coverage checklist.
+Use this internally after the initial research. It strengthens the proposed
+scope; it is not a visible phase, a script of questions, or a coverage
+checklist.
 
 There is no requirement to ask about every lens. Assess, research, infer, or default first. A missing detail becomes a question only when plausible answers cross the parent skill's consequential-decision threshold. Do not ask merely to make the final artifact look complete.
 
 For every candidate gap:
 
 1. Research it if it is discoverable.
-2. Infer the best answer from the scope thesis and evidence when confidence is sufficient.
+2. Infer the best answer from the proposed scope and evidence when confidence is sufficient.
 3. Record a visible default or assumption when reversal is cheap.
 4. Ignore it when it cannot materially change scope, value, risk, or rework.
 5. Only otherwise place the decision in the dependency map and ask it at the right time, with a recommendation.

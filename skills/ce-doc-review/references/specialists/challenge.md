@@ -9,7 +9,7 @@ Pressure-test whether the requirements choose the right problem, outcome, and sc
 - **Alternatives:** Is there a specific smaller or existing solution that delivers most of the value?
 - **Scope:** Does each requirement serve a goal, and does every abstraction or option have a present consumer?
 - **Priority:** Do must-haves form an independently valuable release, or do they depend on deferred work?
-- **Reversal:** Which load-bearing decision is expensive to undo and weakly supported?
+- **Reversal:** Which important decision is expensive to undo and weakly supported?
 
 Challenge only claims made by the document. Do not invent market needs, competing priorities, or hypothetical future scale. Do not review implementation feasibility, security, or interaction design.
 

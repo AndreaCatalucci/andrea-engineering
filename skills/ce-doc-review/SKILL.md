@@ -5,6 +5,9 @@ description: Review an existing requirements document, implementation plan, or s
 
 # Document Review
 
+Immediately before writing user-facing text, read and follow
+[`references/plain-language.md`](references/plain-language.md).
+
 Pressure-test a planning document with one core pass and only the specialists its content warrants. Apply mechanically certain Markdown corrections; report author decisions without guessing.
 
 ## 1. Resolve the document
@@ -24,14 +27,12 @@ Completion criterion: one readable document and its mode are resolved, or a prec
 
 Classify from content; use the path only as a tie-breaker:
 
-- `requirements`: describes the problem, actors, behavior, scope, flows, or acceptance examples.
-- `plan`: describes technical decisions, implementation units, files, dependencies, tests, or verification.
-- `unified-requirements`: `artifact_contract: ce-unified-plan/v1` with `artifact_readiness: requirements-only`.
-- `unified-plan`: the same contract with `artifact_readiness: implementation-ready`.
+- `requirements`: describes the problem, actors, behavior, scope, flows, or acceptance examples. An Andrea plan with `plan_readiness: requirements-only` belongs here.
+- `plan`: describes technical decisions, work steps, files, dependencies, tests, or verification. An Andrea plan with `plan_readiness: implementation-ready` belongs here.
 
-For unified requirements, do not flag the intentionally absent Planning Contract, Implementation Units, Verification Contract, or Definition of Done. Treat invalid readiness values as document findings.
+For requirements-only documents, do not flag the intentionally absent How We'll Build It, Work Steps, How We'll Check It, or Done When. Treat invalid readiness values as document findings.
 
-Extract provenance once: prefer `origin:`, then `product_contract_source:`, otherwise `none`. Read a referenced origin when available; do not fail because an optional origin is unavailable.
+Extract provenance once: prefer `origin:`, then `requirements_source:`, otherwise `none`. Read a referenced origin when available; do not fail because an optional origin is unavailable.
 
 Completion criterion: the document type and provenance are explicit inputs to every later pass.
 
@@ -47,8 +48,8 @@ Select by branch, not by document size:
 
 | Specialist | Trigger |
 | --- | --- |
-| Challenge | `requirements` or `unified-requirements` |
-| Feasibility | `plan` or `unified-plan` |
+| Challenge | `requirements` |
+| Feasibility | `plan` |
 | Security | Concrete auth, authorization, sensitive data, payments, secrets, external endpoints, or trust boundaries |
 | Design | Concrete UI, interaction, user-flow, responsive, or accessibility behavior |
 

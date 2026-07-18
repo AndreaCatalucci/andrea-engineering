@@ -20,7 +20,7 @@ Build one shared grounding block and keep it byte-identical across every ideatio
 - `<grounding>` — the consolidated grounding summary, including the evidence gists and the absolute paths of the dossier files under `<scratch-dir>` (identical bytes across agents). Instruct each agent to read the dossier files before generating — they are the evidence layer its bases cite; the gists are orientation, not evidence. In elsewhere modes the only dossiers are user-supplied research dossiers (when present); otherwise the grounding summary itself is the evidence layer.
 - `<constraints>` — the user's prompt, the focus hint, and any *User-named references*: ideas that violate these are out regardless of basis
 - `<background>` — everything else in the grounding (codebase context, additional context, learnings, external context, user-supplied research): informative, not directive — it can supply an idea's basis, but it must not pull ideation toward whatever was loudest in the corpus when the user named a different focus
-- `<axes>` — the Phase 1.5 axis list, when present
+- `<areas>` — the Phase 1.5 area list, when present
 - `<task>` — the frame assignment, per-frame volume target, ambition charter, verification-read budget, and compact candidate contract; generate raw candidates only
 
 The `<constraints>`/`<background>` split is the primary defense against grounding noise (an unrelated `FEEDBACK.md` the user did not name, a tangentially-cited prior-art result) shaping survivors against user intent — keep it mechanical via the tags, not prose hedging. User-supplied *research* artifacts are background even though user-named — supplying evidence is not issuing a directive; only directive files (per the Phase 1 routing test) ride in `<constraints>`.
@@ -46,11 +46,11 @@ Assign each subagent its frame (or frame pair) as a **starting bias, not a const
 
 **Issue-tracker mode override (repo mode only).** When issue-tracker intent is active and themes were returned by the issue intelligence agent: each high/medium-confidence theme becomes a frame. Pad with frames from the 6-frame default pool (in the order listed above) if fewer than 3 cluster-derived frames. Cap at 4 total — issue-tracker mode keeps its tighter dispatch by design.
 
-**Axis spread instruction.** When an axis list is present, instruct each subagent to distribute its ideas across multiple axes — the frame's lens applies to every axis, but ideas should not all cluster on one. Each idea must be tagged with the axis it targets. The frame is a lens; the axis list is the surface map. A frame that plausibly reaches an axis should produce at least one idea there before doubling up on a different axis. When decomposition was skipped (atomic subject or surprise-me), omit the axis instruction entirely — do not invent axes at dispatch time.
+**Area spread instruction.** When an area list is present, instruct each subagent to distribute its ideas across multiple areas — the frame's point of view applies to every area, but ideas should not all cluster on one. Each idea must be tagged with the area it targets. The frame is a point of view; the area list is the surface map. A frame that plausibly reaches an area should produce at least one idea there before doubling up on a different area. When decomposition was skipped (atomic subject or surprise-me), omit the area instruction entirely — do not invent areas at dispatch time.
 
 **Surprise-me mode addendum.** When Phase 0.2 routed to surprise-me, include this additional instruction in each subagent's dispatch prompt:
 
-> No user-specified subject. Through your frame's lens, explore the Phase 1 material and identify the subject(s) you find most interesting for this frame. Different frames finding different subjects is the feature — cross-subject divergence is what makes surprise-me valuable. Each idea still carries a basis; the basis may include identification of the subject itself (why *this* subject is worth ideating on through your lens, citing what in the Phase 1 material signals it).
+> No user-specified subject. Through your frame's point of view, explore the Phase 1 material and identify the subject(s) you find most interesting for this frame. Different frames finding different subjects is the feature — cross-subject divergence is what makes surprise-me valuable. Each idea still carries a basis; the basis may include identification of the subject itself (why *this* subject is worth ideating on through your point of view, citing what in the Phase 1 material signals it).
 
 ## Compact Candidate Contract (uniform across all frames, all modes)
 
@@ -58,7 +58,7 @@ Explore broadly within each frame, then return every requested candidate in this
 
 - **title**
 - **move** — one sentence stating the concrete direction
-- **axis** — required when Phase 1.5 produced an axis list. Pick the one axis this idea most centrally targets; do not span. Omit entirely when decomposition was skipped.
+- **area** — required when Phase 1.5 produced an area list. Pick the one area this idea most centrally targets; do not span. Omit entirely when decomposition was skipped.
 - **basis** (required, tagged) — one of:
   - `direct:` quoted line / specific file / named issue / explicit user-supplied context
   - `external:` named prior art, domain research, adjacent pattern, with source
@@ -79,10 +79,10 @@ Basis is required. If a subagent cannot articulate one, the idea does not surfac
 
 1. Merge and dedupe into one master candidate list.
 2. Synthesize cross-cutting combinations -- scan for ideas from different frames that combine into something stronger. In specified mode, expect 3-5 additions at most. **In surprise-me mode, cross-cutting is the magic layer** — frames often converge on overlapping subjects or find complementary angles; expect 5-8 additions and give this step more attention. Surface combinations that span multiple frame-chosen subjects as a distinctive surprise-me output pattern.
-3. **Axis-coverage check (when Phase 1.5 produced an axis list; skipped otherwise).** Count ideas per axis after dedupe. For any axis with zero ideas, dispatch one recovery subagent using an unused frame or the frame whose lens best fits the missing axis — e.g., Pain & friction for usability axes, Cross-domain analogy for distribution or compounding axes. The recovery dispatch uses the same compact contract and returns ~3-5 ideas. **Cap recovery at 2 axes total** — if more than 2 axes are empty after the first round, accept thin coverage rather than fanning out further. After recovery returns, merge into the master list and dedupe again. Note empty axes that were not recovered in the rejection summary as "axis: <name> — recovery skipped (cap reached)" so the gap is visible to the user.
+3. **Area-coverage check (when Phase 1.5 produced an area list; skipped otherwise).** Count ideas per area after dedupe. For any area with zero ideas, dispatch one recovery subagent using an unused frame or the frame whose point of view best fits the missing area — e.g., Pain & friction for usability areas, Cross-domain analogy for distribution or compounding areas. The recovery dispatch uses the same compact contract and returns ~3-5 ideas. **Cap recovery at 2 areas total** — if more than 2 areas are empty after the first round, accept thin coverage rather than fanning out further. After recovery returns, merge into the master list and dedupe again. Note empty areas that were not recovered in the rejection summary as "area: <name> — recovery skipped (cap reached)" so the gap is visible to the user.
 4. If a focus was provided, weight the merged list toward it without excluding stronger adjacent ideas.
 5. Spread ideas across multiple dimensions when justified: workflow/DX, reliability, extensibility, missing capabilities, docs/knowledge compounding, quality/maintenance, leverage on future work.
 
 **Checkpoint A (V17).** Immediately after cross-cutting synthesis, write `<scratch-dir>/raw-candidates.md` containing the consolidated candidates with agent attribution. This is best-effort and protects the expensive generation output before critique; continue with a warning if the write fails.
 
-When the merge, synthesis, and axis-coverage steps are complete, return to SKILL.md Phase 2's closing instruction and load `references/post-ideation-workflow.md` before any critique begins.
+When the merge, synthesis, and area-coverage steps are complete, return to SKILL.md Phase 2's closing instruction and load `references/post-ideation-workflow.md` before any critique begins.

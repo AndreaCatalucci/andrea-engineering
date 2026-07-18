@@ -9,12 +9,12 @@ The artifact is a ranked, critiqued candidate set plus the evidence and rejectio
 Render these sections in order:
 
 1. Visible title and metadata
-2. Grounding Context
-3. Topic Axes, when applicable
+2. Relevant Context
+3. Topic Areas, when applicable
 4. Ranked Ideas
 5. Rejection Summary
 
-Do not add next steps, workflow state, skill instructions, or implementation units.
+Do not add next steps, workflow state, skill instructions, or work steps.
 
 ## Metadata
 
@@ -27,18 +27,18 @@ Include:
 
 Markdown uses YAML frontmatter. HTML renders the values once as visible header text. Do not add document or per-idea status fields.
 
-## Grounding Context
+## Relevant Context
 
 Include the consolidated Phase 1 grounding that qualified the ideas. Label the content “Codebase Context” in repo mode and “Topic Context” elsewhere. Preserve concrete evidence, constraints, pain points, and opportunity signals; omit orchestration details.
 
-## Topic Axes
+## Topic Areas
 
-When Phase 1.5 produced axes, list all 3–5 in the topic's own language. When decomposition was attempted but skipped, record one line:
+When Phase 1.5 produced areas, list all 3–5 in the topic's own language. When decomposition was attempted but skipped, record one line:
 
 - `Decomposition skipped — atomic subject`, or
 - `Decomposition skipped — surprise-me mode`
 
-Omit the section when axes are not applicable.
+Omit the section when areas are not applicable.
 
 ## Ranked Ideas
 
@@ -46,7 +46,7 @@ Rank every survivor. Each idea must include:
 
 - **Title**
 - **Description** — concrete explanation
-- **Axis** — omit only when decomposition was skipped
+- **Area** — omit only when decomposition was skipped
 - **Basis** — `direct:`, `external:`, or `reasoned:` evidence that supports the move
 - **Rationale** — why that basis makes the move significant
 - **Downsides** — real tradeoffs and costs
@@ -65,7 +65,7 @@ Decide per idea; there is no quota or cap.
 
 ## Rejection Summary
 
-Record every considered-and-cut idea in a table with a one-line rejection reason. Add any axis with zero survivors as its own row, including whether recovery failed or hit the cap.
+Record every considered-and-cut idea in a table with a one-line rejection reason. Add any area with zero survivors as its own row, including whether recovery failed or hit the cap.
 
 ## Completion check
 
@@ -73,7 +73,7 @@ Before saving, verify:
 
 - Every survivor has every required field and a basis that supports its move.
 - Every rejection has a reason.
-- Grounding and axes match the run that generated the candidates.
+- Grounding and areas match the run that generated the candidates.
 - The ranked order matches the final arbitration.
 - No placeholder, process note, lifecycle state, or downstream instruction remains.
 - The renderer contains the full content; format changes presentation only.

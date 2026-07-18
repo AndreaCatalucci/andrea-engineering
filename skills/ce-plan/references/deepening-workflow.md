@@ -9,7 +9,7 @@ Use a checklist-first, risk-weighted scoring pass.
 For each section, compute:
 - **Trigger count** - number of checklist problems that apply
 - **Risk bonus** - add 1 if the topic is high-risk and this section is materially relevant to that risk
-- **Critical-section bonus** - add 1 for `Key Technical Decisions`, `Implementation Units`, `System-Wide Impact`, `Risks & Dependencies`, or `Open Questions` in `Standard` or `Deep` plans
+- **Critical-section bonus** - add 1 for `Technical Decisions`, `Work Steps`, `System-Wide Impact`, `Risks & Dependencies`, or `Open Questions` in `Standard` or `Deep` plans
 
 Treat a section as a candidate if:
 - it hits **2+ total points**, or
@@ -24,19 +24,19 @@ If the plan already has a `deepened:` date:
 **Section Checklists:**
 
 **Requirements**
-- Requirements are vague or disconnected from implementation units
+- Requirements are vague or disconnected from work steps
 - Success criteria are missing or not reflected downstream
 - Units do not clearly advance the traced requirements
 - Origin requirements are not clearly carried forward
-- Origin A/F/AE IDs (when supplied by the upstream brainstorm) are not preserved where planning decisions touch them, or are referenced inconsistently across Requirements, units, and test scenarios
+- Origin A/F/AE IDs (when supplied by the upstream brainstorm) are not preserved where planning decisions touch them, or are referenced inconsistently across Requirements, steps, and test scenarios
 
 **Context & Research / Sources & References**
-- Relevant repo patterns are named but never used in decisions or implementation units
+- Relevant repo patterns are named but never used in decisions or work steps
 - Cited learnings or references do not materially shape the plan
 - High-risk work lacks appropriate external or internal grounding
 - Research is generic instead of tied to this repo or this plan
 
-**Key Technical Decisions**
+**Technical Decisions**
 - A decision is stated without rationale
 - Rationale does not explain tradeoffs or rejected alternatives
 - The decision does not connect back to scope, requirements, or origin context
@@ -53,24 +53,24 @@ If the plan already has a `deepened:` date:
 - The sketch uses the wrong medium for the work
 - The sketch contains implementation code rather than pseudo-code
 - The non-prescriptive framing is missing or weak
-- The sketch does not connect to the key technical decisions or implementation units
+- The sketch does not connect to the key technical decisions or work steps
 
 **High-Level Technical Design (when absent)** *(Standard or Deep plans only)*
 - The work involves DSL design, API surface design, multi-component integration, complex data flow, or state-heavy lifecycle
 - Key technical decisions would be easier to validate with a visual or pseudo-code representation
-- The approach section of implementation units is thin and a higher-level technical design would provide context
+- The approach section of work steps is thin and a higher-level technical design would provide context
 
-**Implementation Units**
+**Work Steps**
 - Dependency order is unclear or likely wrong
 - File paths or test file paths are missing where they should be explicit
-- Units are too large, too vague, or broken into micro-steps
+- Steps are too large, too vague, or broken into micro-steps
 - Approach notes are thin or do not name the pattern to follow
-- Test scenarios are vague (don't name inputs and expected outcomes), skip applicable categories (e.g., no error paths for a unit with failure modes, no integration scenarios for a unit crossing layers), or are disproportionate to the unit's complexity
-- Feature-bearing units have blank or missing test scenarios (feature-bearing units require actual test scenarios; the `Test expectation: none` annotation is only valid for non-feature-bearing units)
+- Test scenarios are vague (don't name inputs and expected outcomes), skip applicable categories (e.g., no error paths for a step with failure modes, no integration scenarios for a step crossing layers), or are disproportionate to the step's complexity
+- Feature-bearing steps have blank or missing test scenarios (feature-bearing steps require actual test scenarios; the `Test expectation: none` annotation is only valid for non-feature-bearing steps)
 - Verification outcomes are vague or not expressed as observable results
-- Agent-relevant units do not include agent-native verification: parity checks, context-injection checks, tool-result checks, approval/failure behavior, or checkpoint/resume where applicable
-- Existing U-IDs were renumbered after a unit was reordered, split, or deleted (U-IDs are stable: never renumber existing IDs; gaps from deletions are preserved; new units take the next unused number)
-- A unit realizing an origin Key Flow does not cite the F-ID, or a unit enforcing an origin Acceptance Example does not cite the AE-ID, when origin supplies them
+- Agent-relevant steps do not include agent-native verification: parity checks, context-injection checks, tool-result checks, approval/failure behavior, or checkpoint/resume where applicable
+- Existing W-IDs were renumbered after a step was reordered, split, or deleted (W-IDs are stable: never renumber existing IDs; gaps from deletions are preserved; new steps take the next unused number)
+- A step realizing an origin Key Flow does not cite the F-ID, or a step enforcing an origin Acceptance Example does not cite the AE-ID, when origin supplies them
 
 **System-Wide Impact**
 - Affected interfaces, callbacks, middleware, entry points, or parity surfaces are missing
@@ -85,7 +85,7 @@ If the plan already has a `deepened:` date:
 - External dependency assumptions are weak or unstated
 - Security, privacy, performance, or data risks are absent where they obviously apply
 
-Use the plan's own `Context & Research` and `Sources & References` as evidence. If those sections cite a pattern, learning, or risk that never affects decisions, implementation units, or verification, treat that as a confidence gap.
+Use the plan's own `Context & Research` and `Sources & References` as evidence. If those sections cite a pattern, learning, or risk that never affects decisions, work steps, or verification, treat that as a confidence gap.
 
 ## 5.3.4 Report and Dispatch Targeted Research
 
@@ -112,7 +112,7 @@ The names below are skill-local prompt asset file stems under `references/agents
 - `web-researcher` for landscape/prior-art gaps — competitor patterns, market signals, or an unsettled external option set (which library/provider/approach) that recommendations depend on
 - Add `git-history-analyzer` only when historical rationale or prior art is materially missing
 
-**Key Technical Decisions**
+**Technical Decisions**
 - `architecture-strategist` for design integrity, boundaries, and architectural tradeoffs
 - `agent-native-planning-strategist` when the decision involves agents, prompts, tools, MCP, workflow automation, action/context parity, shared workspace, approval gates, or agent execution lifecycle
 - Add `framework-docs-researcher` or `best-practices-researcher` when the decision needs external grounding beyond repo evidence
@@ -123,10 +123,10 @@ The names below are skill-local prompt asset file stems under `references/agents
 - `agent-native-planning-strategist` when the technical design includes agent orchestration, MCP/tools, prompt-defined behavior, shared workspace, checkpoint/resume, approvals, or agent-to-UI communication
 - Add `best-practices-researcher` when the technical design involves a DSL, API surface, or pattern that benefits from external validation
 
-**Implementation Units / Verification**
+**Work Steps / Verification**
 - `repo-research-analyst` (Scope: `patterns`) for concrete file targets, patterns to follow, and repo-specific sequencing clues
 - `pattern-recognition-specialist` for consistency, duplication risks, and alignment with existing patterns
-- `agent-native-planning-strategist` when units should cover agent-accessible domain actions, tool/context changes, prompt changes, or parity testing
+- `agent-native-planning-strategist` when steps should cover agent-accessible domain actions, tool/context changes, prompt changes, or parity testing
 - Add `spec-flow-analyzer` when sequencing depends on user flow or handoff completeness
 
 **System-Wide Impact**
@@ -208,7 +208,7 @@ Skip this step in auto mode — proceed directly to 5.3.7.
 
 In interactive mode, present each agent's findings to the user before integration. For each agent that returned findings:
 
-1. **Summarize the agent and its target section** — e.g., "The architecture-strategist reviewed Key Technical Decisions and found:"
+1. **Summarize the agent and its target section** — e.g., "The architecture-strategist reviewed Technical Decisions and found:"
 2. **Present the findings concisely** — bullet the key points, not the raw agent output. Include enough context for the user to evaluate: what the agent found, what evidence supports it, and what plan change it implies.
 3. **Ask the user** through the [shared codex-interaction contract](codex-interaction.md):
    - **Accept** — integrate these findings into the plan
@@ -229,10 +229,10 @@ If findings were accepted and the plan was modified, proceed through 5.3.7 and 5
 
 Strengthen only the selected sections. Keep the plan coherent and preserve its overall structure.
 
-Record the plan's pre-deepening word count and implementation-unit count.
+Record the plan's pre-deepening word count and work-step count.
 Deepening must preserve the selected depth budget. Prefer replacement,
-clarification, consolidation, and deletion. A new section, KTD, diagram,
-abstraction, or unit is allowed only when a documented P0/P1 correctness gap
+clarification, consolidation, and deletion. A new section, D, diagram,
+abstraction, or step is allowed only when a documented P0/P1 correctness gap
 would otherwise leave the plan unimplementable.
 
 **In interactive mode:** Only integrate findings the user accepted in 5.3.6b. If some findings from different agents touch the same section, reconcile them coherently but do not reintroduce rejected findings.
@@ -243,12 +243,16 @@ Allowed changes:
 - Tighten prose in a strengthened section: cut hedges, split sentences carrying more than one idea, and remove superseded text in place (version control holds the history)
 - Clarify or strengthen decision rationale
 - Tighten requirements trace or origin fidelity
-- Reorder or split implementation units when sequencing is weak — but **never renumber existing U-IDs**. Reordering preserves U-IDs in their new order (e.g., U1, U3, U5 reordered is correct; renumbering to U1, U2, U3 is not). Splitting keeps the original U-ID on the original concept and assigns the next unused number to the new unit. Renumbering breaks ce-work blocker and verification references that were written against the original IDs
+- Reorder or split work steps when sequencing is weak, but **never renumber
+  existing W-IDs**. Reordering W1, W3, and W5 is valid; renumbering them to W1,
+  W2, and W3 is not. A split keeps the original W-ID on the original idea and
+  gives the new step the next unused number. Renumbering breaks existing blocker
+  and verification references.
 - Add missing pattern references, file/test paths, or verification outcomes
 - Expand system-wide impact, risks, or rollout treatment where justified
 - Reclassify open questions between `Resolved During Planning` and `Deferred to Implementation` when evidence supports the change
 - Strengthen, replace, or add a High-Level Technical Design section when the work warrants it and the current representation is weak
-- Strengthen or add per-unit technical design fields where the unit's approach is non-obvious
+- Strengthen or add per-step technical design fields where the step's approach is non-obvious
 - Add or update `deepened: YYYY-MM-DD` in frontmatter when the plan was substantively improved
 
 Do **not**:
@@ -257,13 +261,13 @@ Do **not**:
 - Add generic `Research Insights` subsections everywhere
 - Rewrite the entire plan from scratch
 - Invent new product requirements, scope changes, or success criteria without surfacing them explicitly
-- Renumber existing U-IDs as part of reordering, splitting, deletion, or "tidying" the unit list. Deepening is the most likely accidental-renumber vector — preserve U-IDs even when the new order would look cleaner with sequential numbering
+- Renumber existing W-IDs as part of reordering, splitting, deletion, or "tidying" the step list. Deepening is the most likely accidental-renumber vector — preserve W-IDs even when the new order would look cleaner with sequential numbering
 
 If research reveals a product-level ambiguity that should change behavior or scope:
 - Do not silently decide it here
 - Record it under `Open Questions`
 - Recommend `ce-brainstorm` if the gap is truly product-defining
 
-After synthesis, recalculate words and units. Growth above 10% requires the
+After synthesis, recalculate words and steps. Growth above 10% requires the
 specific P0/P1 reason in the review summary. Without that reason, compress the
 accepted improvements into the existing structure before continuing.

@@ -1,27 +1,36 @@
 ---
 name: ce-brainstorm
-description: 'Shape a vague or ambitious idea into confirmed, requirements-only direction. Use for exploratory product framing before planning; not execution, debugging, code review, or project-specific technology verdicts.'
+description: 'Turn a vague or ambitious idea into confirmed requirements. Use while deciding what to build, before implementation planning; not for execution, debugging, code review, or choosing a project technology.'
 ---
 
 # Brainstorm a Feature or Improvement
 
+Immediately before writing user-facing text, read and follow
+[`references/plain-language.md`](references/plain-language.md).
+
 Resolve the decisions that define **what** to build. `ce-plan` later decides **how** to build it.
 
-The workflow is a dependency-ordered decision interview, not a requirements questionnaire. Research facts, discover the decision surface, and help the user make one decision at a time. Preserve creativity by proposing strong options, challenging the initial framing, and surfacing consequences the user may not have noticed.
+Research the facts, identify the questions that matter, and help the user answer
+one question at a time. Propose useful options, challenge assumptions, and
+point out concrete consequences the user may not have noticed.
 
 Do not implement code. Do not write a plan, invoke a handoff, or take downstream action until the user explicitly confirms the final shared understanding.
 
-## Non-Negotiable Interaction Contract
+## Conversation Rules
 
 1. **One question per turn.** Ask it, wait, and use the answer before asking another. Never bundle related questions.
 2. **Facts are researched.** If a fact can be established from the filesystem, repo, tools, or supplied material, look it up instead of asking the user. Verify before claiming, especially absence claims.
 3. **Consequential decisions belong to the user.** Put choices to them when preference defines the product or a wrong answer materially changes value, risk, or rework. Use visible defaults for lower-cost choices.
 4. **Recommend an answer.** Every decision question includes one clear recommendation and a short reason. Add up to two genuinely distinct alternatives only when they improve the choice.
 5. **User-held facts stay open.** Goals, preferences, observed behavior, and lived experience may require a specific open-ended question. Do not recommend or fabricate these answers.
-6. **Be proactive, not sprawling.** Surface overlooked constraints, opportunities, risks, edge cases, and downstream effects. Turn each into the next decision only when it materially changes scope, behavior, architecture, or acceptance.
+6. **Be proactive, not sprawling.** Point out overlooked constraints,
+   opportunities, risks, edge cases, and later effects. Ask about one only when
+   it changes scope, behavior, architecture, or acceptance.
 7. **Default with judgment.** When one option is strongly supported and cheap to reverse, adopt it as a visible default even if it affects behavior. Expose defaults in the final synthesis so they can be corrected.
-8. **Confirm the whole.** Individual answers are provisional parts of a whole. End with a concise synthesis and wait for explicit confirmation before any artifact or handoff.
-9. **Define scope before dialogue.** Do not begin the decision interview until research supports a manageable scope thesis. Push back on work too broad for one coherent brainstorm.
+8. **Confirm the whole.** Individual answers are parts of the same proposal.
+   End with a short summary and wait for explicit confirmation before writing
+   a document or handing work to another skill.
+9. **Define scope before dialogue.** Do not begin the decision interview until research supports a manageable proposed scope. Push back on work too broad for one coherent brainstorm.
 
 Before the first decision question, read and follow [`references/codex-interaction.md`](references/codex-interaction.md). A useful decision turn normally has this shape:
 
@@ -44,7 +53,9 @@ Before interviewing:
 - If requirements are already complete, research enough to verify them, present the shared-understanding synthesis, and wait for confirmation. Do not manufacture questions.
 - If the request is a quick factual or single-step task, answer directly and stop this workflow.
 - If it asks whether to adopt, switch to, or replace a named external technology, library, pattern, platform, or architecture for this project, read `references/verdict-routing.md` and offer `ce-pov`.
-- For non-software decisions, use the same interview loop. Read `references/universal-brainstorming.md` only for its domain-specific facilitation guidance; do not use the software artifact contract.
+- For non-software decisions, use the same interview loop. Read
+  `references/universal-brainstorming.md` only for its domain-specific guidance;
+  do not use the software-plan format.
 - If resuming a matching requirements-only plan, ask one decision: resume it or start fresh. Preserve its format unless the user requests a different one.
 
 Classify the work silently as **Lightweight**, **Standard**, or **Deep**. Depth controls research and completeness, never the one-question interaction rule.
@@ -58,21 +69,21 @@ Use the prompt, available context, and an initial environment scan to assess **p
 Consider:
 
 - how many distinct actors and outcomes are involved;
-- whether the request spans independent product surfaces or problem areas;
+- whether the request spans independent parts of the product or separate problems;
 - whether one product thesis and boundary can organize the work;
 - how many high-impact unknowns depend on unrelated decisions;
-- whether one requirements artifact could remain coherent and actionable.
+- whether one requirements document could stay clear and actionable.
 
 A technically large feature may still be manageable when it serves one actor, outcome, and product shape. A request combining several independent outcomes or product theses is not manageable merely because they share a codebase.
 
 If the scope is too broad for one conversation:
 
 1. Explain the competing problem areas and why combining them would produce shallow or contradictory decisions.
-2. Recommend the highest-leverage coherent slice to brainstorm first.
+2. Recommend the smallest useful part to work through first.
 3. Offer at most two meaningfully different slices when useful.
 4. Ask the user to choose one and wait. Do not begin detailed questioning until a slice is selected.
 
-If the scope is manageable, form an internal **scope thesis** before dialogue:
+If the scope is manageable, form an internal **proposed scope** before dialogue:
 
 - problem and desired outcome;
 - primary actor;
@@ -92,21 +103,28 @@ Out of scope: <only the major exclusions needed to make the boundary legible>
 
 This is a proposal, not a routine confirmation gate. When evidence strongly supports one coherent boundary, state it and continue to the highest-impact unresolved decision in the same turn. Ask the user to confirm scope only when two or more materially different boundaries remain genuinely plausible.
 
-## Ground the Scope Thesis
+## Ground the Proposed Scope
 
-Complete enough exploration to support or revise the scope thesis before asking substantive questions.
+Complete enough exploration to support or revise the proposed scope before asking substantive questions.
 
 ### Repo orientation
 
-For software work, search for the topic, similar behavior, relevant plans, conventions, vocabulary, and the current state of affected surfaces. Search first and read targeted ranges.
+For software work, search for the topic, similar behavior, relevant plans,
+conventions, vocabulary, and the affected parts of the codebase. Search first
+and read only the relevant sections.
 
 - **Lightweight:** a small inline scan.
 - **Standard:** inline research, roughly 20 targeted reads at most.
-- **Deep:** inline when the footprint is coherent. Create a grounding dossier of at most 150 lines with `file:line` evidence when the footprint is broad enough to justify one.
+- **Deep:** research inline when the affected code is cohesive. When it spans
+  many areas, create a research note of at most 150 lines with `file:line`
+  evidence.
 
 The repo-profile cache may provide stable orientation. If needed, set `SKILL_DIR` to this skill's directory and run `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get`. On a miss, read `references/agents/repo-profiler.md`, derive its compact profile inline, and persist it with the same script. Never dispatch a profiler. If caching fails, continue with targeted inline research. The protocol lives in `references/repo-profile-cache.md`.
 
-Use one extraction-only scout for Deep grounding only when the footprint is broad, unfamiliar, or cross-cutting enough that inline research would crowd out the interview. Read `references/delegation-budgets.md` before dispatching. Otherwise keep research in the main thread.
+Use one extraction-only scout for deep research only when the affected code is
+broad, unfamiliar, or cross-cutting enough to crowd out the conversation. Read
+`references/delegation-budgets.md` before dispatching. Otherwise keep research
+in the main thread.
 
 Do not ask the user for discoverable facts such as existing routes, dependencies, schemas, config, or prior art. Tie consequential factual claims to evidence. Label anything that cannot be verified as an assumption.
 
@@ -122,7 +140,7 @@ Read-only research and user-approved temporary probes are part of reaching under
 
 ## Build the Decision Map
 
-Begin only after a manageable scope thesis exists. Candidate questions refine or challenge that thesis; they do not precede it.
+Begin only after a manageable proposed scope exists. Candidate questions refine or challenge that thesis; they do not precede it.
 
 Maintain a compact internal ledger throughout the conversation:
 
@@ -133,7 +151,9 @@ Maintain a compact internal ledger throughout the conversation:
 
 Do not show the ledger mechanically. Use it to choose the next question.
 
-Read `references/product-pressure-test.md` once after initial grounding. Use its lenses as an internal completeness and creativity rubric, not as a separate phase or visible checklist.
+Read `references/product-pressure-test.md` once after the initial research. Use
+its checks internally to find missing questions and stronger options. Do not
+show it as a separate phase or checklist.
 
 Discover candidate decisions across:
 
@@ -141,7 +161,7 @@ Discover candidate decisions across:
 - product shape and user-visible behavior;
 - scope boundaries, exclusions, and smallest valuable form;
 - constraints, risks, failure modes, and edge cases;
-- success and acceptance signals;
+- measures of success and acceptance criteria;
 - dependencies, reversibility, and non-obvious combined consequences;
 - adjacent or inverted ideas with meaningfully higher upside;
 - for Deep-product work: positioning, durability, and product identity.
@@ -150,7 +170,8 @@ Remove questions that research can answer. Default choices when one answer is st
 
 ## Run the Decision Interview
 
-Do not enter this section until scope assessment, grounding, the scope thesis, and the user-facing working scope are complete.
+Do not enter this section until you have assessed the size of the request,
+researched the relevant facts, and explained the proposed scope to the user.
 
 For each turn:
 
@@ -173,7 +194,10 @@ Stop interviewing when no unresolved decision materially affects scope, behavior
 
 Verify routine claims inline. Use one independent verifier only when a factual mistake could materially distort the direction or when a Deep claim remains unusually uncertain after targeted research. Read `references/delegation-budgets.md` before dispatching.
 
-Give the verifier a short claim list and any grounding dossier path. Require `confirmed` with `file:line`, `refuted` with contradictory evidence, or `unverifiable`. Correct refuted claims and turn unverifiable consequential claims into explicit assumptions before synthesis.
+Give the verifier a short claim list and any research-note path. Require
+`confirmed` with `file:line`, `refuted` with contradictory evidence, or
+`unverifiable`. Correct refuted claims and record important unverifiable claims
+as assumptions before the final summary.
 
 No independent verifier is needed merely because the brainstorm is Standard or because a document may be written.
 
@@ -184,7 +208,7 @@ Read `references/synthesis-summary.md` and produce the final synthesis. It must 
 - what is being built and for whom;
 - material decisions and their rationale;
 - scope boundaries and meaningful exclusions;
-- acceptance or success signals;
+- acceptance criteria or measures of success;
 - defaults and assumptions;
 - unresolved non-blockers, if any.
 
@@ -194,21 +218,22 @@ Do nothing downstream until the user explicitly confirms.
 
 ## After Confirmation
 
-For software work, write or update a requirements-only unified plan only when the decisions are worth preserving. Resolve output format at composition time: explicit request, then known user preference, then active `brainstorm_output` in `.andrea-engineering/config.local.yaml`, otherwise markdown. Pipeline contexts force markdown. Preserve a resumed artifact's format unless explicitly overridden.
+For software work, write or update a requirements-only plan only when the decisions are worth preserving. Resolve output format at composition time: explicit request, then known user preference, then active `brainstorm_output` in `.andrea-engineering/config.local.yaml`, otherwise markdown. Pipeline contexts force markdown. Preserve a resumed document's format unless explicitly overridden.
 
 Read only the references needed at this point:
 
-- `references/brainstorm-sections.md` for the Product Contract and whether an artifact is warranted.
+- `references/brainstorm-sections.md` for the requirements sections and whether
+  a document is warranted.
 - `references/html-rendering.md` or `references/markdown-rendering.md` for the selected format.
 
 Write to `docs/plans/YYYY-MM-DD-NNN-<type>-<topic>-plan.<md|html>` with:
 
-- `artifact_contract: ce-unified-plan/v1`
-- `artifact_readiness: requirements-only`
-- `product_contract_source: ce-brainstorm`
+- `plan_format: andrea-plan/v1`
+- `plan_readiness: requirements-only`
+- `requirements_source: ce-brainstorm`
 
-Keep the artifact requirements-only, concise, and standalone. Capture resolved project vocabulary in an existing root `CONCEPTS.md`; never create that file here.
+Keep the document requirements-only, concise, and standalone. Capture resolved project vocabulary in an existing root `CONCEPTS.md`; never create that file here.
 
-For non-software work, keep the confirmed synthesis in chat unless the user chooses a durable artifact or a handoff to `ce-plan`.
+For non-software work, keep the confirmed synthesis in chat unless the user chooses a durable document or a handoff to `ce-plan`.
 
-Finally read `references/handoff.md` and offer only applicable next steps. This happens after confirmation and, when warranted, artifact creation—never before.
+Finally read `references/handoff.md` and offer only applicable next steps. This happens after confirmation and, when warranted, document creation—never before.

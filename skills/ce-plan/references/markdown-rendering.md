@@ -17,7 +17,7 @@ These hold regardless of which skill produced the artifact.
   — exact fields are per-skill, defined in the section contract).
 - **ASCII identifiers in anchors.** Markdown headings auto-generate anchors
   from the heading text. Keep headings ASCII so anchors are predictable
-  (`#implementation-units`, not `#implementación-units`).
+  (`#work-steps`, not `#implementación-steps`).
 - **Repo-relative paths for file references.** Always. Never absolute paths
   — they break portability across machines, worktrees, teammates.
 - **No HTML mixed in.** Keep the markdown pure. No `<div>`, no `<details>`,
@@ -28,16 +28,16 @@ These hold regardless of which skill produced the artifact.
   single line. The artifact is read rendered and shared, where fixed wraps add
   nothing and only produce noisy mid-sentence diffs; markdown joins soft line
   breaks within a paragraph, so wrapping never changes the rendered output.
-- **Unified plan sections use stable headings.** For unified plan artifacts,
+- **Plan sections use stable headings.** For plan artifacts,
   render the required sections with exact ASCII headings so agents can find
-  them by heading scan: `## Goal Capsule`, `## Product Contract`,
-  `## Planning Contract`, `## Implementation Units`, `## Verification Contract`,
-  `## Definition of Done`, and optional `## Appendix`. Requirements-only
+  them by heading scan: `## Goal`, `## What We're Building`,
+  `## How We'll Build It`, `## Work Steps`, `## How We'll Check It`,
+  `## Done When`, and optional `## Appendix`. Requirements-only
   artifacts omit the plan-only sections rather than emitting empty placeholders.
   These stable headings are the wayfinding contract: consumers scan them
   (markdown headings, or `<h1>`–`<h3>` / anchor ids in HTML) instead of reading
   the whole document.
-- **Goal Capsule is top-loaded.** It appears before Product Contract and long
+- **Goal is top-loaded.** It appears before What We're Building and long
   appendices for fast orientation — not a hidden machine copy.
 
 ## Format principles
@@ -47,7 +47,7 @@ artifact based on content shape.
 
 ### ID prefix format
 
-Stable IDs (R, U, A, F, AE, KTD) appear as plain prefixes at the start of
+Stable IDs (R, W, A, F, AE, D) appear as plain prefixes at the start of
 the bullet or heading — do NOT bold the prefix. The prefix is visually
 distinctive on its own; bolding it inflates visual noise.
 
@@ -56,7 +56,7 @@ distinctive on its own; bolding it inflates visual noise.
 - **R1.** The plan returns paginated sessions.   ← wrong (bolded prefix)
 ```
 
-Same applies to unit headings: `### U1. Cloak detection in preflight contract`.
+Same applies to work-step headings: `### W1. Cloak detection in preflight`.
 
 ### Content shape: prose vs bullets vs tables
 
@@ -80,8 +80,8 @@ narrative thought, prose.
 
 ### Bold leader labels within bullets
 
-When a bullet has substructure that benefits from named fields (Key Flows
-with Trigger / Actors / Steps / Outcome, Acceptance Examples with Covers
+When a bullet has substructure that benefits from named fields (Main Flows
+with Trigger / Actors / Steps / Outcome, Examples with Covers
 / Given / When / Then), use bold leader labels at the start of nested
 bullets — not deeper heading levels.
 
@@ -112,34 +112,34 @@ are noisier in raw form and worse for diffs.
 How section types commonly render in markdown. These are patterns, not
 contracts — the agent picks the shape that fits the content.
 
-- **Goal Capsule** — bullets or a small table for objective, authority,
+- **Goal** — bullets or a small table for objective, authority,
   execution profile, stop conditions, and tail ownership.
-- **Product Contract** — H2 section containing Summary, Problem Frame,
+- **What We're Building** — H2 section containing Summary, Problem,
   Requirements, and product-scope subsections. Put Requirements under
   `### Requirements` so review tools can distinguish Product Requirements
   from implementation detail.
-- **Planning Contract** — H2 section for KTDs, high-level technical design,
+- **How We'll Build It** — H2 section for technical decisions, high-level technical design,
   assumptions, and sequencing.
-- **Summary / Problem Frame** — prose paragraphs.
+- **Summary / Problem** — prose paragraphs.
 - **Requirements** — bullets with `R<N>.` prefix. When requirements span
   more than one concern, grouping under bold inline headers is the default
   shape, not optional polish (group by capability, not by discussion order);
   render a flat list only when every requirement is about the same thing.
   When requirements have status, traceability, or severity that warrant
   additional columns, escalate to a table.
-- **Implementation Units** — H3 heading per unit with `U<N>.` prefix.
+- **Work Steps** — H3 heading per step with `W<N>.` prefix.
   Fields (Goal, Files, Patterns, Test Scenarios, Verification) render as
   bullets with bold leader labels, or as sub-headings if the field has
   multi-paragraph content.
-- **Verification Contract / Definition of Done** — use tables when commands,
-  applicability, unit IDs, and done signals share a uniform shape. Name
+- **How We'll Check It / Done When** — use tables when commands,
+  applicability, step IDs, and done signals share a uniform shape. Name
   concrete repo commands such as `bun test` rather than generic "run tests"
   when the repo has known commands.
-- **Key Technical Decisions** — bullets with bold decision name + prose
-  rationale, or numbered KTD-N pattern when traceability matters.
-- **Key Flows / Acceptance Examples** — bullets with bold leader labels
+- **Technical Decisions** — bullets with bold decision name + prose
+  rationale, or numbered `D<N>.` pattern when traceability matters.
+- **Main Flows / Examples** — bullets with bold leader labels
   (Trigger / Actors / Steps / Outcome / Covers / Given-When-Then).
-- **Scope Boundaries** — bullets, optionally split into "Deferred for
+- **Scope** — bullets, optionally split into "Deferred for
   later" / "Outside this product's identity" sub-headings when the
   positioning distinction matters.
 

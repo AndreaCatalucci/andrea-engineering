@@ -36,4 +36,6 @@ The subject is usually recoverable; the **intent** is the ambiguous part. Classi
 
 ## Warm invocations
 
-A warm invocation with no clear question is this same gate — the conversation is the material you orient on. Infer the decision from it, propose/confirm it, then proceed. For the rest of the warm contract (guest output, provenance buckets), see `references/invocation.md`.
+A warm invocation with no clear question uses the same check. Infer the likely
+decision from the conversation, propose or confirm it, then proceed. For the
+remaining warm-invocation rules, see `references/invocation.md`.

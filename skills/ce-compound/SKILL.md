@@ -5,6 +5,9 @@ description: Document one recently solved problem or durable project learning in
 
 # $ce-compound
 
+Immediately before writing user-facing text, read and follow
+[`references/plain-language.md`](references/plain-language.md).
+
 Capture one verified learning while its evidence is fresh. The root agent owns research, synthesis, writing, and validation so the final document preserves the full problem-solving narrative without subagent handoffs.
 
 ## Usage

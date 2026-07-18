@@ -146,7 +146,7 @@ Common Tailwind values to prefer:
 - **Breaking Changes**: If a fix would require significant refactoring, document the issue and propose the safest approach
 - **Multiple Iterations**: After each run, suggest whether another iteration is needed based on remaining differences
 
-## Success Criteria
+## Success Measures
 
 You succeed when:
 

@@ -49,17 +49,17 @@ Use this document shape:
 </header>
 <main>
   <section id="grounding-context">...</section>
-  <section id="topic-axes">...</section>
+  <section id="topic-areas">...</section>
   <section id="ranked-ideas">...</section>
   <section id="rejection-summary">...</section>
 </main>
 <footer class="composition-signal">...</footer>
 ```
 
-- Match section headings to `ideation-sections.md`: Grounding Context, Topic Axes, Ranked Ideas, Rejection Summary.
-- Omit Topic Axes only when the content contract says it is inapplicable.
+- Match section headings to `ideation-sections.md`: Relevant Context, Topic Areas, Ranked Ideas, Rejection Summary.
+- Omit Topic Areas only when the content contract says it is inapplicable.
 - Use `<article id="idea-1">` for each surviving idea and show its rank visibly in the card heading.
-- Use `<dl>` with visible `<dt>` labels for Axis, Basis, Rationale, Downsides, Confidence, and Complexity.
+- Use `<dl>` with visible `<dt>` labels for Area, Basis, Rationale, Downsides, Confidence, and Complexity.
 - Keep idea cards fully expanded. Do not hide their substance in `<details>`.
 - Use a real `<table>` for the rejection summary with visible column headings.
 - Keep labels, ranks, and field values in text rather than attributes or generated CSS content.
@@ -77,7 +77,7 @@ Do not add JavaScript for navigation. Native anchors are sufficient.
 Make the candidate set easy to compare without flattening its reasoning:
 
 - Show rank and title first.
-- Put axis, confidence, and complexity in one compact metadata row.
+- Put area, confidence, and complexity in one compact metadata row.
 - Give Description and Basis the strongest body emphasis.
 - Keep Rationale and Downsides clearly labeled and fully visible.
 - Use confidence and complexity colors only as secondary signals; always include their text values.
@@ -105,11 +105,11 @@ Skip a visual when its only content would restate the title.
 
 ## Grounding and rejection sections
 
-Render Grounding Context as readable prose with small grouped lists or callouts only when the content has a natural grouping. Do not turn evidence into a wall of chips.
+Render Relevant Context as readable prose with small grouped lists or callouts only when the content has a natural grouping. Do not turn evidence into a wall of chips.
 
-Render Topic Axes as a compact numbered list or uniform cards. Preserve the topic's own vocabulary.
+Render Topic Areas as a compact numbered list or uniform cards. Preserve the topic's own vocabulary.
 
-Render Rejection Summary as a concise table. Include every considered-and-cut idea and its one-line reason, plus any unrecovered axis gap. Keep this section visually quieter than Ranked Ideas but fully readable.
+Render Rejection Summary as a concise table. Include every considered-and-cut idea and its one-line reason, plus any unrecovered area gap. Keep this section visually quieter than Ranked Ideas but fully readable.
 
 ## Links and code
 

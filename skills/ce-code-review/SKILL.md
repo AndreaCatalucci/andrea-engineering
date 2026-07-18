@@ -5,6 +5,9 @@ description: "Structured code review for bugs, regressions, tests, and standards
 
 # Code Review
 
+Immediately before writing user-facing text, read and follow
+[`references/plain-language.md`](references/plain-language.md).
+
 Review a branch, PR, or working-tree diff with one core reviewer and only the specialists justified by criticality and blast radius. Merge, independently validate, and present a single evidence-backed result.
 
 ## Modes and Arguments

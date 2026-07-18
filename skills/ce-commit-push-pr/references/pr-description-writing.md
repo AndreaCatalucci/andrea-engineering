@@ -145,7 +145,7 @@ In the `gh`-fallback path (fork PR, no local base refs), judge from diff context
 - Bad: teaching "dependency injection" because a PR added one constructor argument in a codebase full of DI.
 - Good: teaching infinite scroll on the PR that replaces pagination with it for the first time.
 
-**Compose the section** under the heading `## New concepts` (Step C places it) for at most 2 concepts — when more qualify, teach the most load-bearing and name the rest in one sentence. Per concept, ~10-25 lines covering:
+**Compose the section** under the heading `## New concepts` (Step C places it) for at most 2 concepts — when more qualify, teach the most important and name the rest in one sentence. Per concept, ~10-25 lines covering:
 
 1. **What it is** — the concept in plain words, no jargon dependency.
 2. **Why here** — why it was chosen over the obvious alternative this PR could have used.

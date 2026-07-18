@@ -70,7 +70,10 @@ Each skill's `SKILL.md` defines its trigger and workflow. The plugin manifest is
 
 ## Development
 
-Shared skill assets have one canonical source and generated mirrors. After changing a shared asset, regenerate the mirrors:
+Shared skill assets have one canonical source and generated mirrors. This
+includes the Codex interaction rules and the plain-language rules used by
+document-producing skills. After changing a shared asset, regenerate the
+mirrors:
 
 ```bash
 scripts/sync-shared-skill-assets

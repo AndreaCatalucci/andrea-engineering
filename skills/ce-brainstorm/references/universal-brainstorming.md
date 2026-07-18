@@ -18,7 +18,7 @@ Use inversion, constraint removal, analogy, and adjacent possibilities to discov
 
 Stop when all choices that materially affect the desired outcome are resolved. Present the same final shared-understanding synthesis and wait for explicit confirmation.
 
-This route does not use the software unified-plan metadata or write under `docs/plans/` automatically. After confirmation, offer only relevant choices:
+This route does not use the software plan metadata or write under `docs/plans/` automatically. After confirmation, offer only relevant choices:
 
 - hand the confirmed direction to `ce-plan`;
 - save a summary when the user requests it;

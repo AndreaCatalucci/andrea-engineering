@@ -1,6 +1,6 @@
 # Blindspot Pass
 
-The interview machinery in this skill assumes the user can evaluate what it asks. On territory the user doesn't know, that assumption fails: questions extract guesses, not requirements. The blindspot pass converts the user's unknown unknowns into known unknowns — it maps the decision surface of the flagged territory so the user chooses among options they can now evaluate, instead of generating answers from nothing.
+The interview machinery in this skill assumes the user can evaluate what it asks. On territory the user doesn't know, that assumption fails: questions extract guesses, not requirements. The blindspot pass converts the user's unknown unknowns into known unknowns — it maps the questions to answer of the flagged territory so the user chooses among options they can now evaluate, instead of generating answers from nothing.
 
 A blindspot pass is a decision map, not a tutorial. Test for every item: it must end in something the user will decide, delegate, or explicitly defer during this brainstorm. An item that feeds no decision is domain trivia — cut it.
 
@@ -25,7 +25,7 @@ Never silently switch into teaching. The offer is a blocking question (Interacti
 
 Use this wording, substituting the territory:
 
-> Part of this sits in territory you've flagged as unfamiliar (<territory>). I can map the decision surface first — the decisions you'll face there, the realistic options for each, and what I'd default to — so you're choosing rather than guessing. Or we keep going with questions and I fill gaps with defaults recorded as assumptions. Which do you prefer?
+> Part of this sits in territory you've flagged as unfamiliar (<territory>). I can map the questions to answer first — the decisions you'll face there, the realistic options for each, and what I'd default to — so you're choosing rather than guessing. Or we keep going with questions and I fill gaps with defaults recorded as assumptions. Which do you prefer?
 
 Two options: **Map the territory first** / **Proceed with questions** (defaults become assumptions).
 
@@ -60,11 +60,17 @@ After the map, ask **one** multi-select blocking question (a legitimate Rule 3 c
 Then:
 
 - **Selected decisions** — walk through one per turn as informed single-select menus. Post-pass, menus over mapped options are the right form even where Rule 5 would normally prefer open-ended: the options no longer steer, they recall what was just taught.
-- **Unselected decisions and hazards** — record the recommended default (or the hazard's constraint) as an explicit assumption, the same way rigor-probe uncertainty is recorded: in the Product Contract on the software route, in the synthesis on the universal route.
+- **Unselected decisions and hazards** — record the recommended default (or the
+  hazard's constraint) as an explicit assumption, the same way rigor-probe
+  uncertainty is recorded: under What We're Building for software, and in the
+  summary for non-software work.
 - **"I want to actually learn this one"** — offer a handoff to the `ce-explain` skill for that item (offer, don't auto-fire); the brainstorm resumes when they return or continues with the default meanwhile.
 
 The pass never resolves decisions by itself and never replaces the dialogue. It runs once, converts blindspots into questions the user can answer, and the normal flow — rigor probes, approaches, synthesis — continues on informed ground.
 
 ## Universal route
 
-The pass applies unchanged on the non-software route (an unfamiliar craft, market, or process — "I need to grade this video but don't know what color grading is"). Grounding is web research or labeled model knowledge; delegated defaults land as named assumptions in the wrap-up synthesis instead of a Product Contract.
+The pass applies unchanged to non-software work (an unfamiliar craft, market,
+or process — "I need to grade this video but don't know what color grading
+is"). Use web research or clearly labeled model knowledge. Record delegated
+defaults as assumptions in the final summary.

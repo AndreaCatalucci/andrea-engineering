@@ -40,7 +40,7 @@ These hold regardless of which skill produced the artifact.
   The text-and-attribute redundancy in `<time datetime="2026-05-12">2026-05-12</time>`
   is acceptable because the attribute is a parser hint, not a hidden copy.
 - **Stable IDs as anchor IDs AND visible text.** Every ID-bearing item
-  (R-IDs, U-IDs, A-IDs, F-IDs, AE-IDs, KTDs) gets `id="r1"` on its
+  (R-IDs, W-IDs, A-IDs, F-IDs, AE-IDs, technical decisions) gets `id="r1"` on its
   element AND appears as visible text inside the element (e.g., the
   text "R1." inside the table cell or heading). Downstream agents find
   the ID in source the same way they find it in markdown.
@@ -55,15 +55,15 @@ These hold regardless of which skill produced the artifact.
   leaves readers unable to tell how stale the rendering is.
 - **ASCII identifiers.** Class names, element IDs, data attribute names
   are ASCII-only.
-- **Unified plan navigation.** Unified plan artifacts include a visible
+- **Plan navigation.** Plan artifacts include a visible
   navigation region near the top of the document. It links to stable section
-  anchors for `goal-capsule`,
-  `product-contract`, `planning-contract`, `implementation-units`,
-  `verification-contract`, `definition-of-done`, and `appendix` when those
+  anchors for `goal`,
+  `what-were-building`, `how-well-build-it`, `work-steps`,
+  `how-well-check-it`, `done-when`, and `appendix` when those
   sections exist. Requirements-only artifacts omit links to absent
   implementation sections.
-- **Visible readiness metadata.** If the artifact has `artifact_contract`,
-  `artifact_readiness`, `product_contract_source`, or `execution`, render
+- **Visible readiness metadata.** If the artifact has `plan_format`,
+  `plan_readiness`, `requirements_source`, or `execution`, render
   those values in the visible header metadata. Do not hide a duplicate copy in
   JSON, `data-*`, or `<meta>` tags.
 
@@ -255,20 +255,20 @@ mentions of paths or PRs inside paragraph prose stay as code or text.
 Linking every mention would clutter; readers expect clickable jumps
 where the doc presents itself as a reference index.
 
-### Stable section anchors for unified plans
+### Stable section anchors for plans
 
-When rendering a unified plan, every major logical section gets a stable
+When rendering a plan, every major logical section gets a stable
 anchor ID and visible heading text:
 
 | Logical section | Required id |
 |---|---|
-| Goal Capsule | `goal-capsule` |
-| Product Contract | `product-contract` |
+| Goal | `goal` |
+| What We're Building | `what-were-building` |
 | Product Requirements | `product-requirements` |
-| Planning Contract | `planning-contract` |
-| Implementation Units | `implementation-units` |
-| Verification Contract | `verification-contract` |
-| Definition of Done | `definition-of-done` |
+| How We'll Build It | `how-well-build-it` |
+| Work Steps | `work-steps` |
+| How We'll Check It | `how-well-check-it` |
+| Done When | `done-when` |
 | Appendix | `appendix` |
 
 Long HTML plans are agent-consumed as source text as often as they are read in
@@ -323,7 +323,7 @@ bundles, and the artifact's longevity doesn't warrant a build dependency.
 How section types commonly render in HTML. These are patterns, not
 contracts — the agent picks shapes that fit the content.
 
-- **Summary / Problem Frame** — semantic `<section>` with prose
+- **Summary / Problem** — semantic `<section>` with prose
   paragraphs. Optionally precede with an eyebrow label (small-caps tag
   above the title) for editorial polish.
 - **Requirements** — `<table>` is the default at 5+ uniform items;
@@ -335,16 +335,16 @@ contracts — the agent picks shapes that fit the content.
   its own column. Consider adding a "covered by" column for reverse
   traceability when ID-anchored items have downstream references in
   the same doc.
-- **Implementation Units** — repeating `<article>` cards with a stable
-  ID chip (visible "U1" text), a metadata strip (`<dl>` with field
+- **Work Steps** — repeating `<article>` cards with a stable
+  ID chip (visible "W1" text), a metadata strip (`<dl>` with field
   labels and values for Goal, Files, Dependencies), and secondary
   content (Approach, Test Scenarios, Verification, Patterns to Follow)
-  inside `<details>` collapsibles, **default-closed**. At 3+ units the
-  default-closed rule is load-bearing — rendering all units fully
+  inside `<details>` collapsibles, **default-closed**. At 3+ steps the
+  default-closed rule is important — rendering all steps fully
   expanded turns the doc into one continuous scroll where the reader
-  can't see the unit list at a glance. The metadata strip is the
+  can't see the step list at a glance. The metadata strip is the
   primary always-visible surface; subsection labels (`<summary>`) are
-  clickable affordances for readers to expand on demand. A single unit
+  clickable affordances for readers to expand on demand. A single step
   with no secondary content can skip `<details>` entirely; the rule
   fires when content exists to hide. The `<dl>` strip is for *descriptive*
   fields (Goal, Files, Dependencies). A *directive* field — `Execution
@@ -355,7 +355,7 @@ contracts — the agent picks shapes that fit the content.
   Tinted callout cards) so its visual weight matches its actionability. The
   test: descriptive value -> metadata pair; something the reader must act
   on -> callout.
-- **Key Technical Decisions** — repeating cards with the decision ID,
+- **Technical Decisions** — repeating cards with the decision ID,
   bold decision title (often with inline code for technical
   identifiers), and prose rationale. Flat cards (not collapsibles) —
   these are reference material readers scan, not drill into.
@@ -363,7 +363,7 @@ contracts — the agent picks shapes that fit the content.
   MITIGATED" / "OPEN · DEFERRED FOLLOW-UP") and prose body. Communicate
   status through the eyebrow's color plus an optional subtle full-card
   tint — not a colored stripe on one edge (see "Chips and pills").
-- **Scope Boundaries** — callout cards distinguished (in-scope vs deferred
+- **Scope** — callout cards distinguished (in-scope vs deferred
   vs outside) by a colored eyebrow/label plus a subtle full-card tint when
   the distinction is meaningful — not a one-edge colored stripe.
 
@@ -456,7 +456,7 @@ labeled arrow, each shape edge, and each text label:
 
 Do not add hedging captions or section preambles to plan SVG diagrams —
 phrases like "directional guidance for review, not implementation
-specification" do not belong on plan diagrams or on unit-card
+specification" do not belong on plan diagrams or on step-card
 technical-design subsections. Plan diagrams render the same authoritative
 content as the surrounding prose; the prose-is-authoritative rule
 already governs disagreement. Hedging language is reserved for the
@@ -472,7 +472,7 @@ rendering may include a wireframe mockup. The trigger is the
 with a UI/layout shape can carry a wireframe, whether or not the brainstorm
 as a whole is "a visual product" — a backend-heavy brainstorm with one
 screen change still earns a wireframe for that requirement. It still applies
-to brainstorm **requirements** output — the requirements-only unified plan
+to brainstorm **requirements** output — the requirements-only plan
 `ce-brainstorm` writes (now under `docs/plans/`), not an implementation-ready
 plan (`ce-plan`'s enriched output) — and only to UI-shaped requirements — a
 non-visual requirement (API design, data model, agent workflow,
@@ -514,13 +514,13 @@ fine when the content suggests them.
   nav anchor. Trade-off: a broken sticky TOC (layout collisions,
   active-section state drift, dark-mode CSS issues) is worse than a
   static top-of-doc TOC. For most long docs, default-closed `<details>`
-  on repeating cards (see Implementation Units anatomy) already cuts
+  on repeating cards (see Work Steps anatomy) already cuts
   the visible scroll length enough that a static TOC works — reach for
   sticky only when collapsibles alone don't solve the navigation
   problem.
 - **Within-section sub-nav** for sections containing 6+ repeating cards
-  (Implementation Units, KTDs, Risks at large counts). A short list of
-  card-anchor links (`<ul>` of `<a href="#u1">U1. ...</a>`) rendered at
+  (Work Steps, technical decisions, Risks at large counts). A short list of
+  card-anchor links (`<ul>` of `<a href="#w1">W1. ...</a>`) rendered at
   the top of the section gives readers a jump table — no JS needed.
   Lower-complexity alternative to the sticky TOC for the specific case
   of long card sections.
@@ -536,7 +536,7 @@ fine when the content suggests them.
 - **Side-by-side columns** for parallel content (Request / Response,
   Before / After, Two alternatives).
 - **Tinted callout cards** for content that is "different in kind"
-  (Deferred, Open Questions, advisory notes, unit-level execution notes)
+  (Deferred, Open Questions, advisory notes, step-level execution notes)
   — a subtle full-card background tint plus a colored eyebrow/label
   communicates kind at a glance. Avoid a colored stripe on one edge; tint
   the whole card instead.
@@ -550,7 +550,7 @@ script-style parse. `ce-doc-review` is not a current HTML consumer (see
 opening note).
 
 These rules are why such a consumer can locate one item (a single
-requirement, unit, idea, or other ID-bearing entry) and reason over it from
+requirement, step, idea, or other ID-bearing entry) and reason over it from
 source alone — its title, every labeled field, and any diagram's meaning —
 with no hidden machine-readable copy to fall back on. The semantic structure
 *is* the extraction contract: it is what makes the single-source-of-truth
@@ -560,23 +560,23 @@ field label demoted to an attribute, one item's content scattered across
 distant parts of the doc — breaks that reasoning even when the rendered page
 looks identical. Compose so semantic understanding is reachable in source:
 
-- **Use semantic HTML over `<div>` soup.** `<article>` per unit card,
+- **Use semantic HTML over `<div>` soup.** `<article>` per step card,
   `<dl>` for metadata pairs, `<table>` for tabular content, `<details>`
   / `<summary>` for collapsibles, `<section>` for top-level doc
   sections. Structure markers carry meaning to a text-reading agent.
 - **Render field labels as visible text, not as attributes.** Emit
   `<dt>GOAL</dt><dd>...</dd>`, not `<dd data-field="goal">...</dd>`.
   The label is the semantic anchor.
-- **Keep U-IDs, R-IDs, and similar as visible text** in headings and
-  table cells, not only as `id=""` attributes. The agent finds "U1." in
-  source the same way it finds "U1." in markdown.
+- **Keep W-IDs, R-IDs, and similar as visible text** in headings and
+  table cells, not only as `id=""` attributes. The agent finds "W1." in
+  source the same way it finds "W1." in markdown.
 - **Match section heading vocabulary to what the section contract
-  defines.** When the section contract says "Implementation Units," the
-  HTML heading is "Implementation Units" — not "How we'll build it,"
+  defines.** When the section contract says "Work Steps," the
+  HTML heading is "Work Steps" — not "How we'll build it,"
   even if the narrative version reads better. Section heading
   vocabulary is the contract downstream consumers grep for. (Editorial
   re-titles can appear as eyebrow labels, sub-headings, or visual
-  framing — but the load-bearing section heading matches the contract
+  framing — but the important section heading matches the contract
   name.)
 - **All semantic content lives in actual HTML text.** No CSS `::before
   { content: "..." }` carrying meaning, no background images as
@@ -603,9 +603,9 @@ Before returning the artifact, scan it for common slips:
 - **Source / composition signal** is present as a visible footer at
   the bottom of the doc (composition timestamp + source identifier).
 - **Repeating cards with 3+ instances put secondary content inside
-  default-closed `<details>`.** Fully-expanded unit cards in a long
-  Implementation Units section is a failure mode — the reader can't see
-  the unit list at a glance. Verify by skimming the rendered units:
+  default-closed `<details>`.** Fully-expanded step cards in a long
+  Work Steps section is a failure mode — the reader can't see
+  the step list at a glance. Verify by skimming the rendered steps:
   each `<article>` should render as its ID + title + metadata strip
   with collapsibles below, not as one long block.
 - **Within-section sub-nav** is present for sections with 6+ repeating

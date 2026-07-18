@@ -31,15 +31,15 @@ Reject candidates that are:
 
 Give every rejected idea a one-line reason. Do not generate replacements during filtering.
 
-Score survivors on groundedness, basis strength, expected value, novelty, pragmatism, leverage, implementation burden, overlap, and axis spread. Evaluate axis spread across the survivor set; note any axis left empty after recovery.
+Score survivors on groundedness, basis strength, expected value, novelty, pragmatism, leverage, implementation burden, overlap, and area spread. Evaluate area spread across the survivor set; note any area left empty after recovery.
 
 Keep 5–7 survivors by default. Tighten the cut if more survive; report fewer honestly rather than lowering the bar.
 
 ### Develop survivors
 
-After the cut, expand only the survivors into the final artifact fields: concrete description, rationale, downsides, confidence, and complexity. Preserve the verified basis and axis. Add nuance from the grounding, not invented support. If development exposes a weak premise, return the idea to arbitration instead of polishing it through.
+After the cut, expand only the survivors into the final artifact fields: concrete description, rationale, downsides, confidence, and complexity. Preserve the verified basis and area. Add nuance from the grounding, not invented support. If development exposes a weak premise, return the idea to arbitration instead of polishing it through.
 
-Completion criterion: every raw candidate has a recorded disposition; every survivor has a verified basis, complete artifact fields, and a scope/axis check.
+Completion criterion: every raw candidate has a recorded disposition; every survivor has a verified basis, complete artifact fields, and a scope/area check.
 
 ## Phase 4: Write and Deliver
 
@@ -51,7 +51,7 @@ Write the ideation artifact automatically.
    - Otherwise: use `<scratch-dir>` under `/tmp/andrea-engineering/ce-ideate/<run-id>/` and state that the path is temporary.
 2. Use `<dir>/YYYY-MM-DD-<topic>-ideation.<ext>`, or `open-ideation` when no topic exists. The extension follows `OUTPUT_FORMAT`.
 3. Read `references/ideation-sections.md` and only the matching renderer: `references/markdown-rendering.md` or `references/html-rendering.md`.
-4. Write the grounding context, topic axes when present, ranked ideas, and rejection summary according to those references.
+4. Write the grounding context, topic areas when present, ranked ideas, and rejection summary according to those references.
 5. On resume, update the existing artifact in its current format and preserve prior useful content.
 
 If writing fails, report the failure and ask for a writable path. Do not lose the survivor list.
@@ -59,9 +59,9 @@ If writing fails, report the failure and ask for a writable path. Do not lose th
 Return a compact summary:
 
 - Raw, rejected, and surviving counts plus the absolute artifact path
-- One line per survivor: rank, title, axis, confidence, and complexity
+- One line per survivor: rank, title, area, confidence, and complexity
 - One sentence naming the top pick
-- Any axis with zero survivors
+- Any area with zero survivors
 - Any verification degradation
 
 Do not reproduce the full artifact in chat, open applications, publish, commit, delete files, or present an action menu. End after delivery.
@@ -80,7 +80,7 @@ Before finishing, confirm:
 
 - Ideas were generated before critique.
 - Every survivor has a basis that supports its move.
-- Load-bearing direct evidence was checked.
+- Important direct evidence was checked.
 - Every rejection has a reason.
-- The survivor set passes ambition, scope, subject-identity, and axis-spread checks.
+- The survivor set passes ambition, scope, subject-identity, and area-spread checks.
 - The saved artifact contains the full reasoning; chat contains only orientation.

@@ -25,7 +25,7 @@ topic: <topic>
 
 # <Topic Title>
 
-## Problem Frame
+## Problem
 
 <Who is affected, what is changing, and why it matters.>
 
@@ -39,7 +39,7 @@ topic: <topic>
 
 ---
 
-## Key Flows
+## Main Flows
 
 - F1. Recorded feedback triage
   - **Trigger:** A Riffrec zip is available for review.
@@ -60,20 +60,20 @@ topic: <topic>
 
 ---
 
-## Acceptance Examples
+## Examples
 
 - AE1. **Covers R1.** Given <state>, when <action>, <outcome>.
 
 ---
 
-## Success Criteria
+## Success Measures
 
 - <Human outcome>
 - <Downstream agent handoff quality>
 
 ---
 
-## Scope Boundaries
+## Scope
 
 - <Deliberate non-goal>
 

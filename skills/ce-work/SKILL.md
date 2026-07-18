@@ -25,15 +25,30 @@ Determine how to proceed based on what was provided in `<input_document>` (after
 
 **Plan document** (input is a file path to an existing plan or specification): read the plan's metadata first — YAML frontmatter for a markdown plan, or the visible header text for an HTML plan (both formats carry the same fields).
 
-- If it carries `artifact_contract: ce-unified-plan/v1`, classify `artifact_readiness` before reading the body.
-  - `artifact_readiness: requirements-only` -> stop and tell the user this Product Contract needs `ce-plan` enrichment before implementation. Offer the exact `ce-plan <plan-path>` handoff.
-  - `artifact_readiness: implementation-ready` plus `execution: code` -> continue to Phase 1 using the unified-plan reader strategy below.
+- If it carries `plan_format: andrea-plan/v1`, classify `plan_readiness` before reading the body.
+  - `plan_readiness: requirements-only` -> stop and tell the user this What We're Building needs `ce-plan` enrichment before implementation. Offer the exact `ce-plan <plan-path>` handoff.
+  - `plan_readiness: implementation-ready` plus `execution: code` -> continue to Phase 1 using the plan reader strategy below.
   - Any other readiness value or any non-code/unclassified execution mode -> do not auto-execute as code. Route `execution: knowledge-work` to the non-code carve-out; otherwise ask the user to return to `ce-plan` to produce an implementation-ready code plan.
   - Progress-like values (`active`, `in_progress`, `completed`, `done`) are invalid readiness values. Stop and ask for plan repair rather than guessing.
+- If it contains retired Andrea plan markers — the old metadata keys
+  `artifact_contract`, `artifact_readiness`, or `product_contract_source`, or
+  the old headings `Goal Capsule`, `Product Contract`, `Planning Contract`,
+  `Implementation Units`, `Verification Contract`, or `Definition of Done` —
+  stop. Ask `ce-plan` to write a current plan. Do not read, convert, or execute
+  the retired format.
 - If it carries `execution: knowledge-work`, this is a **non-code plan** — read `references/non-code-execution.md` and follow that carve-out instead of the rest of this workflow.
-- Otherwise (legacy plan, field absent, or `execution: code`) -> continue to Phase 1 and run the normal code lifecycle.
+- If the file is under `docs/plans/` or carries plan metadata but `plan_format`
+  is absent or has another value, stop and ask `ce-plan` to produce a current
+  `andrea-plan/v1` plan. Do not guess at an older format.
+- Otherwise treat the file as a general specification, read it completely, and
+  continue to Phase 1.
 
-**Blank invocation latest-plan discovery:** when `<input_document>` is blank, glob `docs/plans/*.md` and `docs/plans/*.html`, inspect metadata for the newest candidates, and only auto-select a plan that is `artifact_readiness: implementation-ready` plus `execution: code` or a legacy code plan. Stop instead of silently executing when the newest matching artifact is requirements-only, `execution: knowledge-work`, an approach-plan, or an unclassified universal/answer-seeking output. Ask for an explicit path or a `ce-plan` enrichment step. **Superseded sibling:** if a requirements-only candidate has a same-basename file in the other format (`<basename>.md` / `<basename>.html`) that is `implementation-ready`, a format conversion left the requirements-only copy stale — select the implementation-ready sibling and execute it rather than stopping.
+**Blank invocation latest-plan discovery:** when `<input_document>` is blank,
+glob `docs/plans/*.md` and `docs/plans/*.html`, inspect metadata, and select only
+the newest `andrea-plan/v1` plan with `plan_readiness: implementation-ready`
+and `execution: code`. Stop when the newest plan is requirements-only,
+knowledge-work, or otherwise not ready to implement. Ask for an explicit path
+or a `ce-plan` update.
 
 **Bare prompt** (input is a description of work, not a file path):
 
@@ -57,19 +72,19 @@ Determine how to proceed based on what was provided in `<input_document>` (after
 
 1. **Read Plan and Clarify** _(skip if arriving from Phase 0 with a bare prompt)_
 
-   - For unified plans, size your read. A short plan (lightweight or requirements-only, a screen or two) can be read in full. For a long implementation-ready plan, do **not** read the whole document first — it is expensive and unnecessary. Build a section map, then read only what the active unit needs: metadata, then `Goal Capsule`, `Verification Contract`, `Definition of Done`, the `Implementation Units` heading list, and only the active U-ID section plus referenced R/F/AE/KTD excerpts. Read appendices or unrelated U-IDs only when the active unit cites them. To build the map: in **markdown** scan headings (`rg -n '^#{1,3} ' <plan>` — top-level sections plus `### U<N>.` units); in **HTML** scan the `<h1>`–`<h3>` heading elements and their anchor ids. Match on the stable section names / unit IDs (`Goal Capsule`, `Verification Contract`, `### U<N>.`, …), ignoring HTML wrapper tags — not on a format-specific pattern.
-   - For legacy plans, read the work document completely. Both formats (`.md`, `.html`) carry the same section names and IDs; HTML just wraps them in semantic elements (`<section>`, `<article>`, etc.).
-   - Treat the plan as a decision artifact, not an execution script
-   - If the plan includes sections such as `Implementation Units`, `Work Breakdown`, `Requirements` (or legacy `Requirements Trace`), `Files`, `Test Scenarios`, or `Verification`, use those as the primary source material for execution
-   - Check for `Execution note` on each implementation unit — these carry the plan's natural-language execution direction for that unit (for example, start from failing proof, characterize legacy behavior, or prefer smoke/runtime verification). Note them when creating tasks, but do not reduce them to keyword matching.
+   - Size your read. A short plan (a screen or two) can be read in full. For a long implementation-ready plan, build a section map, then read only what the active step needs: metadata, `Goal`, `How We'll Check It`, `Done When`, the `Work Steps` heading list, and the active W-ID section plus cited R/F/AE/D excerpts. Read appendices or unrelated W-IDs only when the active step cites them. In **markdown**, scan headings (`rg -n '^#{1,3} ' <plan>`). In **HTML**, scan the `<h1>`–`<h3>` elements and anchor ids. Match the stable section names and step IDs, ignoring HTML wrapper tags.
+   - Treat the plan as a record of decisions, not an execution script.
+   - Use `Work Steps`, `Requirements`, `Files`, `Test Scenarios`, and
+     `Verification` as the primary source material for execution.
+   - Check for `Execution note` on each work step — these carry the plan's natural-language execution direction for that step (for example, start from failing proof, characterize legacy behavior, or prefer smoke/runtime verification). Note them when creating tasks, but do not reduce them to keyword matching.
    - Check for a `Deferred to Implementation` or `Implementation-Time Unknowns` section — these are questions the planner intentionally left for you to resolve during execution. Note them before starting so they inform your approach rather than surprising you mid-task
-   - Check for a `Scope Boundaries` section — these are explicit non-goals. Refer back to them if implementation starts pulling you toward adjacent work
+   - Check for a `Scope` section — these are explicit non-goals. Refer back to them if implementation starts pulling you toward adjacent work
    - Review any references or links provided in the plan
    - If the user explicitly asks for TDD, test-first, characterization-first execution, or a specific verification style in this session, honor that direction even if the plan has no `Execution note`
    - If anything is unclear or ambiguous, ask clarifying questions now
    - If clarifying questions were needed above, get user approval on the resolved answers. If no clarifications were needed, proceed without a separate approval step — plan scope is the plan's authority, not something to renegotiate
    - **Do not skip this** - better to ask questions now than build the wrong thing
-   - **Do not edit the plan body during execution.** The plan is a decision artifact; progress lives in git commits and the task tracker, not the plan. `ce-work` does not mutate the plan — whether it shipped is derived from git, not recorded in the doc. Legacy plans may contain `- [ ]` / `- [x]` marks on unit headings or a `status:` field — ignore them as state; per-unit completion is determined during execution by reading the current file state.
+   - **Do not edit the plan body during execution.** Progress lives in git commits and the task tracker, not the plan. Determine each step's completion from the current files.
 
 2. **Setup Environment**
 
@@ -127,11 +142,14 @@ Determine how to proceed based on what was provided in `<input_document>` (after
 
 3. **Create Task List** _(skip if Phase 0 already built one, or if Phase 0 routed as Trivial)_
    - Use `update_plan` to break the plan into actionable tasks
-   - Derive tasks from the plan's implementation units, dependencies, files, test targets, and verification criteria
-   - When the plan defines U-IDs for Implementation Units, preserve the unit's U-ID as a prefix in the task subject (e.g., "U3: Add parser coverage"). This keeps blocker references, deferred-work notes, and final summaries anchored to the same identifier the plan uses, so progress and traceability remain unambiguous across plan edits
-   - Carry each unit's `Execution note` into the task when present
-   - For each unit, read the `Patterns to follow` field before implementing — these point to specific files or conventions to mirror
-   - Use each unit's `Verification` field as the primary "done" signal for that task
+   - Derive tasks from the plan's work steps, dependencies, files, test targets, and verification criteria
+   - When the plan defines W-IDs for Work Steps, preserve the step's W-ID as a
+     prefix in the task subject (e.g., "W3: Add parser coverage"). This keeps
+     blocker references, deferred-work notes, and final summaries anchored to
+     the same identifier across plan edits.
+   - Carry each step's `Execution note` into the task when present
+   - For each step, read the `Patterns to follow` field before implementing — these point to specific files or conventions to mirror
+   - Use each step's `Verification` field as the primary "done" signal for that task
    - Do not expect the plan to contain implementation code, micro-step TDD instructions, or exact shell commands
    - Include dependencies between tasks
    - Prioritize based on what needs to be done first
@@ -140,42 +158,44 @@ Determine how to proceed based on what was provided in `<input_document>` (after
 
 4. **Choose Execution Strategy**
 
-   Execute inline by default. Delegate only substantial, independent units with clear ownership and independent verification. Use the plan's `Dependencies` and `Files` to batch delegated units safely.
+   Execute inline by default. Delegate only substantial, independent steps with clear ownership and independent verification. Use the plan's `Dependencies` and `Files` to batch delegated steps safely.
 
    Use `create_goal` only when the user explicitly requests goal execution. Otherwise, do not start a goal.
 
    | Strategy | When to use |
    |----------|-------------|
-   | **Inline** | Default, including dependent or cross-cutting units |
-   | **Serial subagents** | Substantial self-contained units that benefit from fresh context but must execute in order |
-   | **Parallel subagents** | Substantial independent units with clear ownership and independent verification; follow the Parallel Safety Check |
+   | **Inline** | Default, including dependent or cross-cutting steps |
+   | **Serial subagents** | Substantial self-contained steps that benefit from fresh context but must execute in order |
+   | **Parallel subagents** | Substantial independent steps with clear ownership and independent verification; follow the Parallel Safety Check |
 
    **Parallel Safety Check** — before dispatching a batch in parallel:
 
-   1. Map files to units from each candidate unit's `Files:` section (Create/Modify/Test paths).
-   2. **File overlap is necessary but not sufficient.** Also serialize units that contend on things absent from `Files:`: shared types/APIs/interfaces, DB migrations, generated artifacts or clients, lockfiles, snapshots, shared config/schema — or an **environment singleton** (one dev server/port, a shared database, browser sessions, package installs, MCP rate limits). Reason about these; don't just diff paths.
+   1. Map files to steps from each candidate step's `Files:` section (Create/Modify/Test paths).
+   2. **File overlap is necessary but not sufficient.** Also serialize steps that contend on things absent from `Files:`: shared types/APIs/interfaces, DB migrations, generated artifacts or clients, lockfiles, snapshots, shared config/schema — or an **environment singleton** (one dev server/port, a shared database, browser sessions, package installs, MCP rate limits). Reason about these; don't just diff paths.
    3. **No contention:** dispatch the batch in parallel.
    4. **Contention:** serialize — Codex subagents share the working directory, so only the last writer survives overlapping edits.
-   5. **Cap concurrency** at a bounded batch even when more units are independent; over-parallelizing costs more in contention and integration than it saves.
+   5. **Cap concurrency** at a bounded batch even when more steps are independent; over-parallelizing costs more in contention and integration than it saves.
    6. **Abort criteria:** if a batch produces broad unplanned edits, out-of-scope test failures, or repeated conflicts, stop parallelizing and finish the rest inline.
 
    Dispatch with `spawn_agent`; if unavailable, execute inline. Give each worker:
-   - The plan path plus a **bounded unit packet** — Goal Capsule, Definition of Done, the unit's section, the Verification Contract entries relevant to it, and any referenced R/F/AE/KTD excerpts. Do not send "read the whole plan" as the worker prompt. (For a legacy non-unified plan, the plan path for reference is acceptable.)
-   - The unit's Goal, Files, Approach, Execution note, Patterns, Test scenarios, Verification, and any resolved deferred questions for it.
-   - Instruction to check whether the unit's test scenarios cover all applicable categories (happy paths, edge cases, error paths, integration) and supplement gaps before writing tests.
-   - **Instruction to choose the unit's evidence strategy and gather the evidence** (see Evidence Strategy in Phase 2) — for behavior-bearing changes, honor the Execution note and default to proof-first or characterization-first: create/update/strengthen the test and observe the red failure or characterization baseline **before** changing production code. The worker is the only party that witnesses this, so it must capture it as it goes.
-   - **Instruction to report, in its final message, both (a) the file paths it changed and (b) the unit's verification evidence** — `behavior_changed`, existing tests inspected, tests added/changed or used unchanged, the red failure or characterization observed (when applicable), the verification run and result, and any deliberate no-test exception with its reason. Reported paths are a hint; the orchestrator verifies the actual tree. Evidence that exists only in the worker's observation cannot be reconstructed afterward.
-   - **Do not commit.** Workers may run their unit's focused tests, but the orchestrator owns staging, commits, and authoritative test runs.
+   - The plan path plus a **bounded step packet** — Goal, Done When, the step's
+     section, the relevant entries under How We'll Check It, and any referenced
+     R/F/AE/D excerpts. Do not send "read the whole plan" as the worker prompt.
+   - The step's Goal, Files, Approach, Execution note, Patterns, Test scenarios, Verification, and any resolved deferred questions for it.
+   - Instruction to check whether the step's test scenarios cover all applicable categories (happy paths, edge cases, error paths, integration) and supplement gaps before writing tests.
+   - **Instruction to choose the step's evidence strategy and gather the evidence** (see Evidence Strategy in Phase 2) — for behavior-bearing changes, honor the Execution note and default to proof-first or characterization-first: create/update/strengthen the test and observe the red failure or characterization baseline **before** changing production code. The worker is the only party that witnesses this, so it must capture it as it goes.
+   - **Instruction to report, in its final message, both (a) the file paths it changed and (b) the step's verification evidence** — `behavior_changed`, existing tests inspected, tests added/changed or used unchanged, the red failure or characterization observed (when applicable), the verification run and result, and any deliberate no-test exception with its reason. Reported paths are a hint; the orchestrator verifies the actual tree. Evidence that exists only in the worker's observation cannot be reconstructed afterward.
+   - **Do not commit.** Workers may run their step's focused tests, but the orchestrator owns staging, commits, and authoritative test runs.
 
    **Shared-workspace constraints:** workers must not `git add`, commit, or run the full test suite concurrently. A worker may run a focused unit test only when it touches no shared state.
 
-   **After each serial unit:** review the diff against the unit's scope and `Files:`, run the relevant tests, fix before dispatching the next (never on a broken tree), record the unit's verification evidence from the worker's return (for the Phase 2 `verification_evidence` roll-up), update the task list (never edit the plan body — progress lives in commits), and commit. Then dispatch the next unit.
+   **After each serial step:** review the diff against the step's scope and `Files:`, run the relevant tests, fix before dispatching the next (never on a broken tree), record the step's verification evidence from the worker's return (for the Phase 2 `verification_evidence` roll-up), update the task list (never edit the plan body — progress lives in commits), and commit. Then dispatch the next step.
 
    **After a parallel batch — the orchestrator integrates; never trust the handoff summary alone:**
    1. Wait for every worker in the batch to finish.
    2. **Inspect the actual tree, not reported paths.** Determine what each worker really changed (`git status`/diff in its workspace or the shared dir). Reported paths are a hint; declared `Files:` are often incomplete — workers create/modify files the plan didn't anticipate.
-   3. **Detect real collisions** — 2+ workers that modified the same file. Commit the non-colliding work first, then re-run colliding units inline so each builds on the other's committed result.
-   4. **Review, test, and commit each unit in dependency order — the orchestrator owns commits.** Stage only that unit's files, commit with a message derived from its Goal, run the relevant tests, and fix before the next. Capture each worker's returned verification evidence into the run's `verification_evidence` roll-up — if a worker omitted it, re-derive what the tree allows and mark the rest as unverified rather than fabricating a red-before-implementation observation the worker never reported.
+   3. **Detect real collisions** — 2+ workers that modified the same file. Commit the non-colliding work first, then re-run colliding steps inline so each builds on the other's committed result.
+   4. **Review, test, and commit each step in dependency order — the orchestrator owns commits.** Stage only that step's files, commit with a message derived from its Goal, run the relevant tests, and fix before the next. Capture each worker's returned verification evidence into the run's `verification_evidence` roll-up — if a worker omitted it, re-derive what the tree allows and mark the rest as unverified rather than fabricating a red-before-implementation observation the worker never reported.
    5. Update the task list (progress lives in the commits).
    6. Dispatch the next dependency layer.
 
@@ -189,7 +209,7 @@ Determine how to proceed based on what was provided in `<input_document>` (after
    while (tasks remain):
      - Mark task as in-progress
      - Read any referenced files from the plan or discovered during Phase 0
-     - **If the unit's work is already present and matches the plan's intent** (files exist with the expected capability, or the unit's `Verification` criteria are already satisfied by the current code), the work has likely shipped on a prior branch or session. Verify it matches, mark the task complete, and move on. Do not silently reimplement.
+     - **If the step's work is already present and matches the plan's intent** (files exist with the expected capability, or the step's `Verification` criteria are already satisfied by the current code), the work has likely shipped on a prior branch or session. Verify it matches, mark the task complete, and move on. Do not silently reimplement.
      - Look for similar patterns in codebase
      - Find existing test files for implementation files being changed (Test Discovery — see below)
      - Choose the evidence strategy for this task before changing behavior: use an existing failing test, update or strengthen an existing test, add a new failing test, add characterization coverage, or record a deliberate no-test exception with replacement verification
@@ -205,7 +225,7 @@ Determine how to proceed based on what was provided in `<input_document>` (after
      - Evaluate for incremental commit (see below)
    ```
 
-   When a unit carries an `Execution note`, honor its intent rather than matching a fixed vocabulary. For notes that ask for proof-first work, write or identify the relevant failing test before implementation for that unit. For notes that ask for characterization, capture existing behavior before changing it. For notes that point away from unit coverage, run the named replacement verification and record why ordinary tests were not the right proof. For units without an `Execution note`, make the same decision from code and test discovery: upgrade to proof-first or characterization-first when behavior changes and the seam is practical; proceed pragmatically only when the task is non-behavioral or the exception is deliberate.
+   When a step carries an `Execution note`, honor its intent rather than matching a fixed vocabulary. For notes that ask for proof-first work, write or identify the relevant failing test before implementation for that step. For notes that ask for characterization, capture existing behavior before changing it. For notes that point away from unit coverage, run the named replacement verification and record why ordinary tests were not the right proof. For steps without an `Execution note`, make the same decision from code and test discovery: upgrade to proof-first or characterization-first when behavior changes and the seam is practical; proceed pragmatically only when the task is non-behavioral or the exception is deliberate.
 
    Guardrails for execution evidence:
    - Do not write the test and implementation in the same step when working proof-first
@@ -226,14 +246,14 @@ Determine how to proceed based on what was provided in `<input_document>` (after
    | No existing test covers the behavior | Add the smallest focused failing test or characterization test that proves the behavior slice |
    | Testing is inappropriate for the task | Record the no-test exception and replacement verification before marking the task complete |
 
-   **Test Scenario Completeness** — Before writing tests for a feature-bearing unit, check whether the plan's `Test scenarios` cover all categories that apply to this unit. If a category is missing or scenarios are vague (e.g., "validates correctly" without naming inputs and expected outcomes), supplement from the unit's own context before writing tests:
+   **Test Scenario Completeness** — Before writing tests for a feature-bearing step, check whether the plan's `Test scenarios` cover all categories that apply to this step. If a category is missing or scenarios are vague (e.g., "validates correctly" without naming inputs and expected outcomes), supplement from the step's own context before writing tests:
 
    | Category | When it applies | How to derive if missing |
    |----------|----------------|------------------------|
-   | **Happy path** | Always for feature-bearing units | Read the unit's Goal and Approach for core input/output pairs |
-   | **Edge cases** | When the unit has meaningful boundaries (inputs, state, concurrency) | Identify boundary values, empty/nil inputs, and concurrent access patterns |
-   | **Error/failure paths** | When the unit has failure modes (validation, external calls, permissions) | Enumerate invalid inputs the unit should reject, permission/auth denials it should enforce, and downstream failures it should handle |
-   | **Integration** | When the unit crosses layers (callbacks, middleware, multi-service) | Identify the cross-layer chain and write a scenario that exercises it without mocks |
+   | **Happy path** | Always for feature-bearing steps | Read the step's Goal and Approach for core input/output pairs |
+   | **Edge cases** | When the step has meaningful boundaries (inputs, state, concurrency) | Identify boundary values, empty/nil inputs, and concurrent access patterns |
+   | **Error/failure paths** | When the step has failure modes (validation, external calls, permissions) | Enumerate invalid inputs the step should reject, permission/auth denials it should enforce, and downstream failures it should handle |
+   | **Integration** | When the step crosses layers (callbacks, middleware, multi-service) | Identify the cross-layer chain and write a scenario that exercises it without mocks |
 
    **System-Wide Test Check** — Before marking a task done, pause and ask:
 
@@ -256,32 +276,32 @@ Determine how to proceed based on what was provided in `<input_document>` (after
 
    | Commit when... | Don't commit when... |
    |----------------|---------------------|
-   | Logical unit complete (model, service, component) | Small part of a larger unit |
+   | Logical change complete (model, service, component) | Small part of a larger change |
    | Tests pass + meaningful progress | Tests failing |
    | About to switch contexts (backend → frontend) | Purely scaffolding with no behavior |
    | About to attempt risky/uncertain changes | Would need a "WIP" commit message |
 
    **Heuristic:** "Can I write a commit message that describes a complete, valuable change? If yes, commit. If the message would be 'WIP' or 'partial X', wait."
 
-   If the plan has Implementation Units, use them as a starting guide for commit boundaries — but adapt based on what you find during implementation. A unit might need multiple commits if it's larger than expected, or small related units might land together. Use each unit's Goal to inform the commit message.
+   If the plan has Work Steps, use them as a starting guide for commit boundaries — but adapt based on what you find during implementation. A step might need multiple commits if it's larger than expected, or small related steps might land together. Use each step's Goal to inform the commit message.
 
    **Commit workflow:**
    ```bash
    # 1. Verify tests pass (use project's test command)
    # Examples: bin/rails test, npm test, pytest, go test, etc.
 
-   # 2. Stage only files related to this logical unit (not `git add .`)
-   git add <files related to this logical unit>
+   # 2. Stage only files related to this logical change (not `git add .`)
+   git add <files related to this logical change>
 
    # 3. Commit with conventional message
-   git commit -m "feat(scope): description of this unit"
+   git commit -m "feat(scope): description of this change"
    ```
 
    **Handling merge conflicts:** If conflicts arise during rebasing or merging, resolve them immediately. Incremental commits make conflict resolution easier since each commit is small and focused.
 
    **Note:** Incremental commits use clean conventional messages without attribution footers. The final Phase 4 commit/PR includes the full attribution.
 
-   **Parallel subagent mode:** subagents do not commit; the orchestrator stages and commits each unit after the batch.
+   **Parallel subagent mode:** subagents do not commit; the orchestrator stages and commits each step after the batch.
 
 3. **Follow Existing Patterns**
 
@@ -325,7 +345,7 @@ Determine how to proceed based on what was provided in `<input_document>` (after
    - Note any blockers or unexpected discoveries
    - Create new tasks if scope expands
    - Keep user informed of major milestones
-   - When the plan defines U-IDs for Implementation Units, or the plan or origin document carries stable R-IDs (and optionally A/F/AE IDs), reference them in blockers, deferred-work notes, task summaries, and final verification — not routine status updates. U-IDs anchor units across plan edits; R/A/F/AE anchor product intent across the brainstorm-plan handoff. Use the IDs the plan supplies and do not invent ones it does not. This preserves traceability without burying signal under noise.
+   - When the plan defines W-IDs for Work Steps, or the plan or origin document carries stable R-IDs (and optionally A/F/AE IDs), reference them in blockers, deferred-work notes, task summaries, and final verification — not routine status updates. W-IDs anchor steps across plan edits; R/A/F/AE anchor product intent across the brainstorm-plan handoff. Use the IDs the plan supplies and do not invent ones it does not. This preserves traceability without burying signal under noise.
 
 ### Phase 3-4: Quality Check and Finishing Work
 
@@ -352,10 +372,10 @@ Return:
 - `status`: `complete`, `blocked`, or `failed`
 - `plan_path`
 - `changed_files`
-- `u_ids_attempted`
-- `u_ids_completed`
+- `w_ids_attempted`
+- `w_ids_completed`
 - `verification_results`
-- `verification_evidence`: one entry per attempted behavior-bearing unit, plus any non-behavioral unit where tests were intentionally skipped. Each entry states the unit/task, `behavior_changed`, `existing_tests_inspected`, `tests_added_or_changed`, tests used unchanged, red failure or characterization observed when applicable, verification commands/results, and any exception reason. For units executed by subagents, this entry is assembled from each worker's returned evidence (Phase 1 Step 4), not reconstructed from the diff — the red-before-implementation observation exists only in the worker's report.
+- `verification_evidence`: one entry per attempted behavior-bearing step, plus any non-behavioral step where tests were intentionally skipped. Each entry states the step/task, `behavior_changed`, `existing_tests_inspected`, `tests_added_or_changed`, tests used unchanged, red failure or characterization observed when applicable, verification commands/results, and any exception reason. For steps executed by subagents, this entry is assembled from each worker's returned evidence (Phase 1 Step 4), not reconstructed from the diff — the red-before-implementation observation exists only in the worker's report.
 - `blockers`
 - `behavior_change`: whether behavior-bearing code changed
 - `standalone_shipping_skipped: true`

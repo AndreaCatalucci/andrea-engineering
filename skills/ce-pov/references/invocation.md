@@ -30,7 +30,7 @@ A warm invocation with **no explicit question**, or a materially ambiguous one, 
 
 The conversation's momentum pulls toward agreement, and a second opinion that rubber-stamps is worthless. "More adversarial" is not an attitude; it is two concrete rules:
 
-1. Run an **explicit disconfirming-evidence pass** on each load-bearing conversation claim — try to refute it from the scout dossiers before accepting it.
+1. Run an **explicit disconfirming-evidence pass** on each important conversation claim — try to refute it from the scout dossiers before accepting it.
 2. **Never upgrade a grade on conversation momentum alone** — if the only thing pushing toward Adopt is that the room already wants it, that is not grounding, and the grade does not move.
 
 ## Guest output contract

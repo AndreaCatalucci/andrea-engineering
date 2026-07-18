@@ -56,7 +56,7 @@ After determining mode, read the matching reference and follow it. Each referenc
 - [scripts/reply-to-pr-thread](scripts/reply-to-pr-thread) -- GraphQL mutation to reply within a review thread
 - [scripts/resolve-pr-thread](scripts/resolve-pr-thread) -- GraphQL mutation to resolve a thread by ID
 
-## Success Criteria
+## Success Measures
 
 - All unresolved review threads evaluated
 - Valid fixes committed and pushed

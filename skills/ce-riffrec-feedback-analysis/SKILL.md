@@ -5,6 +5,9 @@ description: Analyze Riffrec feedback captures from bundles or standalone record
 
 # Riffrec Feedback Analysis
 
+Immediately before writing user-facing text, read and follow
+[`references/plain-language.md`](references/plain-language.md).
+
 Turn raw product feedback into structured evidence for downstream agents. This skill is the consumption side of [Riffrec](https://github.com/kieranklaassen/riffrec), a capture tool that records synchronized screen + voice + event sessions and emits a `riffrec-*.zip` bundle.
 
 ## Choose the path

@@ -40,6 +40,16 @@ for skill in "${interaction_consumers[@]}"; do
   mirror shared/codex-interaction.md "skills/$skill/references/codex-interaction.md"
 done
 
+plain_language_consumers=(
+  ce-brainstorm ce-code-review ce-commit-push-pr ce-compound
+  ce-compound-refresh ce-doc-review ce-explain ce-ideate ce-plan ce-pov
+  ce-product-pulse ce-promote ce-riffrec-feedback-analysis ce-strategy ce-sweep
+)
+
+for skill in "${plain_language_consumers[@]}"; do
+  mirror shared/plain-language.md "skills/$skill/references/plain-language.md"
+done
+
 profile_consumers=(
   ce-brainstorm ce-code-review ce-compound ce-debug
   ce-explain ce-ideate ce-optimize ce-pov

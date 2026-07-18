@@ -51,7 +51,7 @@ Do not end the workflow after extraction in normal use. The intended sequence is
 3. Inspect or refine `problem-analysis.md` when the evidence needs human-visible interpretation.
 4. Load the `ce-brainstorm` skill with `requirements-kickoff.md`.
 5. Ask the user to confirm, correct, or regroup the captured requirements.
-6. Let `ce-brainstorm` produce the durable requirements-only unified plan under `docs/plans/`.
+6. Let `ce-brainstorm` produce the durable requirements-only plan under `docs/plans/`.
 
 Only stop after step 1 or 2 when the user asks specifically for raw artifacts, transcript, screenshots, or analysis without brainstorming.
 
@@ -97,7 +97,7 @@ The analyzer writes:
 - `problem-analysis.md`: a categorized problem statement scaffold for visual, functional, requirement, and UX findings.
 - `review-prompt.md`: a filled prompt containing screenshot paths and transcript for a deeper visual analysis pass.
 - `source-materials.md`: a manifest linking the original source location, local-only raw files, transcript locations, chunks, local-only frames, and generated artifacts.
-- `requirements-kickoff.md`: a CE-friendly requirements starter with Problem Frame, Actors, Key Flows, R-IDs, Acceptance Examples, Success Criteria, Scope Boundaries, Questions, and Next Steps.
+- `requirements-kickoff.md`: a CE-friendly requirements starter with Problem, Actors, Main Flows, R-IDs, Examples, Success Measures, Scope, Questions, and Next Steps.
 - `analysis.json`: structured session, event, transcript, moment, and artifact metadata.
 - `frames/`: extracted PNG screenshots for selected moments. Local-only by default.
 - `raw/`: extracted zip contents and copied source media. Local-only by default.
