@@ -31,7 +31,7 @@ mirror() {
 
 interaction_consumers=(
   ce-babysit-pr ce-brainstorm ce-commit-push-pr ce-commit
-  ce-compound-refresh ce-debug ce-doc-review ce-dogfood ce-explain ce-ideate
+  ce-compound-refresh ce-debug ce-dogfood ce-explain ce-ideate
   ce-optimize ce-plan ce-pov ce-product-pulse ce-promote ce-resolve-pr-feedback
   ce-setup ce-strategy ce-sweep ce-test-browser ce-test-xcode ce-work ce-worktree
 )
