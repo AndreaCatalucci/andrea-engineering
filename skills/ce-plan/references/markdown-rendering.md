@@ -128,9 +128,9 @@ contracts — the agent picks the shape that fits the content.
   When requirements have status, traceability, or severity that warrant
   additional columns, escalate to a table.
 - **Work Steps** — H3 heading per step with `W<N>.` prefix.
-  Fields (Goal, Files, Patterns, Test Scenarios, Verification) render as
-  bullets with bold leader labels, or as sub-headings if the field has
-  multi-paragraph content.
+  Required fields (Goal, Affected area, Verification) render as bullets with
+  bold leader labels. Render Constraints and optional execution detail the
+  same way when present. Do not add empty fields to satisfy a visual template.
 - **How We'll Check It / Done When** — use tables when commands,
   applicability, step IDs, and done signals share a uniform shape. Name
   concrete repo commands such as `bun test` rather than generic "run tests"

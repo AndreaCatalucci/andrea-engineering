@@ -1,6 +1,6 @@
 ---
 name: ce-plan
-description: "Create practical plans for multi-step work, including software and non-software tasks. Use when asked to plan, break down implementation, plan from requirements, or add needed detail to an existing plan; prefer ce-brainstorm when the user is still deciding what to build."
+description: "Plan multi-step work with implementation guardrails. Use when asked to plan software or non-software work, break down implementation, plan from requirements, or revise an existing plan; prefer ce-brainstorm when the user is still deciding what to build."
 ---
 
 # Create Technical Plan
@@ -12,6 +12,10 @@ Turn requirements, a feature request, a bug report, or a rough description into
 the shortest plan that lets implementation begin without reopening important
 decisions.
 
+A plan is a set of guardrails, not an execution script. Settle choices whose
+wrong answer would cause material risk or rework. Leave local coding choices to
+the implementer unless the plan has evidence that one choice matters.
+
 `ce-brainstorm` defines what to build. `ce-plan` explains how to build it.
 `ce-work` carries out the finished plan. A brainstorm can help, but is not
 required.
@@ -22,7 +26,8 @@ A software planning run completes only when:
 
 - one canonical plan exists in `docs/plans/`;
 - external sources that shape implementation are established or recorded as blockers;
-- each implementation-ready step names real repo-relative implementation and test paths;
+- each implementation-ready step passes the guardrail contract in
+  `references/plan-sections.md`;
 - confidence checking and required document review completed or took a documented format/interactive skip;
 - the final compactness and concreteness audits pass;
 - the absolute plan path and review state are returned.
@@ -41,13 +46,13 @@ Soft budgets:
 
 | Depth | Words | Work steps |
 |---|---:|---:|
-| Lightweight | 500-1,000 | 2-4 |
-| Standard | 1,000-2,000 | 3-5 |
-| Deep | Over 2,000 only when additional decisions cannot be expressed more compactly | Usually 4-8 |
+| Lightweight | 300-700 | 1-3 |
+| Standard | 700-1,200 | 2-5 |
+| Deep | Over 1,200 only when additional decisions cannot be expressed more compactly | Usually 4-7 |
 
 An explicit request for a short, concrete, simple, or practical plan selects the compact end of the applicable range. Exceeding a budget is allowed only for material decisions, not ceremony.
 
-A focused feature with no more than four outcome steps targets at most 1,500
+A focused feature with no more than four outcome steps targets at most 1,000
 words, even when it handles external data or other high-risk behavior. Exceeding
 that cap requires a documented P0/P1 correctness reason naming the decision
 that could not be expressed compactly.
@@ -193,19 +198,14 @@ mirror every requirement with an example.
 
 Build work steps around independently understandable outcomes, not
 architectural layers. Keep supporting work with the outcome it serves unless
-it is useful on its own. Each step that changes behavior names:
+it is useful on its own. A step sets the boundary and proof; it does not narrate
+the coding. Exact files, patterns, sequencing, and test cases belong only when
+they preserve an important decision or control a material risk. Defer other
+details to implementation.
 
-- one outcome-oriented goal and covered requirement IDs;
-- real repo-relative implementation files;
-- real repo-relative test files;
-- existing patterns to follow;
-- approach and dependencies;
-- concrete happy-path, edge, failure, and integration scenarios when applicable;
-- observable verification.
-
-Do not invent abstractions for hypothetical reuse. Read
-`references/plan-sections.md` for the complete plan format and what belongs in
-each section.
+Before composing, read `references/plan-sections.md`. It is the single source
+of truth for the plan sections and work-step fields. Do not invent abstractions
+for hypothetical reuse.
 
 ### 6. Choose the Smallest Useful Representation
 
@@ -264,9 +264,11 @@ Before returning, verify:
 
 - every external source has exact authority and acquisition path;
 - the Source/Input/Operation/Outcome path appears within the first 25 lines;
-- every step names real implementation and test files;
+- every step passes the guardrail test in `references/plan-sections.md`;
 - the operator-facing action and observable success condition are identifiable;
 - no abstraction exists only for hypothetical reuse;
+- no implementation choice is prescribed without a material risk or rework
+  reason;
 - one fact has one home;
 - removing any section would lose an actual decision; otherwise remove it;
 - word and step budgets pass, including the post-review growth check;

@@ -61,14 +61,15 @@ If the plan already has a `deepened:` date:
 - The approach section of work steps is thin and a higher-level technical design would provide context
 
 **Work Steps**
-- Dependency order is unclear or likely wrong
-- File paths or test file paths are missing where they should be explicit
+- A materially important dependency order is unclear or likely wrong
+- The affected component or boundary is unclear
 - Steps are too large, too vague, or broken into micro-steps
-- Approach notes are thin or do not name the pattern to follow
-- Test scenarios are vague (don't name inputs and expected outcomes), skip applicable categories (e.g., no error paths for a step with failure modes, no integration scenarios for a step crossing layers), or are disproportionate to the step's complexity
-- Feature-bearing steps have blank or missing test scenarios (feature-bearing steps require actual test scenarios; the `Test expectation: none` annotation is only valid for non-feature-bearing steps)
 - Verification outcomes are vague or not expressed as observable results
-- Agent-relevant steps do not include agent-native verification: parity checks, context-injection checks, tool-result checks, approval/failure behavior, or checkpoint/resume where applicable
+- A material failure or integration risk has no targeted verification
+- A step prescribes files, patterns, or coding tactics without naming the risk or
+  rework that makes the choice important
+- Agent-relevant steps omit verification for a material parity, context,
+  approval, failure, or resume risk
 - Existing W-IDs were renumbered after a step was reordered, split, or deleted (W-IDs are stable: never renumber existing IDs; gaps from deletions are preserved; new steps take the next unused number)
 - A step realizing an origin Key Flow does not cite the F-ID, or a step enforcing an origin Acceptance Example does not cite the AE-ID, when origin supplies them
 
@@ -248,11 +249,13 @@ Allowed changes:
   W2, and W3 is not. A split keeps the original W-ID on the original idea and
   gives the new step the next unused number. Renumbering breaks existing blocker
   and verification references.
-- Add missing pattern references, file/test paths, or verification outcomes
+- Clarify an affected boundary, important constraint, or verification outcome
+- Remove implementation mechanics that have no risk- or decision-based reason
 - Expand system-wide impact, risks, or rollout treatment where justified
 - Reclassify open questions between `Resolved During Planning` and `Deferred to Implementation` when evidence supports the change
 - Strengthen, replace, or add a High-Level Technical Design section when the work warrants it and the current representation is weak
-- Strengthen or add per-step technical design fields where the step's approach is non-obvious
+- Add a per-step technical detail only when the wrong choice would cause
+  material risk or rework
 - Add or update `deepened: YYYY-MM-DD` in frontmatter when the plan was substantively improved
 
 Do **not**:

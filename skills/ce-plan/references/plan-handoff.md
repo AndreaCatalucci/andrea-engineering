@@ -6,7 +6,10 @@ Load this reference after the plan is written and its confidence check is comple
 
 Run this phase only for Markdown plans. `ce-doc-review` currently applies Markdown-specific mutations, so HTML plans skip it and report that limitation.
 
-For Markdown, run `ce-doc-review` with `mode:headless <plan-path>`. This review is mandatory even when the confidence check passed: confidence strengthens rationale and grounding; document review checks coherence, feasibility, scope, and role-specific concerns.
+For Markdown, run `ce-doc-review` with `mode:headless <plan-path>`. This review
+is mandatory even when the confidence check passed. Review important decisions,
+boundaries, risks, and proof; do not treat missing local coding tactics as a
+feasibility gap.
 
 Capture:
 
@@ -15,10 +18,11 @@ Capture:
 - any P0/P1 findings.
 
 Give the reviewer the pre-review `scripts/plan-metrics.py` word and
-step counts and the
-selected depth budget. Review fixes should replace, clarify, consolidate, or
-delete. New sections, technical decisions, diagrams, abstractions, or steps require evidence
-that a P0/P1 issue would otherwise leave the plan unimplementable.
+step counts and the selected depth budget. Review fixes should replace,
+clarify, consolidate, or delete. New sections, technical decisions, diagrams,
+abstractions, steps, or implementation details require evidence that a P0/P1
+issue would otherwise leave the plan unsafe or force the implementer to reopen
+an important decision.
 
 Address P0/P1 findings before returning from a pipeline run. Otherwise preserve remaining findings in the final summary so the user can request an interactive review later.
 

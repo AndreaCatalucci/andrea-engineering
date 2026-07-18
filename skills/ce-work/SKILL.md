@@ -74,8 +74,9 @@ or a `ce-plan` update.
 
    - Size your read. A short plan (a screen or two) can be read in full. For a long implementation-ready plan, build a section map, then read only what the active step needs: metadata, `Goal`, `How We'll Check It`, `Done When`, the `Work Steps` heading list, and the active W-ID section plus cited R/F/AE/D excerpts. Read appendices or unrelated W-IDs only when the active step cites them. In **markdown**, scan headings (`rg -n '^#{1,3} ' <plan>`). In **HTML**, scan the `<h1>`–`<h3>` elements and anchor ids. Match the stable section names and step IDs, ignoring HTML wrapper tags.
    - Treat the plan as a record of decisions, not an execution script.
-   - Use `Work Steps`, `Requirements`, `Files`, `Test Scenarios`, and
-     `Verification` as the primary source material for execution.
+   - Use `Work Steps`, `Requirements`, affected areas, constraints, and
+     `Verification` as the primary source material for execution. Treat exact
+     files, patterns, approaches, and test scenarios as optional guidance.
    - Check for `Execution note` on each work step — these carry the plan's natural-language execution direction for that step (for example, start from failing proof, characterize legacy behavior, or prefer smoke/runtime verification). Note them when creating tasks, but do not reduce them to keyword matching.
    - Check for a `Deferred to Implementation` or `Implementation-Time Unknowns` section — these are questions the planner intentionally left for you to resolve during execution. Note them before starting so they inform your approach rather than surprising you mid-task
    - Check for a `Scope` section — these are explicit non-goals. Refer back to them if implementation starts pulling you toward adjacent work
@@ -142,13 +143,16 @@ or a `ce-plan` update.
 
 3. **Create Task List** _(skip if Phase 0 already built one, or if Phase 0 routed as Trivial)_
    - Use `update_plan` to break the plan into actionable tasks
-   - Derive tasks from the plan's work steps, dependencies, files, test targets, and verification criteria
+   - Derive tasks from the plan's work-step outcomes, important constraints,
+     dependencies when present, and verification criteria. Discover local files,
+     patterns, and test targets when the plan intentionally leaves them open.
    - When the plan defines W-IDs for Work Steps, preserve the step's W-ID as a
      prefix in the task subject (e.g., "W3: Add parser coverage"). This keeps
      blocker references, deferred-work notes, and final summaries anchored to
      the same identifier across plan edits.
    - Carry each step's `Execution note` into the task when present
-   - For each step, read the `Patterns to follow` field before implementing — these point to specific files or conventions to mirror
+   - When a step includes `Patterns to follow`, treat it as a deliberate
+     constraint or useful starting point, not a substitute for local discovery
    - Use each step's `Verification` field as the primary "done" signal for that task
    - Do not expect the plan to contain implementation code, micro-step TDD instructions, or exact shell commands
    - Include dependencies between tasks

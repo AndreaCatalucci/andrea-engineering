@@ -15,7 +15,10 @@ When one passage is clearly authoritative, a local reconciliation may be `mechan
 
 For requirements, trace goals to requirements, actors, flows, and acceptance examples. Find orphan requirements and goals with no supporting behavior.
 
-For plans, trace requirements to work steps and each step to files, dependencies, tests, and verification. Do not demand plan-level detail from requirements documents.
+For plans, trace requirements to work steps and each step to an affected area
+and observable verification. Require exact files, dependencies, or test cases
+only when they preserve an important decision or control a material risk. Do
+not demand plan-level detail from requirements documents.
 
 For unified documents, review What We're Building as the requirements. When the
 plan is ready to implement, review How We'll Build It and the work steps as the

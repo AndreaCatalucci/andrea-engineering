@@ -83,7 +83,8 @@ They must not point implementers at absent How We'll Build It,
 Work Steps, How We'll Check It, or Done When sections.
 `ce-plan` adds those implementation sections when it enriches to
 implementation-ready. Implementation-ready artifacts include the full registry
-above, except Appendix remains optional.
+above, except Appendix remains optional. Keep the required sections short; the
+registry is navigation, not a demand to fill every possible subsection.
 
 ### Wayfinding: map before reading (size-aware)
 
@@ -181,23 +182,30 @@ present. They carry the contracts downstream consumers depend on.
 - **How We'll Build It** — the implementation-facing decisions: Technical
   Decisions, high-level design, assumptions, implementation constraints,
   sequencing, and research that shapes the implementation.
-- **Work Steps** (with stable W-IDs) — outcome-sized work packets,
-  each independently understandable and executable. Group supporting codecs,
+- **Work Steps** (with stable W-IDs) — outcome-sized guardrails that an
+  implementer can act on after doing local discovery. Group supporting codecs,
   receipts, lifecycle handling, orchestration, readiness, rollback, and docs
   into the outcome they serve unless one is independently valuable. Each step
-  names Goal, Requirements, implementation and test Files, Patterns, Approach,
-  Test Scenarios, and Verification. `ce-work` and goal-mode executors consume
-  these steps.
+  includes:
+  - **Goal** — the observable outcome and covered requirement IDs.
+  - **Affected area** — the component, boundary, or one or two useful
+    repo-relative starting anchors. This is not an exhaustive file manifest.
+  - **Verification** — observable evidence that the outcome works.
+
+  Add Constraints, exact Files, Patterns, Approach, Dependencies, Execution
+  notes, or Test Scenarios only when that detail preserves an important
+  decision, controls a material risk, or makes a non-obvious order clear.
+  Details the implementer can safely resolve while coding stay out of the plan.
+  `ce-work` and goal-mode executors consume these steps as starting points, not
+  scripts.
   - **Work Step Index (large plans only, ~10+ steps).** When the plan has roughly
     ten or more steps, open the section with a compact navigation table — one
-    row per step: **W-ID · one-line title · files touched · depends-on**. It
-    lets an executor map steps to files and resolve dependency order without
+    row per step: **W-ID · one-line title · affected area · depends-on**. It
+    lets an executor map steps to components and resolve dependency order without
     scanning every step body. It is a **navigation aid only**: the step bodies
     stay authoritative, it carries nothing beyond those four fields (no
-    approach, tests, or rationale), and `files touched` is the key/primary
-    paths, not an exhaustive restatement. **Omit it below ~10 steps** — there
-    the per-step `Dependencies`/`Files` (and any sequencing or dependency
-    diagram) already suffice, and an index would be ceremony.
+    approach, tests, or rationale). **Omit it below ~10 steps** — there the step
+    bodies already suffice, and an index would be ceremony.
 - **How We'll Check It** — repo-specific commands and quality gates,
   including which tests prove the plan, when `release:validate` applies, and
   what behavioral skill evaluation is required. Avoid generic "run tests"
@@ -207,9 +215,9 @@ present. They carry the contracts downstream consumers depend on.
   "build time reduced 30%") and consider routing to `ce-optimize` — a metric
   target is a sharper done signal for a long-running goal than a boolean check.
 - **Done When** — a concise completion summary, not a restatement of
-  requirements, steps, and verification. Include global and per-step done
-  signals only when they add a boundary not already obvious from Verification,
-  plus cleanup of abandoned experimental code.
+  requirements, steps, and verification. Include only global boundaries not
+  already obvious from Verification, plus cleanup of abandoned experimental
+  code when relevant.
 
 ## Include when material
 
@@ -297,7 +305,7 @@ Hold every kept section to these:
   owns only the final completion boundary. Reference an ID instead of
   restating its content elsewhere.
 - **Focused means capped.** A feature with at most four outcome steps stays at
-  or below 1,500 words unless the review records the P0/P1 correctness reason
+  or below 1,000 words unless the review records the P0/P1 correctness reason
   for exceeding it. External-data and high-risk labels do not waive the cap.
 
 - **Lead with the decision or outcome.** Put the conclusion first, then the
@@ -322,6 +330,11 @@ Precision is not padding: keep file paths, IDs, dates, domain terms,
 conditionals, and exact thresholds verbatim; when a concrete anchor is knowable
 from the work already done, use it instead of a vague abstraction. Economy
 targets the connective tissue around precision, never the precision itself.
+
+**Guardrail test:** could a competent implementer choose a different local
+implementation and still satisfy the plan? If not, every constrained choice
+must name the material risk or rework it prevents. Delete unsupported coding
+instructions.
 
 **Resolve in place; don't stratify.** When deepening, a doc-review pass, or a
 later decision supersedes earlier text, rewrite or remove the original — don't

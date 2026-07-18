@@ -337,8 +337,8 @@ contracts — the agent picks shapes that fit the content.
   the same doc.
 - **Work Steps** — repeating `<article>` cards with a stable
   ID chip (visible "W1" text), a metadata strip (`<dl>` with field
-  labels and values for Goal, Files, Dependencies), and secondary
-  content (Approach, Test Scenarios, Verification, Patterns to Follow)
+  labels and values for Goal and Affected area), and any optional secondary
+  content (Constraints, Approach, Test Scenarios, Verification, Patterns)
   inside `<details>` collapsibles, **default-closed**. At 3+ steps the
   default-closed rule is important — rendering all steps fully
   expanded turns the doc into one continuous scroll where the reader

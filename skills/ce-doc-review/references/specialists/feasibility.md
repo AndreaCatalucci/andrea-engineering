@@ -10,6 +10,9 @@ Ground the implementation plan in the actual codebase. Use read-only repository 
 - **Dependencies:** Are external services and unit ordering explicit enough to execute?
 - **Migration:** Where data or contracts change, are compatibility, rollout, rollback, and ordering workable?
 - **Performance:** Test only stated targets or constraints supported by current-scale evidence.
-- **Implementability:** Would an implementer still need to make a important architectural decision omitted from the plan?
+- **Implementability:** Would an implementer still need to make an important architectural decision omitted from the plan?
 
-Cite document text as evidence and name codebase evidence in the consequence or recommendation. Do not flag implementation preferences when the documented approach works.
+Cite document text as evidence and name codebase evidence in the consequence or
+recommendation. Do not flag missing local coding tactics or implementation
+preferences when the plan's outcomes, important constraints, and proof are
+clear.
