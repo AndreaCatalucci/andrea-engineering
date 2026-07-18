@@ -1,13 +1,6 @@
 ---
 name: ce-product-pulse
-description: "Generate time-windowed product pulse reports from configured signals."
-allowed-tools:
-  - Read
-  - Write
-  - Glob
-  - Grep
-  - Bash
-  - AskUserQuestion
+description: "Generate time-windowed product pulse reports from configured signals. Use when the user asks for a product health, adoption, or performance pulse from connected data sources."
 ---
 
 # Product Pulse
@@ -18,7 +11,7 @@ The skill does not mutate the product, the database, or any external system. Its
 
 ## Interaction Method
 
-Default to the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension). Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
+Before asking the user for input, read and follow [`references/codex-interaction.md`](references/codex-interaction.md).
 
 Ask one question at a time. Reserve multi-select for first-run configuration only.
 
@@ -50,7 +43,7 @@ Apply a **15-minute trailing buffer** to the window's upper bound. Many analytic
 
 ### Phase 0: Route by Config State
 
-**Read config.** Resolve `<repo-root>` at runtime by running `git rev-parse --show-toplevel` with the shell tool. Then read `<repo-root>/.andrea-engineering/config.local.yaml` with the native file-read tool (e.g., Read in Claude Code, read_file in Codex). If the root cannot be resolved or the file does not exist, treat this as a first run. Otherwise extract values for the `pulse_*` keys listed under "Config keys" below.
+**Read config.** Resolve `<repo-root>` at runtime by running `git rev-parse --show-toplevel` with the Codex shell tool. Then read `<repo-root>/.andrea-engineering/config.local.yaml`. If the root cannot be resolved or the file does not exist, treat this as a first run. Otherwise extract values for the `pulse_*` keys listed under "Config keys" below.
 
 **Config keys:**
 - `pulse_product_name` -- string, used in report titles. Required for routing: if unset, skill is unconfigured.
@@ -79,7 +72,7 @@ If the argument was `setup`, `reconfigure`, or `edit config`, go to Phase 1 rega
 
 #### 1.0 Seed from strategy (if available)
 
-Before asking any questions, read `STRATEGY.md` using the native file-read tool. If the file exists, extract:
+Before asking any questions, read `STRATEGY.md`. If the file exists, extract:
 
 - The product name from the `name` key in the YAML frontmatter, falling back to the H1 title (stripping the trailing ` Strategy` suffix, e.g., `# Spiral Strategy` -> `Spiral`) if frontmatter is missing
 - The list of key metrics from the `## Key metrics` section, one per line
@@ -109,11 +102,11 @@ If the user offers read-write database access, refuse and offer the alternatives
 
 Write the captured config to `<repo-root>/.andrea-engineering/config.local.yaml` as flat `pulse_*` keys, using the schema in `references/interview.md` under "Config file shape". Resolve the repo root with `git rev-parse --show-toplevel`. To write: (1) if the file or directory does not exist, create `.andrea-engineering/` and write the YAML file; (2) if the file exists, merge new keys into the existing YAML, preserving any non-pulse keys (e.g., `plan_*`) untouched. If `.andrea-engineering/config.local.yaml` is not already covered by the repo's `.gitignore`, offer to add the entry before writing. Show the resulting pulse block to the user in chat and offer one round of edits.
 
-After the config is written, run the **scheduling recommendation** from `references/interview.md` section 9: offer to set up a recurring run so the user gets the pulse on a cadence instead of having to remember to run it. Accept yes/no/later. If yes, hand off to whichever scheduling primitive the current harness exposes — the in-plugin `schedule` skill if it is installed, otherwise note that scheduling is platform-specific (cron, GitHub Actions, the host's own automation) and emit a brief hint covering what would need to run. Do not schedule inline. Then proceed to Phase 2.
+After the config is written, run the **scheduling recommendation** from `references/interview.md` section 9: offer to create a recurring Codex automation so the user gets the pulse on a cadence instead of having to remember to run it. Accept yes/no/later. If yes, use Codex's automation tool after the user confirms the cadence. Then proceed to Phase 2.
 
 ### Phase 2: Run the Pulse
 
-If Phase 1 ran (first run, or `setup`/`reconfigure` argument), re-read `.andrea-engineering/config.local.yaml` from the repo root using the native file-read tool to pick up any edits accepted during the Phase 1 review step. Otherwise, use the `pulse_*` values already extracted in Phase 0. Apply hard defaults for any unset settings (see Phase 0 "Config keys").
+If Phase 1 ran (first run, or `setup`/`reconfigure` argument), re-read `.andrea-engineering/config.local.yaml` from the repo root to pick up any edits accepted during the Phase 1 review step. Otherwise, use the `pulse_*` values already extracted in Phase 0. Apply hard defaults for any unset settings (see Phase 0 "Config keys").
 
 #### 2.1 Dispatch Queries
 
@@ -156,7 +149,7 @@ Surface the Headlines and top Followup in chat. Provide the full file path so th
 
 First-run setup already offered scheduling (see Phase 1.1 end). Phase 3 is a lighter re-surface for ad-hoc runs:
 
-- If the argument was a known schedule keyword (`daily`, `hourly`, `weekly`), note that this run is ad-hoc and suggest scheduling via the harness's available primitive (the in-plugin `schedule` skill where present; otherwise a platform-native option) for recurring runs.
+- If the argument was a known schedule keyword (`daily`, `hourly`, `weekly`), note that this run is ad hoc and offer to create a recurring Codex automation.
 - If no schedule is on file and this is the third or later pulse run the user has done, mention once that scheduling is available. Don't nag on every run.
 
 Never schedule automatically. Any scheduling handoff requires explicit confirmation.

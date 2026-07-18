@@ -212,7 +212,7 @@ After the config is written and shown to the user, make a scheduling offer befor
 
 **Handling the answer:**
 
-- **Yes (daily or weekly)** -> "I'll hand this to the `schedule` skill. Confirm the time/day and it'll set up the recurring job." Do not schedule inline - hand off to the `schedule` skill explicitly, which is the single source of truth for recurring tasks. On Claude Code, this uses the Routines feature.
+- **Yes (daily or weekly)** -> confirm the time/day, then create the recurring job with Codex's automation tool.
 - **Not now** -> capture `schedule: manual` in the config. No nag.
 - **Later** -> capture `schedule: ask-again-after-3-runs` in the config. The SKILL.md Phase 3 logic re-surfaces the offer after 3 manual runs.
 
@@ -254,7 +254,7 @@ pulse_excluded_metrics: "{{metric,metric}}"          # strategy metrics intentio
 - **Strategy metrics carried forward**: surfaced in the report, not stored as config — they live in `STRATEGY.md` and are re-read each run from there.
 - **Per-source connection details** (URLs, API keys, query specifics): live with the user's MCP configuration, not in this config.
 - **Hardcoded operational settings** (15-minute trailing buffer, top-N error count, p50/p95/p99 latencies, "no PII in reports", "parallel analytics + tracing, serial DB"): these are skill behavior, not user config; they live in `SKILL.md` and stay constant.
-- **Schedule cadence**: handled by the `schedule` skill (or platform-native cron), not pulse config. The pulse skill only hands off; it does not own the cadence record.
+- **Schedule cadence**: owned by the Codex automation, not pulse config.
 - **Tracing top-N count and latency on/off**: not configurable in this version. The report always includes top 5 errors and full p50/p95/p99 latency. Add config keys later if a real need surfaces.
 
 After writing, surface the resulting `pulse_*` block to the user in chat. Offer one round of edits. Then return to SKILL.md Phase 2.

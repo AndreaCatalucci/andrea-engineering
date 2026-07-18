@@ -188,16 +188,10 @@ The opening goes under `## Summary` if the body uses any `##` headings; bare par
 ---
 
 ![Andrea Engineering](https://img.shields.io/badge/Built_with-Andrea_Engineering-6366f1)
-![HARNESS](https://img.shields.io/badge/MODEL_SLUG-COLOR?logo=LOGO&logoColor=white)
+![Codex](https://img.shields.io/badge/Codex-MODEL_SLUG-000000)
 ```
 
-| Harness | `LOGO` | `COLOR` |
-|---|---|---|
-| Claude Code | `claude` | `D97757` |
-| Codex | (omit `?logo=` param) | `000000` |
-| Antigravity CLI (`agy`) | `googlegemini` | `4285F4` |
-
-**Model slug:** spaces become underscores; append context window and thinking level in parens if known. **URL-encode literal parens as `%28` / `%29`** — unencoded parens inside markdown image URLs break release-please's commit parser, which silently drops the commit from the changelog. Examples: `Opus_4.6_%281M,_Extended_Thinking%29`, `Sonnet_4.6_%28200K%29`, `Gemini_3.1_Pro`.
+**Model slug:** use the current Codex model name when the runtime exposes it; otherwise use `Codex`. Replace spaces with underscores. If qualifiers contain parentheses, URL-encode them as `%28` / `%29` so markdown and release tooling parse the badge reliably.
 
 Skip the badge if regenerating a body that already contains it.
 

@@ -1,6 +1,6 @@
 # Next.js dev-server recipe (auto-detect fallback)
 
-Loaded when `detect-project-type.sh` returns `next` and there is no `.claude/launch.json` to consult.
+Loaded when `detect-project-type.sh` returns `next`.
 
 ## Signature
 
@@ -37,25 +37,7 @@ Default: `3000`. Next.js respects `-p <port>` / `--port <port>` and the `PORT` e
 
 Next.js 14+ supports `--turbo` (and 15+ makes it default). If the `dev` script in `package.json` includes `--turbo`, preserve it. Turbopack changes reload behavior but not port or URL conventions.
 
-## Stub generation
-
-```json
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Next dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 3000
-    }
-  ]
-}
-```
-
-Substitute the resolved package manager (`npm` / `pnpm` / `yarn` / `bun`) and port.
-
 ## Common gotchas
 
-- **Monorepo roots:** in a pnpm/Turborepo monorepo, `npm run dev` at the root typically fans out to multiple packages. Users should set `cwd` in `.claude/launch.json` to the specific Next app (`cwd: "apps/web"`).
+- **Monorepo roots:** in a pnpm/Turborepo monorepo, the root `dev` command may fan out to multiple packages. If the requested feature belongs to one app, run the command from that app's directory.
 - **Env loading:** `.env.local` is loaded automatically by Next; polish does not need to export it.

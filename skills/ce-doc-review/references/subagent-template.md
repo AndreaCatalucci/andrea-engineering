@@ -1,6 +1,6 @@
-# Document Review Sub-agent Prompt Template
+# Document Review Subagent Prompt Template
 
-This template is used by the ce-doc-review orchestrator to spawn each reviewer sub-agent. Variable substitution slots are filled at dispatch time.
+This template is used by the ce-doc-review orchestrator to spawn each reviewer subagent. Variable substitution slots are filled at dispatch time.
 
 ---
 

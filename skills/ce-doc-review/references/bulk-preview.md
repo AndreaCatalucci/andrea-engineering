@@ -80,7 +80,7 @@ When no `why_it_matters` is available for a finding (rare — only if persona ou
 
 ## Question and options
 
-After the preview body is rendered, ask the user using the platform's blocking question tool (`AskUserQuestion` in Claude Code, `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension)). In Claude Code, the tool should already be loaded from the Interactive-mode pre-load step — if it isn't, call `ToolSearch` with query `select:AskUserQuestion` now. The text fallback below applies only when the harness genuinely lacks a blocking tool — `ToolSearch` returns no match, the tool call explicitly fails, or the runtime mode does not expose it (e.g., Codex edit modes without `request_user_input`). A pending schema load is not a fallback trigger. Never silently skip the question.
+After the preview body is rendered, ask through the [shared codex-interaction contract](codex-interaction.md). Never silently skip the question.
 
 Stem (adapted to the path):
 
@@ -92,8 +92,6 @@ Options (exactly two, in all three cases):
 
 - `Proceed` — execute the plan as shown
 - `Cancel` — do nothing, return to the originating question
-
-Only when `ToolSearch` explicitly returns no match or the tool call errors — or on a platform with no blocking question tool — fall back to presenting numbered options and waiting for the user's next reply.
 
 ---
 

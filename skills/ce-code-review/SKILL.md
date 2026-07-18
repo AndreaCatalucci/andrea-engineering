@@ -32,11 +32,11 @@ Ignore deprecated `mode:autofix`; default mode already owns safe local applicati
 - Default mode may apply verified fixes locally; `mode:agent` is strictly report-only.
 - Review tracked changes only. List excluded untracked paths in Coverage.
 - Never recommend deleting or ignoring `docs/brainstorms/*`, `docs/plans/*`, or `docs/solutions/*`.
-- Report review outcomes, not dispatch mechanics or internal model tiers.
+- Report review outcomes, not dispatch mechanics.
 
 ## Fast Review
 
-When the user explicitly asks for a quick/light/fast review and `mode:agent` is absent, announce the quick path and use the harness's built-in code review. If none exists, continue with this workflow. `mode:agent` always uses the structured workflow.
+When the user explicitly asks for a quick/light/fast review and `mode:agent` is absent, announce the quick path and run only the inline fast pass plus `core-reviewer`. `mode:agent` always uses the full structured workflow.
 
 ## Severity and Routing
 
@@ -65,7 +65,7 @@ Stop on an invalid or inaccessible scope. Preserve the resolved diff, files, mod
 
 ### 2. Resolve shared project orientation
 
-For local-aligned/current-checkout scope, query `scripts/repo-profile-cache.py get`. On a miss, use `references/agents/repo-profiler.md` to derive and persist the compact profile; on failure or `NO-CACHE`, continue without it. Never use the local cache for remote scope because it describes the wrong tree.
+For local-aligned/current-checkout scope, set `SKILL_DIR` to this skill's directory and query `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get`. On a miss, use `references/agents/repo-profiler.md` to derive and persist the compact profile; on failure or `NO-CACHE`, continue without it. Never use the local cache for remote scope because it describes the wrong tree.
 
 The profile is orientation, not evidence. Applicable project instructions and current code remain authoritative.
 
@@ -87,7 +87,7 @@ Read `references/persona-catalog.md`. Always select `core-reviewer`, which cover
 
 Read the project instructions governing changed files. An inline standards finding requires both a direct rule quote and a violating line; otherwise suppress it. If `docs/solutions/` exists, search by changed modules/concepts and carry at most three strong Known Pattern notes. Historical guidance is context, not a defect.
 
-Announce the core lenses and one short reason per specialist. If adversarial review qualifies, follow `references/cross-model-review.md` to add a non-blocking peer-model pass when supported.
+Announce the core lenses and one short reason per specialist.
 
 ### 4. Dispatch review
 
@@ -102,7 +102,7 @@ Before dispatch, read:
 - `references/findings-schema.json`
 - each selected `references/personas/<name>.md`
 
-Spawn generic read-only subagents with the exact shared scope, intent, PR context, profile orientation, diff/files, run ID, and schema. `core`, `security`, and `adversarial` inherit the session model; use a known mid-tier selector for other reviewers only when the platform exposes one. Respect the harness concurrency limit with a bounded queue; capacity is backpressure, not reviewer failure.
+Spawn generic read-only Codex subagents with `spawn_agent`, passing the exact shared scope, intent, PR context, profile orientation, diff/files, run ID, and schema. Let every reviewer inherit the parent model. Respect Codex's active-agent limit with a bounded queue; capacity is backpressure, not reviewer failure.
 
 Remote reviewers inspect fetched refs with `git show` or diff hunks, never stale workspace files. Subagents may write only their run artifact under `/tmp`; they never edit the project.
 
@@ -164,7 +164,6 @@ After output, stop. Do not offer push/PR actions or run post-review triage.
 | `references/subagent-template.md` | Reviewer dispatch |
 | `references/diff-scope.md` | Shared scope rules for reviewers |
 | `references/findings-schema.json` | Reviewer JSON contract |
-| `references/cross-model-review.md` | Conditional peer adversarial pass |
 | `references/validator-template.md` | Single batched validation pass |
 | `references/merge-apply-contract.md` | Merge, apply, JSON, artifacts |
 | `references/review-output-template.md` | Markdown report skeleton |

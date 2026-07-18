@@ -5,15 +5,13 @@ description: "Create or update STRATEGY.md. Use when starting a product, changin
 
 # Product Strategy
 
-**Note: The current year is 2026.** Use this when dating the strategy document.
-
 `ce-strategy` produces and maintains `STRATEGY.md` - a short, durable anchor document that captures what the product is, who it serves, how it succeeds, and where the team is investing. It lives at the repo root as a canonical, well-known file (peer of `README.md`). Downstream skills (`ce-ideate`, `ce-brainstorm`, `ce-plan`) read it as grounding when it exists.
 
 The document is short and structured on purpose. Good answers to a handful of sharp questions produce a better strategy than any amount of prose. This skill asks those questions, pushes back on weak answers, and writes the doc.
 
 ## Interaction Method
 
-Default to the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension). Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
+Before asking the user for input, read and follow [`references/codex-interaction.md`](references/codex-interaction.md).
 
 Ask one question at a time. Prefer free-form responses for the substantive sections (problem, approach, persona); reserve single-select for routing decisions (which section to revisit). Each option label must be self-contained.
 
@@ -34,7 +32,7 @@ Interpret any argument as an optional focus: a section name to revisit (`metrics
 
 ### Phase 0: Route by File State
 
-Read `STRATEGY.md` using the native file-read tool.
+Read `STRATEGY.md` directly.
 
 - **File does not exist** -> First run. Go to Phase 1.
 - **File exists and argument names a specific section** -> Targeted update. Go to Phase 2.
@@ -67,7 +65,7 @@ Read the existing `STRATEGY.md` thoroughly. Summarize current state in 3-5 lines
 
 If the argument named a specific section, jump to that section in `references/interview.md`. Preserve all other sections exactly. Apply pushback as if this were a first run - do not rubber-stamp existing weak content just because it is already written.
 
-If no specific target, ask the user which section to revisit using the blocking question tool. Options:
+If no specific target, ask the user which section to revisit through the Interaction Method. Options:
 
 - "Target problem"
 - "Our approach"

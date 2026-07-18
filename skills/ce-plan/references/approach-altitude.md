@@ -25,7 +25,7 @@ This is not a software plan template (no implementation units / test scenarios) 
 
 ## Stage 3: Checkpoint
 
-Hold at the approach. Use `request_user_input` when available; otherwise ask in chat and wait.
+Hold at the approach and ask through the [shared codex-interaction contract](codex-interaction.md).
 
 **Sequence orthogonal axes** rather than cramming them into one menu (per the "split orthogonal decisions" rule and the 4-option cap):
 
@@ -44,7 +44,7 @@ Hold at the approach. Use `request_user_input` when available; otherwise ask in 
 2. **Persist** the marked plan to `docs/plans/` (the marker needs a file to live in so it can travel — R7's file-optional governs the user keeping a chat-only copy, but non-code *execution* forces a persist).
 3. Return the saved plan path. Run `ce-work` only after a later explicit user request.
 
-`ce-plan` itself does not execute the deliverable in any path — it produces the approach-plan and hands off. The portable plan is also runnable by any other agent without `ce-work`.
+`ce-plan` itself does not execute the deliverable in any path — it produces the approach-plan and hands off. The portable plan is also runnable directly by Codex without `ce-work`.
 
 ## Boundaries: not the other approach surfaces
 
@@ -52,4 +52,4 @@ Three in-chat "approach" mechanics already exist. Approach altitude is separate 
 
 - **Answer-seeking's plan-of-attack** (`references/universal-planning.md`): non-blocking (states the approach and proceeds immediately), discards its scaffold, produces a chat answer, and lives only in the non-software answer-seeking branch. Approach altitude is domain-general, **holds at a checkpoint** for a user decision, and produces a **persistable, deepenable** approach-plan. An investigative request with no approach-language is answer-seeking's, not this.
 - **Scoping synthesis** (Phase 0.7 / 5.1.5): a *scope* checkpoint for a deliverable already committed to — it confirms what the implementation plan will target. Approach altitude is an *altitude* checkpoint that decides whether to commit to the deliverable at all; it sits above the implementation plan, not inside producing one.
-- **Deepening** (Phase 5.3): operates on a plan that already exists, strengthening it via confidence sub-agents. Approach altitude operates *before any artifact exists*. The "deepen" affordance offered at the approach-altitude checkpoint is the user optionally enriching the approach-plan — not the Phase 5.3 confidence pass.
+- **Deepening** (Phase 5.3): operates on a plan that already exists, strengthening it via confidence subagents. Approach altitude operates *before any artifact exists*. The "deepen" affordance offered at the approach-altitude checkpoint is the user optionally enriching the approach-plan — not the Phase 5.3 confidence pass.

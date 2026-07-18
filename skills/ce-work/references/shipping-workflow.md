@@ -12,8 +12,7 @@ This file contains the shipping workflow (Phase 3-4). It is loaded when all Phas
    # Run full test suite (use project's test command)
    # Examples: bin/rails test, npm test, pytest, go test, etc.
 
-   # Run linting (per the project's configured lint command / active instructions)
-   # Use linting-agent before pushing to origin
+   # Run linting with the project's configured command / active instructions
    ```
 
 2. **Confirm simplification coverage**
@@ -22,7 +21,7 @@ This file contains the shipping workflow (Phase 3-4). It is loaded when all Phas
 
 3. **Code Review**
 
-   Review the diff with **`ce-code-review`** — the plugin's portable review skill — as the single path. It self-right-sizes (a lite roster for small, low-risk, code-only diffs; the full roster otherwise), so there is no "escalate to a heavier reviewer" decision and **no harness-specific review detection** — it behaves identically on every harness. (This replaces the former Tier 1 harness-native `/review` / Tier 2 escalation split: the size and sensitive-surface judgment that used to live here now lives inside `ce-code-review`'s own reviewer selection and small-diff gate.)
+   Review the diff with **`ce-code-review`** as the single path. It self-right-sizes: a lite roster for small, low-risk, code-only diffs and the full roster otherwise.
 
    **Skip dedicated review only for a purely mechanical diff** — formatting, dependency-version bumps, lint-only fixes, generated artifacts (the same class step 2 skips for simplify). Note in the shipping summary: `Code review: skipped (mechanical diff)`. Everything else gets reviewed.
 
@@ -32,7 +31,7 @@ This file contains the shipping workflow (Phase 3-4). It is loaded when all Phas
 
    **3b. Apply fixes (caller-owned).** Load `references/review-findings-followup.md`: filter on JSON, batch by file, dispatch fix subagents. Orchestrator merges, tests, commits. Then proceed to the Residual Work Gate.
 
-   **If `ce-code-review` cannot run at all** — subagent dispatch unavailable, unauthenticated, or hard-capped, returning `status: failed`/`degraded` with no coverage even after its own sequential Fallback: in an **interactive** session, run the harness-native review if one exists (e.g. `/review`) and fix inline; in a **non-interactive** session (autonomous pipeline, or no native review available), skip the dedicated step, note `Code review: skipped (ce-code-review unavailable)`, and add an explicit manual diff scan to Final Validation. Never silently ship a non-mechanical change with no review of any kind.
+   **If `ce-code-review` cannot run at all** and returns `status: failed` or degraded with no coverage, note `Code review: dedicated review unavailable` and perform an explicit manual diff scan during Final Validation. Never silently ship a non-mechanical change with no review.
 
 4. **Residual Work Gate** (REQUIRED when `ce-code-review` ran and left actionable residuals)
 
@@ -40,7 +39,7 @@ This file contains the shipping workflow (Phase 3-4). It is loaded when all Phas
 
    **Non-interactive / autonomous sessions (no human can answer — e.g. an `lfg`-style pipeline or a headless run):** do **not** call the blocking tool — that would hang the pipeline. After step 3b auto-applied every mechanically-eligible finding, take the `Accept and proceed` path automatically: record the remaining actionable residuals verbatim to the durable Known Residuals sink (the PR description's Known Residuals section, or `docs/residual-review-findings/<branch-or-head-sha>.md` on the no-PR path) and continue to Final Validation. Residuals are recorded, never dropped — this keeps autonomous shipping unblocked without losing findings.
 
-   **Interactive sessions:** Ask the user using the platform's blocking question tool (`AskUserQuestion` in Claude Code with `ToolSearch select:AskUserQuestion` pre-loaded if needed, `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension)). Fall back to numbered options in chat only when the harness genuinely lacks a blocking tool. Never silently skip the gate.
+   **Interactive sessions:** Ask through the [shared codex-interaction contract](codex-interaction.md). Never silently skip the gate.
 
    Stem: `Code review left N actionable finding(s) not yet fixed. How should the agent proceed?`
 
@@ -76,7 +75,7 @@ This file contains the shipping workflow (Phase 3-4). It is loaded when all Phas
 
 1. **Prepare Validation Context**
 
-   Do not try to launch a dedicated CE evidence-capture workflow. Modern harnesses provide their own browser, screenshot, terminal recording, and artifact capture tools; use those directly only when the user asks or when the artifact already exists.
+   Do not launch a dedicated CE evidence-capture workflow. Use Codex browser, screenshot, terminal, and artifact tools directly when the user asks or when the artifact already exists.
 
    Note whether the completed work has observable behavior (UI rendering, CLI output, API/library behavior with a runnable example, generated artifacts, or workflow output), and summarize any manual validation performed. If the user supplied evidence (URL, markdown embed, local artifact path), pass it to `ce-commit-push-pr` as PR-description context.
 
@@ -107,7 +106,7 @@ Before creating PR, verify:
 - [ ] All clarifying questions asked and answered
 - [ ] All tasks marked completed
 - [ ] Testing addressed -- tests pass AND new/changed behavior has corresponding test coverage (or an explicit justification for why tests are not needed)
-- [ ] Linting passes (use linting-agent)
+- [ ] Linting passes with the project's configured command
 - [ ] Code follows existing patterns
 - [ ] Figma designs match implementation (if applicable)
 - [ ] Validation/evidence context passed to `ce-commit-push-pr` when the change has observable behavior
@@ -116,14 +115,14 @@ Before creating PR, verify:
 - [ ] Simplification cadence satisfied; the latest pass covered reuse, quality, and efficiency
 - [ ] Code review: `ce-code-review` ran (self-sized), or skipped (mechanical diff / unavailable — noted in summary); residuals handled via the Residual Work Gate
 - [ ] PR description includes summary, testing notes, and evidence when captured
-- [ ] PR description includes Compound Engineered badge with accurate model and harness
+- [ ] PR description includes the Andrea Engineering and Codex badges
 
 ## Code Review
 
-Single portable path: **`ce-code-review`** self-sizes (lite roster for small low-risk code-only diffs, full roster otherwise). No harness-native review detection, no escalation tiers — the size/sensitive-surface judgment lives inside `ce-code-review` now.
+**`ce-code-review`** self-sizes to a lite roster for small low-risk code-only diffs and the full roster otherwise.
 
 **Skip** only for a purely mechanical diff (formatting, dep-bumps, lint-only, generated). Everything else is reviewed.
 
 **Two steps — review is not fix.** (3a) Review-only via `mode:agent`; add `depth:full` when the plan/task/user explicitly asked for a deep review. (3b) Batched fix subagents per `references/review-findings-followup.md`; residuals → Residual Work Gate.
 
-**If `ce-code-review` can't run** (no subagent dispatch): interactive → harness-native review if present, fix inline; non-interactive → skip-with-note + manual diff scan in Final Validation. Never silently ship a non-mechanical change unreviewed.
+**If `ce-code-review` cannot run**, record the failure and perform a manual diff scan during Final Validation. Never silently ship a non-mechanical change unreviewed.

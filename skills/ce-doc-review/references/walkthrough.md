@@ -10,7 +10,7 @@ Interactive mode only.
 
 After `safe_auto` fixes apply and synthesis produces the remaining finding set, the orchestrator asks a four-option routing question before any walk-through or bulk action runs.
 
-Use the platform's blocking question tool (`AskUserQuestion` in Claude Code, `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension)). In Claude Code, the tool should already be loaded from the Interactive-mode pre-load step in `SKILL.md` — if it isn't, call `ToolSearch` with query `select:AskUserQuestion` now. Fall back to presenting the options as a numbered list only when the harness genuinely lacks a blocking tool — `ToolSearch` returns no match, the tool call explicitly fails, or the runtime mode does not expose it (e.g., Codex edit modes without `request_user_input`). A pending schema load is not a fallback trigger. Never silently skip the question. Rendering the routing question as narrative text without the numbered-list fallback is a bug.
+Ask through the [shared codex-interaction contract](codex-interaction.md). Never silently skip the routing decision.
 
 **Stem:** `What should the agent do with the remaining N findings?`
 
@@ -53,7 +53,7 @@ Each finding's recommended action has already been normalized by synthesis step 
 **Cascading root decisions.** When the user picks Skip or Defer on a finding with `dependents`:
 
 1. Announce the cascade in the terminal before firing the next question: "Skipping/Deferring this root will auto-resolve N dependent finding(s): {titles}. Continue?"
-2. Use the platform's blocking question tool with two options: `Cascade — apply same action to all dependents` (recommended) and `Decide each dependent individually`. Labels must be self-contained per the blocking-question tool design rules.
+2. Ask through the [shared codex-interaction contract](codex-interaction.md) with two options: `Cascade — apply same action to all dependents` (recommended) and `Decide each dependent individually`. Keep the labels self-contained.
 3. On Cascade: apply the root's action to every dependent and skip those findings' walk-through entries. Persistence follows the per-action routing rules from "Per-finding routing" below — the canonical home for every cascaded decision is the in-memory decision list (annotated with `cascaded from {root_title}` and the cascaded action), plus any action-specific side effect:
    - Cascaded `Apply` — add the dependent id to the Apply set and record in the decision list.
    - Cascaded `Defer` — invoke the open-questions append flow for the dependent and record the append outcome in the decision list. If the append fails, fall back to the per-finding failure path (Retry / Record only / Convert to Skip) for that dependent before advancing the cascade.
@@ -69,7 +69,7 @@ When the user picks Apply on a root, do NOT cascade — the premise held, so dep
 
 ## Per-finding presentation
 
-Each finding is presented in two parts: a terminal output block carrying the explanation, and a question via the platform's blocking question tool carrying the decision. Never merge the two — the terminal block uses markdown; the question uses plain text.
+Each finding is presented in two parts: a terminal output block carrying the explanation, and a decision asked through the [shared codex-interaction contract](codex-interaction.md). Never merge the two — the terminal block uses markdown; the question uses plain text.
 
 ### Terminal output block (print before firing the question)
 
@@ -113,7 +113,7 @@ Substitutions:
 
 ### Question stem (short, decision-focused)
 
-After the terminal block renders, fire the platform's blocking question tool with a compact two-line stem:
+After the terminal block renders, ask through the [shared codex-interaction contract](codex-interaction.md) with a compact two-line stem:
 
 ```
 Finding {N} of {M} — {severity} {short handle}.
@@ -161,8 +161,6 @@ When reviewers disagreed or evidence cuts against the default, still mark one op
 
 - **Combined N=1 + no-append:** the menu shows two options: Apply / Skip.
 
-Only when `ToolSearch` explicitly returns no match or the tool call errors — or on a platform with no blocking question tool — fall back to presenting the options as a numbered list and waiting for the user's next reply.
-
 ---
 
 ## Per-finding routing
@@ -180,7 +178,7 @@ This sub-question — and the `Acknowledge without applying` option in particula
 
 Synthesis step 3.5b demotes the default recommendation from Apply to Defer for any merged finding without a `suggested_fix`, so `(recommended)` never lands on Apply for these findings. But the menu still lets the user pick Apply manually. When that happens, do not add the finding to the Apply set — the execution pass has no edit payload to apply, which would either fail the batch or record a misleading "applied" outcome.
 
-Fire a blocking sub-question using the platform's question tool. The stem explains why Apply is not executable in one line, then offers three self-contained options. Position indicator stays on the current finding while the sub-question is open.
+Ask a blocking sub-question through the shared Codex interaction contract. The stem explains why Apply is not executable in one line, then offers three self-contained options. Position indicator stays on the current finding while the sub-question is open.
 
 **Stem:** `Apply isn't executable for this finding — the review surfaced the issue without a concrete fix. How should the agent proceed?`
 
@@ -228,7 +226,7 @@ Cross-session persistence is out of scope. Mirrors `ce-code-review`'s walk-throu
 
 After the loop terminates — either every finding has been answered, or the user took `Auto-resolve with best judgment on the rest → Proceed` — the walk-through hands off to the execution phase:
 
-1. **Apply set:** in a single pass, the orchestrator applies every accumulated Apply-set finding's `suggested_fix` to the document. Document edits happen inline via the platform's edit tool — ce-doc-review has no batch-fixer subagent (per scope boundary); the orchestrator performs the edits directly, since `gated_auto` and `manual` fixes for documents are single-file markdown changes with no cross-file dependencies. **Defensive no-fix check:** before dispatching the edit for each Apply-set entry, verify the merged finding carries a `suggested_fix`. If it does not (the decision-time no-fix guard in "Per-finding routing" should prevent this, but treat it as a defensive fallback), skip the edit, record the finding in the completion report's failure section with reason `Apply skipped — no suggested_fix available`, and continue the batch. Do not fail the entire pass because one Apply-set entry lacks a fix.
+1. **Apply set:** in a single pass, the orchestrator applies every accumulated Apply-set finding's `suggested_fix` with `apply_patch`. `ce-doc-review` has no batch-fixer subagent; the orchestrator performs these single-file markdown edits directly. **Defensive no-fix check:** before applying each entry, verify the merged finding carries a `suggested_fix`. If it does not, skip the edit, record the finding in the completion report's failure section with reason `Apply skipped — no suggested_fix available`, and continue the batch. Do not fail the entire pass because one Apply-set entry lacks a fix.
 2. **Defer set:** already executed inline during the walk-through via `references/open-questions-defer.md`. Nothing to dispatch here.
 3. **Skip:** no-op.
 

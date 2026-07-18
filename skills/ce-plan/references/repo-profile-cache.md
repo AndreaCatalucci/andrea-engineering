@@ -2,7 +2,7 @@
 
 Read this when a repo-grounding skill needs the question-agnostic **project profile** (stack, deps, conventions, structure). The profile is derived once and reused within a session and across sessions and skills at an unchanged commit — only the *question-specific* grounding for the current run is ever re-derived.
 
-This file is **byte-duplicated** into every consuming skill (the plugin has no cross-skill import mechanism). All copies must stay identical; `tests/repo-profile-cache-parity.test.ts` enforces it. The deterministic cache I/O lives in the co-located `scripts/repo-profile-cache.py`; the derivation-on-miss is done by the co-located `references/agents/repo-profiler.md` persona.
+This protocol is mirrored into every consuming skill so each skill remains self-contained. The deterministic cache I/O lives in the co-located `scripts/repo-profile-cache.py`; derivation on a miss follows the co-located `references/agents/repo-profiler.md` prompt. Consumers always resolve both from their own `SKILL_DIR`.
 
 ## What is cached (the agnostic profile)
 
@@ -19,7 +19,7 @@ A single JSON object, versioned by `profile_schema_version`:
 Never read from the cache — recompute every run:
 
 - The `docs/solutions/` enumeration (a new learning, even uncommitted, must be visible — re-globbing it is ~free and the match reads files fresh anyway).
-- Subdirectory-scoped instruction files (area-scoped `CLAUDE.md`/`AGENTS.md`).
+- Subdirectory-scoped `AGENTS.md` files.
 - All question-specific grounding: a candidate's call-sites/footprint, prior-decision matches, feature patterns, git history of touched files, tracker/PR activity, external research.
 
 ## Cache location & key
@@ -35,7 +35,7 @@ Two checkouts at the same commit share the same entry. Lookup is git metadata on
 
 ## Protocol — how a skill uses it
 
-Invoke the helper via the `SKILL_DIR` anchor (set `SKILL_DIR` to the absolute path of the directory containing the SKILL.md you just read; the Bash tool's cwd is the user's project, not the skill dir):
+Invoke the helper via the `SKILL_DIR` anchor. Set `SKILL_DIR` to the absolute path of the directory containing the `SKILL.md` you just read; Codex shell commands run from the user's project, not the skill directory:
 
 ```bash
 SKILL_DIR="<absolute path of this skill's directory>";
@@ -45,7 +45,7 @@ python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
 `get` prints exactly one of:
 
 - `HIT` then the profile JSON on the following lines → load it as the agnostic profile; skip derivation.
-- `MISS` then a write-path on the next line → dispatch the `repo-profiler` persona to derive the profile, write its JSON output to a file, then persist it. This `put` runs after the profiler, so it is a **separate Bash-tool call** from the `get` above — shell variables do not persist between calls, so **re-set `SKILL_DIR` in the same command**:
+- `MISS` then a write-path on the next line → dispatch the `repo-profiler` persona to derive the profile, write its JSON output to a file, then persist it. This `put` runs after the profiler, so it is a **separate Codex shell call** from the `get` above — shell variables do not persist between calls, so **re-set `SKILL_DIR` in the same command**:
   ```bash
   SKILL_DIR="<absolute path of this skill's directory>";
   python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <profile-json-file>
@@ -56,7 +56,7 @@ In all three cases, after the agnostic profile is in hand, run **this skill's qu
 
 ## Freshness (delta-aware)
 
-A cached entry is a `HIT` only when, at the current `HEAD`, its `profile_schema_version` matches and **no profile-input path** is dirty or newly-added. Freshness is checked with `git status --porcelain --untracked-files=all`, so untracked (`??`) new inputs invalidate too. The profile-input set is a conservative **superset** of every file the schema derives from — dependency manifests + lockfiles (any depth), license, root instruction/doc files, `CONCEPTS.md`/`STRATEGY.md`, topology sources (`Dockerfile`, `.github/workflows/`, `.cursor/rules`). A dirty source file, `docs/plans/*`, or other non-input path does **not** invalidate. Completeness of this set is the cardinal-rule safety requirement: over-invalidating costs a re-derive; under-invalidating would serve a stale profile.
+A cached entry is a `HIT` only when, at the current `HEAD`, its `profile_schema_version` matches and **no profile-input path** is dirty or newly-added. Freshness is checked with `git status --porcelain --untracked-files=all`, so untracked (`??`) new inputs invalidate too. The profile-input set is a conservative **superset** of every file the schema derives from — dependency manifests + lockfiles (any depth), license, root instruction/doc files, `CONCEPTS.md`/`STRATEGY.md`, and topology sources such as `Dockerfile` and `.github/workflows/`. A dirty source file, `docs/plans/*`, or other non-input path does **not** invalidate. Completeness of this set is the cardinal-rule safety requirement: over-invalidating costs a re-derive; under-invalidating would serve a stale profile.
 
 ## Degradation
 

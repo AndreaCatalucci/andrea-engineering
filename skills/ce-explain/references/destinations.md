@@ -19,11 +19,11 @@ The run-dir file remains the complete standalone document; the fragment is a re-
 
 1. Ask nothing extra if the user already named a path; otherwise accept the path from their menu answer's free-text.
 2. Copy the artifact out of the run dir to that path (`cp "$RUN_DIR/explainer.html" <path>` — or `explainer.md` for a markdown run), creating parent directories if needed.
-3. Where the platform exposes a browser-opening primitive (`open` on macOS, `xdg-open` on Linux, `start` on Windows), offer to open it; otherwise print the absolute path.
+3. Print the absolute path.
 
 ## Publish to Proof (markdown output only)
 
-Proof ingests markdown, so this option renders only when the run resolved `output:md`. Invoke the `ce-proof` skill via the platform's skill-invocation primitive when it is installed, passing the artifact path, a title (`Explainer: <subject>`), and identity `ai:andrea-engineering` / `Andrea Engineering`; surface the returned share URL. When the skill is not installed but the Proof web API is reachable, POST the markdown per that API. On failure: retry once after a short wait, then report plainly that the upload didn't succeed and why, and fall back to the local-file path. One-way publish; the run-dir file stays canonical.
+Proof ingests markdown, so this option renders only when the run resolved `output:md`. Load and follow `ce-proof`, passing the artifact path, title (`Explainer: <subject>`), and identity `ai:andrea-engineering` / `Andrea Engineering`; surface the returned share URL. On failure, retry once after a short wait, then report why the upload failed and fall back to the local-file path. One-way publish; the run-dir file stays canonical.
 
 ## Send to Thinkroom
 

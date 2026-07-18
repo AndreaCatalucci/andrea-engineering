@@ -11,9 +11,9 @@ If no PR number was provided, detect from the current branch:
 gh pr view --json number -q .number
 ```
 
-Then fetch all feedback using the GraphQL script at [scripts/get-pr-comments](../scripts/get-pr-comments). Set `SKILL_DIR` to the absolute directory you loaded the ce-resolve-pr-feedback SKILL.md from — the Bash tool's CWD is the user's project, not the skill dir, and shell state does not persist between Bash calls, so set it inline in each block below that runs a bundled script. If the bundled script is missing on disk the call fails plainly; fall back to the `gh` commands shown after this block.
+Then fetch all feedback using the GraphQL script at [scripts/get-pr-comments](../scripts/get-pr-comments). Set `SKILL_DIR` to the absolute directory you loaded the ce-resolve-pr-feedback SKILL.md from — Codex shell calls run from the user's project, not the skill directory, and shell state does not persist between calls, so set it inline in each block below that runs a bundled script. If the bundled script is missing on disk the call fails plainly; fall back to the `gh` commands shown after this block.
 
-**GitHub Enterprise host.** The bundled `gh api graphql` scripts hit `gh`'s default host unless told otherwise, so on a GHE PR they would wrongly target `github.com`. Derive the host: if the caller passed a full PR **URL**, take its host; otherwise read it from `gh repo view --json url -q .url`. Then — because shell state does **not** persist between separate Bash calls — pass the host as a `GH_HOST=<host>` **env prefix inline on every bundled-script call** (`gh api` honors `GH_HOST` as the request host). A single `export` in one block does **not** carry to the reply/resolve/verify blocks that run as later Bash calls, which is why each call below shows the prefix. On `github.com`, drop the `GH_HOST=<host> ` prefix entirely.
+**GitHub Enterprise host.** The bundled `gh api graphql` scripts hit `gh`'s default host unless told otherwise, so on a GHE PR they would wrongly target `github.com`. Derive the host: if the caller passed a full PR **URL**, take its host; otherwise read it from `gh repo view --json url -q .url`. Because Codex shell calls do not share shell state, pass the host as a `GH_HOST=<host>` **env prefix inline on every bundled-script call** (`gh api` honors `GH_HOST` as the request host). A single `export` does **not** carry to later reply/resolve/verify calls. On `github.com`, drop the `GH_HOST=<host> ` prefix entirely.
 
 ```bash
 PR_HOST=$(printf '%s' "<pr-url-if-one-was-passed>" | sed -n 's#^https\?://\([^/]*\)/.*#\1#p');
@@ -55,7 +55,7 @@ Before processing, classify each piece of feedback as **new** or **already handl
 
 The distinction is about content, not who posted what. A deferral from a teammate, a previous skill run, or a manual reply all count. Similarly, actionability is about content -- bot feedback that requests a specific code change is actionable; a bot's boilerplate header wrapping those requests is not.
 
-**Silent drop.** Non-actionable items are dropped without narration. Do not announce, list, or count dropped items in conversation, the task list, or the step 9 summary. Review-bot wrappers from CodeRabbit, Codex, Gemini Code Assist, and Copilot (bodies like "Here are some automated review suggestions...") commonly appear here -- recognize them by their boilerplate content, drop silently. Only CI/status bot summaries (Codecov) are pre-filtered at the script level; everything else relies on this content-aware check so bot format changes cannot silently hide actionable findings.
+**Silent drop.** Non-actionable items are dropped without narration. Do not announce, list, or count dropped items in conversation, the task list, or the step 9 summary. AI review-bot wrapper messages commonly appear here; recognize them by boilerplate rather than vendor name and drop them silently. Only CI/status bot summaries are pre-filtered at the script level; everything else relies on this content-aware check so format changes cannot silently hide actionable findings.
 
 If there are no new items across all feedback types, skip steps 3-8 and go straight to step 9.
 
@@ -74,7 +74,7 @@ Produce a verdict per item and sort into three lists:
 - **reply-list** — `replied` / `not-addressing` / `declined`. No code change. Compose the reply text now per the rubric (you have the evidence) and carry it to step 7.
 - **human-list** — `needs-human`. Compose `decision_context` now; carry to steps 7 and 9.
 
-Create a task list of all new items (e.g., `TaskCreate` in Claude Code, `update_plan` in Codex) tagged with their verdict, so progress is visible.
+Create an `update_plan` task for every new item, tagged with its verdict, so progress is visible.
 
 **At scale.** If the batch is large (many threads spanning many files) and judging them all inline would overflow your context, process the consolidation in groups (e.g., file-clustered groups of ~8-10 threads), emitting the three lists incrementally. Don't fan the judgment out to subagents to avoid this — batch it instead.
 
@@ -252,8 +252,8 @@ Still pending from a previous run (count):
    [Re-present the decision options if available, or summarize what was asked]
 ```
 
-If a blocking question tool is available, use it to ask about all pending decisions (both new `needs-human` and previous-run pending) together. If there are only pending decisions and no new work was done, the summary is just the pending items.
+Ask about all pending decisions (both new `needs-human` and previous-run pending) together. If there are only pending decisions and no new work was done, the summary is just the pending items.
 
-Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension). Use it to present the decisions and wait for the user's response. After they decide, process the remaining items: fix the code, compose the reply, post it, and resolve the thread.
+Present the decisions through the [shared codex-interaction contract](codex-interaction.md) and wait for the response. After they decide, process the remaining items: fix the code, compose the reply, post it, and resolve the thread.
 
-Fall back to presenting the decisions in the summary output and waiting in conversation only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip. If the user doesn't respond, the items remain open on the PR for later handling.
+If the user doesn't respond, the items remain open on the PR for later handling.

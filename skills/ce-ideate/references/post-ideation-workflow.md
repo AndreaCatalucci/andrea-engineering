@@ -50,7 +50,7 @@ Write the ideation artifact automatically.
    - Elsewhere mode with an existing `docs/ideation/`: use it.
    - Otherwise: use `<scratch-dir>` under `/tmp/andrea-engineering/ce-ideate/<run-id>/` and state that the path is temporary.
 2. Use `<dir>/YYYY-MM-DD-<topic>-ideation.<ext>`, or `open-ideation` when no topic exists. The extension follows `OUTPUT_FORMAT`.
-3. Read `references/ideation-sections.md` and only the matching renderer: `markdown-rendering.md` or `html-rendering.md`.
+3. Read `references/ideation-sections.md` and only the matching renderer: `references/markdown-rendering.md` or `references/html-rendering.md`.
 4. Write the grounding context, topic axes when present, ranked ideas, and rejection summary according to those references.
 5. On resume, update the existing artifact in its current format and preserve prior useful content.
 

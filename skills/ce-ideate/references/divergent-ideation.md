@@ -4,7 +4,7 @@ Read this file at the start of Phase 2 — after Phase 1 grounding and any Phase
 
 ## Fleet
 
-Dispatch parallel ideation sub-agents using the inherited Codex model. The default fleet is **5 agents covering all six frames**:
+Dispatch parallel ideation subagents using the inherited Codex model. The default fleet is **5 agents covering all six frames**:
 
 - **3 agents**, one per evidence-driven frame: Pain and friction; Inversion, removal, or automation; Leverage and compounding.
 - **2 agents** for the remaining frames: one takes Cross-domain analogy; the other takes Assumption-breaking and reframing **plus** Constraint-flipping (cousins that productively share one context).
@@ -33,7 +33,7 @@ The `<constraints>`/`<background>` split is the primary defense against groundin
 
 ## Frames
 
-Assign each sub-agent its frame (or frame pair) as a **starting bias, not a constraint**. Prompt each to begin from its assigned perspective but follow any promising thread -- cross-cutting ideas that span multiple frames are valuable.
+Assign each subagent its frame (or frame pair) as a **starting bias, not a constraint**. Prompt each to begin from its assigned perspective but follow any promising thread -- cross-cutting ideas that span multiple frames are valuable.
 
 **Frame selection (mode-symmetric — same six frames in repo and elsewhere modes):**
 
@@ -46,9 +46,9 @@ Assign each sub-agent its frame (or frame pair) as a **starting bias, not a cons
 
 **Issue-tracker mode override (repo mode only).** When issue-tracker intent is active and themes were returned by the issue intelligence agent: each high/medium-confidence theme becomes a frame. Pad with frames from the 6-frame default pool (in the order listed above) if fewer than 3 cluster-derived frames. Cap at 4 total — issue-tracker mode keeps its tighter dispatch by design.
 
-**Axis spread instruction.** When an axis list is present, instruct each sub-agent to distribute its ideas across multiple axes — the frame's lens applies to every axis, but ideas should not all cluster on one. Each idea must be tagged with the axis it targets. The frame is a lens; the axis list is the surface map. A frame that plausibly reaches an axis should produce at least one idea there before doubling up on a different axis. When decomposition was skipped (atomic subject or surprise-me), omit the axis instruction entirely — do not invent axes at dispatch time.
+**Axis spread instruction.** When an axis list is present, instruct each subagent to distribute its ideas across multiple axes — the frame's lens applies to every axis, but ideas should not all cluster on one. Each idea must be tagged with the axis it targets. The frame is a lens; the axis list is the surface map. A frame that plausibly reaches an axis should produce at least one idea there before doubling up on a different axis. When decomposition was skipped (atomic subject or surprise-me), omit the axis instruction entirely — do not invent axes at dispatch time.
 
-**Surprise-me mode addendum.** When Phase 0.2 routed to surprise-me, include this additional instruction in each sub-agent's dispatch prompt:
+**Surprise-me mode addendum.** When Phase 0.2 routed to surprise-me, include this additional instruction in each subagent's dispatch prompt:
 
 > No user-specified subject. Through your frame's lens, explore the Phase 1 material and identify the subject(s) you find most interesting for this frame. Different frames finding different subjects is the feature — cross-subject divergence is what makes surprise-me valuable. Each idea still carries a basis; the basis may include identification of the subject itself (why *this* subject is worth ideating on through your lens, citing what in the Phase 1 material signals it).
 
@@ -65,7 +65,7 @@ Explore broadly within each frame, then return every requested candidate in this
   - `reasoned:` explicit first-principles argument for why this move likely applies — not a gesture; the argument is written out
 - **significance** — one line connecting the basis to why the move matters
 
-Basis is required. If a sub-agent cannot articulate one, the idea does not surface. Do not pre-write downsides, confidence, complexity, visuals, or multi-paragraph rationale for raw candidates; the root agent develops only the survivors after verification.
+Basis is required. If a subagent cannot articulate one, the idea does not surface. Do not pre-write downsides, confidence, complexity, visuals, or multi-paragraph rationale for raw candidates; the root agent develops only the survivors after verification.
 
 **Generation rules (uniform across frames, all modes):**
 
@@ -79,7 +79,7 @@ Basis is required. If a sub-agent cannot articulate one, the idea does not surfa
 
 1. Merge and dedupe into one master candidate list.
 2. Synthesize cross-cutting combinations -- scan for ideas from different frames that combine into something stronger. In specified mode, expect 3-5 additions at most. **In surprise-me mode, cross-cutting is the magic layer** — frames often converge on overlapping subjects or find complementary angles; expect 5-8 additions and give this step more attention. Surface combinations that span multiple frame-chosen subjects as a distinctive surprise-me output pattern.
-3. **Axis-coverage check (when Phase 1.5 produced an axis list; skipped otherwise).** Count ideas per axis after dedupe. For any axis with zero ideas, dispatch one recovery sub-agent using an unused frame or the frame whose lens best fits the missing axis — e.g., Pain & friction for usability axes, Cross-domain analogy for distribution or compounding axes. The recovery dispatch uses the same compact contract and returns ~3-5 ideas. **Cap recovery at 2 axes total** — if more than 2 axes are empty after the first round, accept thin coverage rather than fanning out further. After recovery returns, merge into the master list and dedupe again. Note empty axes that were not recovered in the rejection summary as "axis: <name> — recovery skipped (cap reached)" so the gap is visible to the user.
+3. **Axis-coverage check (when Phase 1.5 produced an axis list; skipped otherwise).** Count ideas per axis after dedupe. For any axis with zero ideas, dispatch one recovery subagent using an unused frame or the frame whose lens best fits the missing axis — e.g., Pain & friction for usability axes, Cross-domain analogy for distribution or compounding axes. The recovery dispatch uses the same compact contract and returns ~3-5 ideas. **Cap recovery at 2 axes total** — if more than 2 axes are empty after the first round, accept thin coverage rather than fanning out further. After recovery returns, merge into the master list and dedupe again. Note empty axes that were not recovered in the rejection summary as "axis: <name> — recovery skipped (cap reached)" so the gap is visible to the user.
 4. If a focus was provided, weight the merged list toward it without excluding stronger adjacent ideas.
 5. Spread ideas across multiple dimensions when justified: workflow/DX, reliability, extensibility, missing capabilities, docs/knowledge compounding, quality/maintenance, leverage on future work.
 

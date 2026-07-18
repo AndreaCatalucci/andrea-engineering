@@ -1,32 +1,23 @@
 ---
 name: ce-polish
-description: "Start the dev server, inspect the feature in browser, and iterate on polish."
+description: "Start the dev server, inspect a feature in the browser, and iterate on polish. Use when the user wants interactive visual or UX refinement of a working feature."
 ---
 
 # Polish
 
 Start the dev server, open the feature in a browser, and iterate. You use the feature, say what feels off, and fixes happen.
 
-## Phase 0: Get on the right branch
+## Phase 0: Confirm the workspace
 
 1. If a PR number or branch name was provided, check it out (probe for existing worktrees first).
 2. If blank, use the current branch.
-3. Verify the current branch is not main/master.
+3. Report the active branch and preserve any unrelated local changes.
 
 ## Phase 1: Start the dev server
 
-The scripts below ship in this skill's `scripts/` directory. The Bash tool's working directory is the user's project, not the skill directory, so a bare `scripts/<name>` path will not resolve — invoke each by the skill's own absolute path. Every runnable block below sets `SKILL_DIR` inline (shell state does not persist between Bash tool calls, so each command must carry it); replace the `<absolute path …>` placeholder with the directory you loaded this `ce-polish` SKILL.md from before running.
+The scripts below ship in this skill's `scripts/` directory. Codex shell calls run from the user's project, so invoke each script through the absolute path to this skill. Shell state does not persist across calls; set `SKILL_DIR` in every command.
 
-### 1.1 Check for `.claude/launch.json`
-
-```bash
-SKILL_DIR="<absolute path of the directory containing this SKILL.md>";
-bash "$SKILL_DIR/scripts/read-launch-json.sh"
-```
-
-If it finds a configuration, use it — the user already told us how to start the project.
-
-### 1.2 Auto-detect (when no launch.json)
+### 1.1 Detect the project
 
 Identify the framework:
 
@@ -38,7 +29,7 @@ bash "$SKILL_DIR/scripts/detect-project-type.sh"
 Route by type to the matching recipe reference for start command and port defaults:
 
 | Type | Recipe |
-|------|--------|
+| --- | --- |
 | `rails` | `references/dev-server-rails.md` |
 | `next` | `references/dev-server-next.md` |
 | `vite` | `references/dev-server-vite.md` |
@@ -63,18 +54,20 @@ SKILL_DIR="<absolute path of the directory containing this SKILL.md>";
 bash "$SKILL_DIR/scripts/resolve-port.sh" --type <type>
 ```
 
-### 1.3 Start the server
+Before choosing the detected default, honor any explicit start command, working directory, URL, or port already supplied by the user or active project instructions. For an unknown project, ask the user for the start command instead of inventing one.
 
-Start the dev server in the background, log output to a temp file. Probe `http://localhost:<port>` for up to 30 seconds. If it doesn't come up, show the last 20 lines of the log and ask the user what to do.
+### 1.2 Start the server
 
-### 1.4 Open in browser
+Start the dev server in a persistent Codex terminal session so it remains available while browser inspection and edits continue. Keep the session ID, and poll it for startup failures. Probe `http://localhost:<port>` for up to 30 seconds. If it does not come up, show the relevant recent log output and ask the user how the project should be started.
 
-Load `references/ide-detection.md` for the env-var probe table. Open the browser using the IDE's mechanism (Claude Code → `open`, Cursor → Cursor browser, VS Code → Simple Browser).
+### 1.3 Inspect in the Codex browser
 
-Tell the user:
+Load Codex's `browser:control-in-app-browser` skill and open `http://localhost:<port>` in the in-app browser. Navigate to the requested feature, inspect visible and interactive states, and capture screenshots when visual comparison helps. Use `chrome:control-chrome` only when the task specifically depends on the user's existing Chrome session.
+
+Send a commentary update:
 ```
 Dev server running on http://localhost:<port>
-Browse the feature and tell me what could be better.
+Inspecting the requested feature now; you can also browse it at that URL.
 ```
 
 ## Phase 2: Iterate
@@ -82,16 +75,14 @@ Browse the feature and tell me what could be better.
 This is the core loop. The user browses the feature and tells you what to improve. You fix it. Repeat until they're happy.
 
 - When the user describes something to fix → make the change, the dev server hot-reloads
-- When the user asks to check something → use a browser-automation capability to screenshot or inspect the page; prefer `agent-browser` if it's installed, otherwise use whatever the host exposes
-- When the user says they're done → commit the fixes and stop
+- When the user asks to check something → use the Codex in-app browser to inspect the page and capture evidence
+- When the user says they're done → stop the dev server if it is no longer needed, summarize the changes and verification, and leave committing to an explicit request
 
 No checklist. No envelope. Just conversation.
 
 ## References
 
 Reference files (loaded on demand):
-- `references/launch-json-schema.md` — launch.json schema + per-framework stubs
-- `references/ide-detection.md` — host IDE detection and browser-handoff
 - `references/dev-server-detection.md` — port resolution documentation
 - `references/dev-server-rails.md` — Rails dev-server defaults
 - `references/dev-server-next.md` — Next.js dev-server defaults
@@ -103,7 +94,6 @@ Reference files (loaded on demand):
 - `references/dev-server-procfile.md` — Procfile-based dev-server defaults
 
 Scripts (invoked via `bash "$SKILL_DIR/scripts/<name>"` — see Phase 1 for `SKILL_DIR`):
-- `scripts/read-launch-json.sh` — launch.json reader
 - `scripts/detect-project-type.sh` — project-type classifier
 - `scripts/resolve-package-manager.sh` — lockfile-based package-manager resolver
 - `scripts/resolve-port.sh` — port resolution cascade

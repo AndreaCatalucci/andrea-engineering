@@ -1,6 +1,6 @@
 # Procfile / Overmind dev-server recipe (auto-detect fallback)
 
-Loaded when `detect-project-type.sh` returns `procfile` and there is no `.claude/launch.json` to consult. Rails apps with `bin/dev` take precedence over the bare Procfile path (see `dev-server-rails.md`).
+Loaded when `detect-project-type.sh` returns `procfile`. Rails apps with `bin/dev` take precedence over the bare Procfile path (see `dev-server-rails.md`).
 
 ## Signature
 
@@ -34,26 +34,8 @@ worker: bundle exec sidekiq
 
 Parse the `web:` line for `-p <n>` or `--port <n>`. If neither is present, fall through to the cascade in `references/dev-server-detection.md`.
 
-## Stub generation
-
-```json
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Overmind dev",
-      "runtimeExecutable": "overmind",
-      "runtimeArgs": ["start", "-f", "Procfile.dev"],
-      "port": 3000
-    }
-  ]
-}
-```
-
-Substitute `foreman` if `overmind` is unavailable on the user's machine — the stub represents what the user will run, not a canonical recipe.
-
 ## Common gotchas
 
 - **Socket files:** `overmind` writes a socket to `.overmind.sock` by default. Polish's kill-by-port logic reclaims the port but does not clean up the socket. If overmind is already running and polish restarts it, the new process may fail with "connection refused" until the stale socket is removed. The `OVERMIND_SOCKET` env var can redirect the socket to a per-run path if needed.
 - **Procfile vs Procfile.dev:** production and development Procfiles often differ. Always prefer `Procfile.dev` for polish.
-- **Multiple web processes:** some Procfiles split web traffic across multiple processes (API + frontend). Polish can only open one URL — users with multi-web setups should author `.claude/launch.json` explicitly to select which process is "the dev server" for polish.
+- **Multiple web processes:** some Procfiles split traffic across multiple web processes. Ask which process and URL represents the feature under inspection rather than guessing.

@@ -1,6 +1,6 @@
 ---
 name: ce-commit
-description: Create a git commit with a clear, value-communication message. Use when the user asks to commit/save staged or unstaged changes with a repo-appropriate, value-communicating message.
+description: Commit working-tree changes with a repo-appropriate, value-focused message. Use when the user asks to save staged or unstaged changes in git.
 ---
 
 # Git Commit
@@ -9,7 +9,7 @@ Create a single, well-crafted git commit from the current working tree changes.
 
 ## Context
 
-Gather the working-tree context by running each command below as its **own** shell tool call — a single argv-style invocation (just the program and its arguments). Do **not** join them with `;`, `&&`, `||`, pipes, `$(...)`, or redirects like `2>/dev/null`: that syntax parses only under POSIX shells and aborts under Windows PowerShell. Read each command's exit status directly — a non-zero exit is a normal state to interpret, not a failure to suppress.
+Gather the working-tree context by running each command below as its **own** shell tool call — a single argv-style invocation (just the program and its arguments). Do **not** join context-gathering commands with shell operators or redirects. Read each command's exit status directly — a non-zero exit is a normal state to interpret, not a failure to suppress.
 
 | Command | Purpose | Non-zero exit / empty output means |
 | --- | --- | --- |
@@ -39,7 +39,7 @@ If both fail, fall back to `main`.
 
 If `git status` shows a clean working tree (no staged, modified, or untracked files), report that there is nothing to commit and stop.
 
-If the current branch is empty, the repository is in detached HEAD state. Explain that a branch is required before committing if the user wants this work attached to a branch. Ask whether to create a feature branch now. Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension). Fall back to presenting options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
+If the current branch is empty, the repository is in detached HEAD state. Explain that a branch is required before committing if the user wants this work attached to a branch. Read and follow [`references/codex-interaction.md`](references/codex-interaction.md), then ask whether to create a feature branch now.
 
 - If the user chooses to create a branch, derive the name from the change content, create it with `git checkout -b <branch-name>`, then run `git branch --show-current` again and use that result as the current branch name for the rest of the workflow.
 - If the user declines, continue with the detached HEAD commit.
@@ -48,7 +48,7 @@ If the current branch is empty, the repository is in detached HEAD state. Explai
 
 Follow this priority order:
 
-1. **Repo conventions already in context** -- If project instructions (AGENTS.md, CLAUDE.md, or similar) are already loaded and specify commit message conventions, follow those. Do not re-read these files; they are loaded at session start.
+1. **Repo conventions already in context** -- If `AGENTS.md` specifies commit message conventions, follow them. Do not re-read it; Codex loads applicable instructions at session start.
 2. **Recent commit history** -- If no explicit convention is documented, examine the 10 most recent commits from Step 1. If a clear pattern emerges (e.g., conventional commits, ticket prefixes, emoji prefixes), match that pattern.
 3. **Default: conventional commits** -- If neither source provides a pattern, use conventional commit format: `type(scope): description` where type is one of `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `perf`, `ci`, `style`, `build`.
 
@@ -71,16 +71,11 @@ Write the commit message:
 - **Subject line**: Concise, imperative mood, focused on *why* not *what*. Follow the convention determined in Step 2.
 - **Body** (when needed): Add a body separated by a blank line for non-trivial changes. Explain motivation, trade-offs, or anything a future reader would need. Omit the body for obvious single-purpose changes.
 
-For each commit group, stage and commit in a single call. Prefer staging specific files by name over `git add -A` or `git add .` to avoid accidentally including sensitive files (.env, credentials) or unrelated changes. Use a heredoc to preserve formatting:
+For each commit group, stage and commit in separate argv-style calls. Prefer staging specific files by name over `git add -A` or `git add .` to avoid accidentally including sensitive files (`.env`, credentials) or unrelated changes.
 
 ```bash
-git add file1 file2 file3 && git commit -m "$(cat <<'EOF'
-type(scope): subject line here
-
-Optional body explaining why this change was made,
-not just what changed.
-EOF
-)"
+git add file1 file2 file3
+git commit -m "type(scope): subject line here" -m "Optional body explaining why this change was made, not just what changed."
 ```
 
 ### Step 5: Confirm

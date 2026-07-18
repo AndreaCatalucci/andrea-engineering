@@ -30,7 +30,7 @@ Gate findings by their `confidence` anchor value. Anchors are discrete integers 
 - **FYI-subsection** (anchor `50`): surface in the presentation layer's FYI subsection regardless of `autofix_class`. These do not enter the walk-through or any bulk action — observational value without forcing a decision. Advisory observations ("nothing breaks, but...") naturally land here.
 - **Actionable** (anchors `75` and `100`): enter the classification pipeline. Route by `autofix_class` (see 3.7).
 
-**Why this threshold, not Anthropic's ≥ 80 code-review threshold:** Document review has opposite economics from code review. There is no linter backstop — the review IS the backstop. Premise-level concerns (product-lens, adversarial) naturally cap at anchors 50-75 because "is the motivation valid?" cannot be verified against ground truth. The routing menu already makes dismissal cheap (Skip, Append to Open Questions), so surfaced-and-skipped is a low-cost outcome while missed-and-shipped derails downstream implementation. Filter low (`≥ 50`) and let the routing menu handle volume.
+**Why this threshold differs from code review:** Document review has opposite economics from code review. There is no linter backstop — the review IS the backstop. Premise-level concerns (product-lens, adversarial) naturally cap at anchors 50-75 because "is the motivation valid?" cannot be verified against ground truth. The routing menu already makes dismissal cheap (Skip, Append to Open Questions), so surfaced-and-skipped is a low-cost outcome while missed-and-shipped derails downstream implementation. Filter low (`≥ 50`) and let the routing menu handle volume.
 
 ### 3.3 Deduplicate
 
@@ -246,7 +246,7 @@ Run this pass on the merged set across all personas. Record the count dropped as
 
 Apply only `safe_auto` findings **at confidence anchor `100`** to the document in a single pass. This matches the 3.7 routing table: anchor `100` + `safe_auto` silent-applies; anchor `75` + `safe_auto` was demoted to `gated_auto` in 3.7 and enters the walk-through instead; anchor `50` + any `autofix_class` routes to FYI and must never auto-apply.
 
-- Edit the document inline using the platform's edit tool
+- Edit the document inline with `apply_patch`
 - Track what was changed for the "Applied fixes" section in the rendered output (`safe_auto` is the internal enum; the rendered section header reads "Applied fixes")
 - Do not ask for approval — these have one clear correct fix AND evidence directly confirms (anchor `100`)
 - Do NOT silent-apply any `safe_auto` finding at anchor `75` or `50`. If a finding reaches this step with `autofix_class: safe_auto` and anchor below `100`, the 3.7 routing rule was not applied correctly; re-run 3.7 for that finding before continuing.
@@ -321,7 +321,7 @@ Brief summary at the top: "Applied N fixes. K items need attention (X errors, Y 
 
 Include the Coverage table, applied fixes, FYI observations (as a distinct subsection), residual concerns, and deferred questions.
 
-**All tables MUST be pipe-delimited markdown (`| col | col |`). Do NOT use ASCII box-drawing characters (`┌ ┬ ┐ ├ ┼ ┤ └ ┴ ┘ │ ─`) under any circumstances, including for the Coverage table.** This rule restates the template's formatting requirement at the point of rendering so it cannot drift. Pipe-delimited tables render correctly across all target harnesses; box-drawing characters break rendering in some and violate the repo convention documented in root `AGENTS.md`.
+**All tables MUST be pipe-delimited markdown (`| col | col |`). Do NOT use ASCII box-drawing characters (`┌ ┬ ┐ ├ ┼ ┤ └ ┴ ┘ │ ─`), including for the Coverage table.** Pipe-delimited tables render correctly in Codex and follow the repository convention in root `AGENTS.md`.
 
 ### R29 Rejected-Finding Suppression (Round 2+)
 
@@ -365,7 +365,7 @@ These are pipeline artifacts and must not be flagged for removal.
 
 **Headless mode:** Return "Review complete" immediately. Do not ask questions. The caller receives the text envelope from Phase 4 and handles any remaining findings.
 
-**Interactive mode:** fire the terminal question using the platform's blocking question tool (`AskUserQuestion` in Claude Code, `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension)). In Claude Code the tool should already be loaded from the Interactive-mode pre-load step in `SKILL.md` — if it isn't, call `ToolSearch` with `select:AskUserQuestion` now. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question. This question is distinct from the mid-flow routing question (`references/walkthrough.md`) — the routing question chooses *how* to engage with findings, this one chooses *what to do next* once engagement is complete. Do not merge them.
+**Interactive mode:** ask the terminal question through the [shared codex-interaction contract](codex-interaction.md). This question is distinct from the mid-flow routing question (`references/walkthrough.md`) — the routing question chooses *how* to engage with findings, this one chooses *what to do next* once engagement is complete. Do not merge them.
 
 **Stem:** `Apply decisions and what next?`
 
@@ -395,7 +395,7 @@ The `<next stage>` substitution uses the document classification from Phase 1. R
 
 **Label adaptation:** when no decisions are queued to apply, the primary option drops the `Apply decisions and` prefix — the label should match what the system is doing. `Apply decisions and proceed` when fixes are queued; `Proceed` when nothing is queued.
 
-**Caller-context handling (implicit):** the terminal question's "Proceed to <next stage>" option is interpreted contextually by the agent from the visible conversation state. When ce-doc-review is invoked from inside another skill's flow (e.g., ce-brainstorm Phase 4 re-review, ce-plan phase 5.3.8), the agent does not fire a nested `/ce-plan` or `/ce-work` dispatch — it returns control to the caller's flow which continues its own logic. When invoked standalone, "Proceed" dispatches the appropriate next skill. No explicit caller-hint argument is required; if this implicit handling proves unreliable in practice, an explicit `nested:true` flag can be added as a follow-up.
+**Caller-context handling (implicit):** the terminal question's "Proceed to <next stage>" option is interpreted contextually by the agent from the visible conversation state. When ce-doc-review is invoked from inside another skill's flow (e.g., ce-brainstorm Phase 4 re-review, ce-plan phase 5.3.8), the agent does not fire a nested `$ce-plan` or `$ce-work` dispatch — it returns control to the caller's flow which continues its own logic. When invoked standalone, "Proceed" dispatches the appropriate next skill. No explicit caller-hint argument is required; if this implicit handling proves unreliable in practice, an explicit `nested:true` flag can be added as a follow-up.
 
 ### Iteration limit
 

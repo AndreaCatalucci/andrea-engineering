@@ -4,7 +4,7 @@ Use this path when the input is a longer recording (over ~60 seconds), contains 
 
 ## Workflow
 
-1. Run the analyzer (`SKILL_DIR` is the directory containing the `ce-riffrec-feedback-analysis` SKILL.md; set it in the same command — shell state does not persist between Bash calls):
+1. Run the analyzer (`SKILL_DIR` is the directory containing the `ce-riffrec-feedback-analysis` SKILL.md; set it in the same command because Codex shell calls do not share shell state):
 
    ```bash
    SKILL_DIR="<absolute path of the directory containing the ce-riffrec-feedback-analysis SKILL.md>";
@@ -17,7 +17,7 @@ Use this path when the input is a longer recording (over ~60 seconds), contains 
 
 3. Read `source-materials.md` before brainstorm. It is the source-of-truth manifest for the original raw feedback location, transcript, local-only frames, chunks, analysis artifacts, and screenshot paths. Use it to keep brainstorm and planning traceable to the original feedback evidence.
 
-4. Inspect the extracted screenshots for high-signal moments using the platform's image-view tool. Prioritize screenshots selected because of click events near verbal complaints, failed network requests, console errors, or repeated interaction.
+4. Inspect high-signal extracted screenshots with Codex `view_image`. Prioritize screenshots selected because of click events near verbal complaints, failed network requests, console errors, or repeated interaction.
 
 5. Fill or refine `problem-analysis.md` using the frame review structure from `review-prompt.md`. The final problem analysis must have exactly these top-level categories:
 
@@ -34,7 +34,7 @@ Use this path when the input is a longer recording (over ~60 seconds), contains 
    - **Inferences:** likely user intent, likely broken control, suspected missing state.
    - **Requirements:** product behavior needed to resolve the problem.
 
-7. When the current workspace contains the product source code, run a source-mapping pass before or during brainstorm. Use the transcript language, visible UI labels, screenshot paths, route names, and generated requirements to search the codebase for likely components, controllers, services, models, tests, and state stores. For larger sessions, split this mapping by product area and use sub-agents when available so independent areas can be inspected in parallel.
+7. When the current workspace contains the product source code, run a source-mapping pass before or during brainstorm. Use the transcript language, visible UI labels, screenshot paths, route names, and generated requirements to search the codebase for likely components, controllers, services, models, tests, and state stores. For larger sessions, split this mapping by product area and dispatch Codex subagents with `spawn_agent` so independent areas can be inspected in parallel.
 
 8. Add source mapping to the brainstorm material as suspected implementation surfaces, not as proven root cause unless the code clearly proves it. Include confidence levels and short evidence notes explaining why each file or component is relevant.
 

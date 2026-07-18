@@ -6,8 +6,6 @@ description: "Generate and evaluate grounded ideas. Use when the user asks for i
 
 # Generate Improvement Ideas
 
-**Note: The current year is 2026.** Use this when dating ideation documents.
-
 `ce-ideate` selects promising directions.
 
 - `ce-ideate` answers: "What are the strongest ideas worth exploring?"
@@ -18,9 +16,7 @@ This workflow produces a ranked ideation artifact — written to `docs/ideation/
 
 ## Interaction Method
 
-Use Codex's blocking question tool when available. Otherwise present numbered choices in chat and wait for the user's reply. Never silently skip a required question.
-
-Ask one question at a time. Prefer concise single-select choices when natural options exist.
+Before asking the user for input, read and follow [`references/codex-interaction.md`](references/codex-interaction.md). Prefer concise single-select choices when natural options exist.
 
 ## Focus Hint
 
@@ -44,7 +40,7 @@ If no argument is provided, proceed with open-ended ideation.
 
 ## Dispatch Model
 
-All sub-agents inherit the active Codex model. Do not request model names or capability tiers. Differentiate roles through evidence, frame assignments, read budgets, and output contracts.
+All subagents inherit the active Codex model. Do not request model names or capability tiers. Differentiate roles through evidence, frame assignments, read budgets, and output contracts.
 
 `surprise-me` and `go deep` increase frame separation, verification reads, or critic count as specified below; they do not change models.
 
@@ -87,7 +83,7 @@ Before grounding, check whether the subject is identifiable. If reasonable ideat
 
 **Questioning principles (apply in this phase and in 0.4):**
 
-- Questions exist only to supply what sub-agents need to operate: an identifiable subject (this phase) and enough context for the agent to say something specific about it (0.4, elsewhere modes only). Nothing else.
+- Questions exist only to supply what subagents need to operate: an identifiable subject (this phase) and enough context for the agent to say something specific about it (0.4, elsewhere modes only). Nothing else.
 - Never ask about solution direction, constraints, audience, tone, success criteria, or anything that characterizes the subject — those belong to `ce-brainstorm`.
 - Always keep "Surprise me" (letting the agent decide the focus) as a real option, not a fallback for when the user can't name a subject. Ideation is allowed to be greenfield by design.
 - Stop as soon as the subject is identifiable or the user has delegated to "Surprise me." More than 3 total questions across 0.2 and 0.4 is a smell that ideation is not the right workflow — consider suggesting `ce-brainstorm`.
@@ -106,11 +102,11 @@ The test: would a reader, seeing only this prompt, know what subject the agent s
 
 **Being inside a repo does not settle vagueness.** `improvements` in any repo is still scattered across DX, reliability, features, docs, tests, architecture. The repo provides material for grounding *after* a subject is settled, not the subject itself. Do not silently interpret a vague prompt as "about this repo" and proceed.
 
-**Genuine ambiguity (repo mode).** When real doubt remains on a short phrase, one cheap check settles it: Glob for the phrase in filenames, or Grep for it in README/docs. Any repo footprint → identifiable; none and still vague → ask. When in doubt otherwise, err toward asking — one question is trivial compared to dispatching a dozen agents on a scattered interpretation.
+**Genuine ambiguity (repo mode).** When real doubt remains on a short phrase, use `rg --files` to check filenames and `rg` to search README/docs. Any repo footprint → identifiable; none and still vague → ask. When in doubt otherwise, err toward asking — one question is trivial compared to dispatching a dozen agents on a scattered interpretation.
 
 **The scope question.**
 
-Ask via the platform's blocking question tool per Interaction Method above — never silently skip.
+Ask per Interaction Method above.
 
 - **Stem:** "What should the agent ideate about?"
 - **Options:**
@@ -121,7 +117,7 @@ Ask via the platform's blocking question tool per Interaction Method above — n
 Routing:
 
 - **Specify** → accept the user's follow-up as the subject. Re-apply the identifiability check once. If still ambiguous, ask once more with "Surprise me" still on the menu. Do not cascade toward specificity about *how* to solve — only about *what* the subject is.
-- **Surprise me** → mark the run as **surprise-me mode**. The agent will discover subjects from Phase 1 material rather than carry a user-specified subject. This is a first-class mode — it changes how Phase 1 scans and how Phase 2 sub-agents operate (see those phases). **Dispatch routing for surprise-me is deterministic:** if CWD is inside a git repo, route to repo-grounded (the codebase supplies substance); otherwise route to elsewhere-software and require Phase 0.4 to collect at least one piece of substance (URL, description, draft, or paste) before dispatching — "surprise me" outside a repo is only viable once the user has supplied something to surprise them about. Skip Decision 1/2 in Phase 0.3: with no user subject there is no prompt content to weigh, and surprise-me never routes to elsewhere-non-software (no way to infer naming/narrative/personal intent without a subject). The user can correct by interrupting and re-invoking with a named subject.
+- **Surprise me** → mark the run as **surprise-me mode**. The agent will discover subjects from Phase 1 material rather than carry a user-specified subject. This is a first-class mode — it changes how Phase 1 scans and how Phase 2 subagents operate (see those phases). **Dispatch routing for surprise-me is deterministic:** if CWD is inside a git repo, route to repo-grounded (the codebase supplies substance); otherwise route to elsewhere-software and require Phase 0.4 to collect at least one piece of substance (URL, description, draft, or paste) before dispatching — "surprise me" outside a repo is only viable once the user has supplied something to surprise them about. Skip Decision 1/2 in Phase 0.3: with no user subject there is no prompt content to weigh, and surprise-me never routes to elsewhere-non-software (no way to infer naming/narrative/personal intent without a subject). The user can correct by interrupting and re-invoking with a named subject.
 - **Cancel** → exit cleanly. Narrate that the user can rephrase and re-invoke.
 
 #### 0.3 Mode Classification
@@ -209,7 +205,7 @@ The line is informational; users do not need to acknowledge it.
 
 Before generating ideas, gather grounding in the root agent. Web research runs in all modes unless skipped. Search repository learnings in repo mode and elsewhere-software; skip them for elsewhere-non-software.
 
-**Surprise-me grounding depth.** When Phase 0.2 routed to surprise-me mode, Phase 1 must produce richer material than specified mode — Phase 2 sub-agents will discover their own subjects from what Phase 1 returns, so texture matters:
+**Surprise-me grounding depth.** When Phase 0.2 routed to surprise-me mode, Phase 1 must produce richer material than specified mode — Phase 2 subagents will discover their own subjects from what Phase 1 returns, so texture matters:
 
 - **Repo mode surprise-me:** sample representative files per top-level area and recent PR/commit activity. Treat issue themes as first-class input. Keep the scan representative, not exhaustive.
 - **Elsewhere mode surprise-me:** user-context synthesis extracts themes, recurring language, tensions, and omissions from whatever the user supplied, rather than just restating it. Web research broadens beyond narrow prior-art for a single subject toward the domain's landscape.
@@ -364,7 +360,7 @@ Run axis analysis in the root agent against the grounding already in context, wi
 
 **Axis evidence (repo mode).** For each axis, search and read targeted repository evidence directly. Add concise `file:line` pointers for pain points, workarounds, TODOs, surprising patterns, and leverage points under `Evidence: <axis>`. Skip this for atomic, surprise-me, and elsewhere modes.
 
-Append the axis list (or skip-reason) to the consolidated grounding summary under a section labeled `Topic axes`. Phase 2 reads this section to thread axes into sub-agent prompts; Phase 3 uses it for axis-spread scoring; the Phase 4 artifact includes it under Grounding Context (per `references/ideation-sections.md`).
+Append the axis list (or skip-reason) to the consolidated grounding summary under a section labeled `Topic axes`. Phase 2 reads this section to thread axes into subagent prompts; Phase 3 uses it for axis-spread scoring; the Phase 4 artifact includes it under Grounding Context (per `references/ideation-sections.md`).
 
 ### Phase 2: Divergent Ideation
 

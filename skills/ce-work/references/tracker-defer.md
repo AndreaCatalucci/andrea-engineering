@@ -56,7 +56,7 @@ Availability probes run **at most once per session** and **only when Defer execu
 Typical probe sequence:
 
 1. Consult the project's instructions already in context for tracker references — don't open or name specific instruction files; read one directly only when the relevant instructions aren't in context (subdirectory scope, or a fresh subagent). If nothing found, set `tracker_name = null`, `confidence = low`.
-2. **Probe the named tracker when one was found.** For GitHub Issues, run `gh auth status` and `gh repo view --json hasIssuesEnabled`. For Linear or other connector/MCP-backed trackers, first discover available tools via the platform's tool-discovery primitive (e.g., `ToolSearch` in Claude Code) rather than assuming absence from an unloaded tool, then verify the discovered tool is responsive. For API-backed trackers, verify credentials wherever the platform exposes them (environment, connector auth, or a documented secrets location) — not only shell env vars. Set `named_sink_available` from the probe result.
+2. **Probe the named tracker when one was found.** For GitHub Issues, run `gh auth status` and `gh repo view --json hasIssuesEnabled`. For connector/MCP-backed trackers, inspect the tools available in Codex and verify the matching tool is responsive. For API-backed trackers, verify credentials through the configured Codex connector or documented secrets location—not only shell environment variables. Set `named_sink_available` from the probe result.
 3. **Probe the GitHub Issues fallback to compute `any_sink_available`.** Even when the named tracker was found and probed, `gh` matters for the `no_sink` bucket decision so that a run with no documented tracker but working `gh` still offers Defer.
    - If `named_sink_available = true`: `any_sink_available = true` (no further probes needed).
    - Otherwise, probe GitHub Issues via `gh auth status` + `gh repo view --json hasIssuesEnabled` (skip if already probed in step 2). If it works, `any_sink_available = true`.
@@ -69,7 +69,7 @@ When Interactive mode's routing question is skipped entirely (R2 zero-findings c
 ## Label logic (Interactive mode)
 
 - When `confidence = high` AND `named_sink_available = true`: the routing question's option C and the walk-through's per-finding Defer option both include the tracker name verbatim. Example: `File a Linear ticket per finding`, `Defer — file a Linear ticket`.
-- When `any_sink_available = true` but either `confidence = low` or `named_sink_available = false` (a fallback tier is working instead): the labels read generically — `File an issue per finding`, `Defer — file a ticket`. Before executing the first Defer of the session, the agent confirms the effective tracker choice with the user using the platform's blocking question tool.
+- When `any_sink_available = true` but either `confidence = low` or `named_sink_available = false` (a fallback tier is working instead): the labels read generically — `File an issue per finding`, `Defer — file a ticket`. Before executing the first Defer of the session, confirm the effective tracker choice through the [shared codex-interaction contract](codex-interaction.md).
 - When `any_sink_available = false`: option C is omitted from the routing question, option B (Defer) is omitted from the walk-through per-finding options, and the agent tells the user why in the routing question's stem.
 
 Non-interactive mode skips label decisions entirely — it acts silently on the detected sink.
@@ -109,7 +109,7 @@ The finding_id is a stable fingerprint composed as `normalize(file) + line_bucke
 
 When ticket creation fails at execution (API error, auth expiry mid-session, rate limit, malformed body rejected, 4xx/5xx response):
 
-**Interactive mode:** surface the failure inline and ask the user using the platform's blocking question tool.
+**Interactive mode:** surface the failure inline and ask through the [shared codex-interaction contract](codex-interaction.md).
 
 Stem:
 > Defer failed: <tracker name> returned <error summary>. How should the agent handle this finding?
@@ -123,27 +123,25 @@ Options:
 
 When a high-confidence named tracker fails at execution, the cached `named_sink_available` is set to `false` for the rest of the session. Subsequent Defer actions fall straight through to the next tier without retrying a confirmed-broken sink. `any_sink_available` is only downgraded to `false` when every tier has been confirmed broken — a failed Linear call that succeeds via `gh` keeps `any_sink_available = true`.
 
-Only when `ToolSearch` explicitly returns no match or the tool call errors — or on a platform with no blocking question tool — fall back to numbered options and waiting for the user's reply (Interactive mode only).
-
 ---
 
 ## Per-tracker behavior
 
-Concrete behavior per tracker at execution time. The agent may invoke any of these through the appropriate interface (MCP, CLI, or API) — the choice depends on what is available in the current environment.
+Concrete behavior per tracker at execution time. Use the connected Codex tracker app for Linear or Jira and `gh` for GitHub Issues.
 
 | Tracker | Interface | Invocation sketch | Body format | Labels |
 |---------|-----------|-------------------|-------------|--------|
-| Linear | MCP (preferred) or API | Create issue in the project/workspace identified by documentation; assign to the reporter if the MCP tool exposes user context | Markdown | Severity priority field if the MCP exposes it; otherwise include severity in body |
+| Linear | Codex app | Create an issue in the documented project/workspace; assign it to the reporter when user context is available | Markdown | Severity priority field when available; otherwise include severity in body |
 | GitHub Issues | `gh issue create` | Repo defaults to the current repo. Use `--label` for severity tag when labels exist; omit `--label` if the repo has no label fixture. Fall back to a label-less issue on first failure. | Markdown | `--label P0` / `--label P1` / etc. when labels exist |
-| Jira | MCP or API | Create issue in the project identified by documentation; Jira's markdown dialect differs from GitHub's — use plain text in the body when MCP does not handle conversion | Plain text when MCP does not handle markdown | Severity priority field |
+| Jira | Codex app | Create an issue in the documented project; use plain text when Jira formatting support is uncertain | Plain text | Severity priority field |
 | No sink available | — | Interactive: Defer option omitted, findings remain in the report's residual-work section. Non-interactive: findings returned in the `no_sink` bucket for caller routing. | — | — |
 
 When uncertain, prefer "drop with explicit user-facing notice" over "pass through silently and hope." A Defer that produces no durable artifact and no user message is data loss.
 
 ---
 
-## Cross-platform notes
+## Codex interaction
 
-The question-tool name varies by platform. In Interactive mode, use the platform's blocking question tool (`AskUserQuestion` in Claude Code, `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension)). In Claude Code the tool should already be loaded from the Interactive-mode pre-load step — if it isn't, call `ToolSearch` with query `select:AskUserQuestion` now. Fall back to numbered options in chat only when the harness genuinely lacks a blocking tool — `ToolSearch` returns no match, the tool call explicitly fails, or the runtime mode does not expose it (e.g., Codex edit modes without `request_user_input`). A pending schema load is not a fallback trigger. Never silently skip the question.
+In Interactive mode, ask through the [shared codex-interaction contract](codex-interaction.md). Never silently skip the question.
 
-Non-interactive mode is platform-agnostic: it never prompts, so the platform's question tool is not relevant.
+Non-interactive mode never prompts; apply its defined defaults directly.

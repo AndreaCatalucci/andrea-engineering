@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+MODE="sync"
+
+if [[ "${1:-}" == "--check" ]]; then
+  MODE="check"
+elif [[ $# -gt 0 ]]; then
+  echo "usage: scripts/sync-shared-skill-assets [--check]" >&2
+  exit 2
+fi
+
+drift=0
+
+mirror() {
+  local source="$ROOT_DIR/$1"
+  local destination="$ROOT_DIR/$2"
+
+  if [[ "$MODE" == "check" ]]; then
+    if [[ ! -f "$destination" ]] || ! cmp -s "$source" "$destination"; then
+      echo "out of sync: $2 (source: $1)" >&2
+      drift=1
+    fi
+    return
+  fi
+
+  mkdir -p "$(dirname "$destination")"
+  cp "$source" "$destination"
+}
+
+interaction_consumers=(
+  ce-babysit-pr ce-brainstorm ce-commit-push-pr ce-commit
+  ce-compound-refresh ce-debug ce-doc-review ce-dogfood ce-explain ce-ideate
+  ce-optimize ce-plan ce-pov ce-product-pulse ce-promote ce-resolve-pr-feedback
+  ce-setup ce-strategy ce-sweep ce-test-browser ce-test-xcode ce-work ce-worktree
+)
+
+for skill in "${interaction_consumers[@]}"; do
+  mirror shared/codex-interaction.md "skills/$skill/references/codex-interaction.md"
+done
+
+profile_consumers=(
+  ce-brainstorm ce-code-review ce-compound ce-debug
+  ce-explain ce-ideate ce-optimize ce-pov
+)
+
+for skill in "${profile_consumers[@]}"; do
+  mirror skills/ce-plan/scripts/repo-profile-cache.py "skills/$skill/scripts/repo-profile-cache.py"
+  mirror skills/ce-plan/references/repo-profile-cache.md "skills/$skill/references/repo-profile-cache.md"
+  mirror skills/ce-plan/references/agents/repo-profiler.md "skills/$skill/references/agents/repo-profiler.md"
+done
+
+mirror skills/ce-compound/references/concepts-vocabulary.md skills/ce-compound-refresh/references/concepts-vocabulary.md
+mirror skills/ce-compound/references/schema.yaml skills/ce-compound-refresh/references/schema.yaml
+mirror skills/ce-compound/references/yaml-schema.md skills/ce-compound-refresh/references/yaml-schema.md
+mirror skills/ce-compound/assets/resolution-template.md skills/ce-compound-refresh/assets/resolution-template.md
+mirror skills/ce-compound/scripts/validate-frontmatter.py skills/ce-compound-refresh/scripts/validate-frontmatter.py
+mirror skills/ce-compound/scripts/validate-doc-claims.py skills/ce-compound-refresh/scripts/validate-doc-claims.py
+
+mirror skills/ce-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py skills/ce-sweep/scripts/analyze_riffrec_zip.py
+mirror skills/ce-brainstorm/references/markdown-rendering.md skills/ce-ideate/references/markdown-rendering.md
+
+if [[ "$MODE" == "check" && "$drift" -ne 0 ]]; then
+  exit 1
+fi

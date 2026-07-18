@@ -815,7 +815,7 @@ def write_requirements_kickoff(
             "",
             "## Next Steps",
             "",
-            "-> Resume `/ce-brainstorm` to confirm candidate findings and replace generic R-items with product-specific requirements.",
+            "-> Resume `$ce-brainstorm` to confirm candidate findings and replace generic R-items with product-specific requirements.",
         ]
     )
     output_path.write_text("\n".join(lines) + "\n")

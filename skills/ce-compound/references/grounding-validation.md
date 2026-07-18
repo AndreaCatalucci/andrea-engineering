@@ -27,18 +27,18 @@ The script reports flags; you decide each one. Three resolutions — **fix**, **
 | scaffold ("Learning 3", `{{…}}`) | Drafting-context leak | Always fix — rewrite as a real path or link |
 | relative link unresolved | Wrong target | Fix the path |
 
-If the script cannot be resolved on this platform, apply its checks manually at the same scope — scan the body for cited paths that don't exist, hex SHAs, `Learning(s) N` / `{{…}}` scaffold, and broken relative links — and note in the run output that the check was manual. Do not silently skip.
+If the script cannot be resolved, apply its checks manually at the same scope — scan the body for cited paths that don't exist, hex SHAs, `Learning(s) N` / `{{…}}` scaffold, and broken relative links — and note in the run output that the check was manual. Do not silently skip.
 
 After any body edit from this step or Step 2, re-run the script until it reports clean or every remaining flag is confirmed intentional.
 
 ## Step 2: Semantic validator subagent (Full and headless; skipped in lightweight)
 
-Dispatch **one generic read-only subagent** covering the written solution doc plus any `CONCEPTS.md` entries added or edited this run (Phase 2.4's entries are claims too — a glossary entry written from a session-level summary is exactly how wrong semantics enter the vocabulary). Use the same mid-tier model class as other reviewer subagents when the platform exposes one. Build its prompt from this template:
+Dispatch **one generic read-only subagent** with `spawn_agent`, using Codex's inherited model, covering the written solution doc plus any `CONCEPTS.md` entries added or edited this run (Phase 2.4's entries are claims too — a glossary entry written from a session-level summary is exactly how wrong semantics enter the vocabulary). Build its prompt from this template:
 
 ```
 You are a grounding validator for documentation about to enter a permanent
-knowledge store. You are read-only: never edit files. Inspect with Read,
-Grep, Glob, git (non-mutating), and gh when available.
+knowledge store. You are read-only: never edit files. Inspect with rg,
+focused file reads, non-mutating git commands, and gh when needed.
 
 Inputs: the doc content below, the CONCEPTS.md entries below (if any), and
 this staleness context: <INFO line from the mechanical script, or "none">.

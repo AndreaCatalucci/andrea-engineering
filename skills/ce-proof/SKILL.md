@@ -1,11 +1,6 @@
 ---
 name: ce-proof
 description: Publish, read, comment on, or edit markdown in Proof. Use for Proof links, sharing specs/plans/drafts, or publish handoffs from planning workflows; avoid proofread, math, evidence, or proof-of-concept meanings.
-allowed-tools:
-  - Bash
-  - Read
-  - Write
-  - WebFetch
 ---
 
 # Proof - Collaborative Markdown Editor
@@ -22,7 +17,7 @@ Every write to a Proof doc must be attributed. Two fields carry the agent's iden
 - **Machine ID (`by` on every op, `X-Agent-Id` header):** `ai:andrea-engineering` — stable, lowercase-hyphenated, machine-parseable. Appears in marks, events, and the API response.
 - **Display name (`name` on `POST /presence`):** `Andrea Engineering` — human-readable, shown in Proof's presence chips and comment-author badges.
 
-Set the display name once per doc session by posting to presence with the `X-Agent-Id` header; Proof binds the name to that agent ID for the session. These values are the defaults for any caller of this skill; a caller may pass a different `identity` pair if a distinct sub-agent should own the doc. Do not use `ai:compound` or other ad-hoc variants — identity stays uniform unless a caller explicitly overrides it.
+Set the display name once per doc session by posting to presence with the `X-Agent-Id` header; Proof binds the name to that agent ID for the session. These values are the defaults for any caller of this skill; a caller may pass a different `identity` pair if a distinct subagent should own the doc. Do not use `ai:compound` or other ad-hoc variants — identity stays uniform unless a caller explicitly overrides it.
 
 ## Publish Mode
 
@@ -36,229 +31,14 @@ to Proof; return the local browser/open path instead. When publishing a unified
 plan, label the title by readiness when available, e.g. `Plan: <title>
 (requirements-only)` or `Plan: <title> (implementation-ready)`.
 
-## Web API (Primary for Sharing)
+## Transport References
 
-### Create a Shared Document
+Choose one transport before making a request:
 
-No authentication required. Returns a shareable URL with access token.
+- **Shared Proof URL or web API** — read `references/web-api.md` before the first request. It owns authentication, mutation tokens, retry discipline, edit primitives, and endpoint shapes.
+- **Running macOS Proof app** — read `references/local-bridge.md` before the first localhost request.
 
-```bash
-curl -X POST https://www.proofeditor.ai/share/markdown \
-  -H "Content-Type: application/json" \
-  -d '{"title":"My Doc","markdown":"# Hello\n\nContent here."}'
-```
-
-**Response format:**
-```json
-{
-  "slug": "abc123",
-  "tokenUrl": "https://www.proofeditor.ai/d/abc123?token=xxx",
-  "accessToken": "xxx",
-  "ownerSecret": "yyy",
-  "_links": {
-    "state": "https://www.proofeditor.ai/api/agent/abc123/state",
-    "ops": "https://www.proofeditor.ai/api/agent/abc123/ops"
-  }
-}
-```
-
-Use the `tokenUrl` as the shareable link. The `_links` give you the exact API paths.
-
-### Read a Shared Document
-
-If you already have a shared Proof URL, no browser automation is needed. Fetch the URL directly with content negotiation:
-
-```bash
-curl -s -H "Accept: application/json" "https://www.proofeditor.ai/d/{slug}?token=<token>"
-curl -s -H "Accept: text/markdown" "https://www.proofeditor.ai/d/{slug}?token=<token>"
-```
-
-The JSON response includes the markdown, API links, and agent auth hints. Use `/state` when you need mutation metadata, marks, or presence:
-
-```bash
-curl -s "https://www.proofeditor.ai/api/agent/{slug}/state" \
-  -H "x-share-token: <token>"
-```
-
-For comment-ingest workflows, prefer the server-side filter:
-
-```bash
-curl -s "https://www.proofeditor.ai/api/agent/{slug}/state?kinds=comment" \
-  -H "x-share-token: <token>"
-```
-
-`state.marks` is a union of comments, suggestions, and provenance/authorship marks. The `?kinds=comment` filter avoids treating human-authored provenance marks as review comments.
-
-### Edit a Shared Document
-
-Comment, suggestion, and rewrite operations go to `POST https://www.proofeditor.ai/api/agent/{slug}/ops`. Block edits use `/api/agent/{slug}/edit/v2`.
-
-**Note:** Use the `/api/agent/{slug}/ops` path (from `_links` in create response), NOT `/api/documents/{slug}/ops`.
-
-**Authentication for protected docs:**
-- Header: `x-share-token: <token>` or `Authorization: Bearer <token>`
-- Token comes from the URL parameter: `?token=xxx` or the `accessToken` from create response
-- Header: `X-Agent-Id: ai:andrea-engineering` (required for presence; include on ops for consistent attribution)
-
-**Wire-format reminder.** `/api/agent/{slug}/ops` uses a top-level `type` field; `/api/agent/{slug}/edit/v2` uses an `operations` array where each entry has `op`. Do not mix — sending `op` to `/ops` returns 422.
-
-**Every mutation requires a `baseToken`.** Reuse the `mutationBase.token` from the most recent `/state` or `/snapshot` read, then update it from successful mutation responses (`.mutationBase.token`). On `BASE_TOKEN_REQUIRED` or `STALE_BASE`, re-read and retry once. Only do a pre-mutation read if no prior read has happened in this session or you need fresh document/comment/snapshot content.
-
-`/edit/v2` block refs are a separate concern: they can drift across revisions, so re-fetch `/snapshot` for fresh refs before a block edit if any writes have landed since your last snapshot.
-
-### Edit Strategy: Avoid Whole-Doc Rewrite
-
-Do not default to full-document replacement. Pick the narrowest edit primitive that matches the requested change:
-
-1. **Literal repeated change:** use `/edit/v2` with `find_replace_in_doc` (optionally constrained by `fromRef`, `toRef`, or `block_filter`). This is the fastest and least error-prone path for terminology renames, punctuation/style sweeps, and other exact text substitutions.
-2. **Known block or section change:** use `/edit/v2` block operations from a fresh `/snapshot`: `replace_block`, `insert_before`, `insert_after`, `delete_block`, `replace_range`, or `find_replace_in_block`.
-3. **Visible track-changes desired:** use `/ops` `suggestion.add` (pending or `status: "accepted"`) when the user should see a suggestion mark and reject/revert affordance for that specific edit.
-4. **Whole-doc replacement:** use `rewrite.apply` only as a last resort when the user explicitly asks to replace the entire document, when the intended change is genuinely global and cannot be expressed as block/range/find-replace operations, and when no live clients are present. Before rewriting, read current state, preserve comments/marks expectations, and mention that the rewrite is broad.
-
-When in doubt, start with `/snapshot` and build a small `/edit/v2` batch. A narrow failed edit is easier to inspect and retry than a broad rewrite, and it avoids clobbering concurrent human work.
-
-**Retry discipline after mutation errors — verify before retrying.** An error response is not proof that nothing was written.
-
-- `STALE_BASE`, `BASE_TOKEN_REQUIRED`, `MISSING_BASE`, `INVALID_BASE_TOKEN` — pre-commit, token-related. Re-read `/state`, rebuild the request body with a fresh `baseToken`, and retry once with a new `Idempotency-Key`.
-- `ANCHOR_NOT_FOUND`, `ANCHOR_AMBIGUOUS` — pre-commit, but the `quote` no longer uniquely matches content. Re-reading does not help by itself; the caller must tighten or regenerate the anchor before retrying. Do not auto-retry blindly.
-- `INVALID_OPERATIONS`, `INVALID_REQUEST`, `INVALID_REF`, `INVALID_BLOCK_MARKDOWN`, `INVALID_RANGE`, `INVALID_MARKDOWN`, 422 — pre-commit, but the payload is wrong. Do not retry blindly; fix the payload first.
-- `COLLAB_SYNC_FAILED`, `REWRITE_BARRIER_FAILED`, `PROJECTION_STALE`, `INTERNAL_ERROR`, 5xx, network timeout, and any **202 with `collab.status: "pending"`** — the canonical doc may have been written even though the call looks like a failure. Before any retry, re-read `/state` and check whether the intended mark/edit is already present; only retry if it isn't.
-- `Idempotency-Key` (see below) protects against double-apply *on the same request* (e.g., TCP-level retry). It does not help if you build a new request body and send a second call — that is a new logical write with a new key.
-
-Duplicate-mark incidents usually come from retrying a `comment.add` or `suggestion.add` after a timeout without verifying. When in doubt: re-read, diff, then decide.
-
-**`Idempotency-Key` header** is recommended on every mutation for safe automation retries; required when `/state.contract.idempotencyRequired` is true. Use the same key only when resending the exact same serialized request body. If the body changes — including because you replaced `baseToken` after `STALE_BASE` — mint a new key or Proof will reject it as key reuse with a different payload.
-
-**Comment on text:**
-```json
-{"type": "comment.add", "quote": "text to comment on", "by": "ai:andrea-engineering", "text": "Your comment here", "baseToken": "<token>"}
-```
-
-**Reply to a comment:**
-```json
-{"type": "comment.reply", "markId": "<id>", "by": "ai:andrea-engineering", "text": "Reply text", "baseToken": "<token>"}
-```
-
-**Reply and resolve in one mutation:**
-```json
-{"type": "comment.reply", "markId": "<id>", "by": "ai:andrea-engineering", "text": "Fixed.", "resolve": true, "baseToken": "<token>"}
-```
-
-**Batch existing-thread comment mutations:**
-```json
-{"by": "ai:andrea-engineering", "baseToken": "<token>", "operations": [
-  {"type": "comment.reply", "markId": "<id-1>", "text": "Fixed.", "resolve": true},
-  {"type": "comment.reply", "markId": "<id-2>", "text": "Leaving this open because X."}
-]}
-```
-
-Batch `/ops` supports `comment.reply`, `comment.resolve`, and `comment.unresolve` for existing threads. Use it to reply to and resolve multiple threads in one call instead of issuing separate reply and resolve requests per thread.
-
-**Resolve / unresolve a comment:**
-```json
-{"type": "comment.resolve", "markId": "<id>", "by": "ai:andrea-engineering", "baseToken": "<token>"}
-{"type": "comment.unresolve", "markId": "<id>", "by": "ai:andrea-engineering", "baseToken": "<token>"}
-```
-
-**Suggest a replacement (pending — user must accept/reject):**
-```json
-{"type": "suggestion.add", "kind": "replace", "quote": "original text", "by": "ai:andrea-engineering", "content": "replacement text", "baseToken": "<token>"}
-```
-
-**Suggest and immediately apply (tracked but committed — user can reject to revert):**
-```json
-{"type": "suggestion.add", "kind": "replace", "quote": "original text", "by": "ai:andrea-engineering", "content": "replacement text", "status": "accepted", "baseToken": "<token>"}
-```
-
-`status: "accepted"` creates the suggestion mark and commits the change in one call. The mark persists as an audit trail with per-edit attribution and a reject-to-revert affordance. Works with `kind: "insert" | "delete" | "replace"`.
-
-**Accept or reject an existing suggestion:**
-```json
-{"type": "suggestion.accept", "markId": "<id>", "by": "ai:andrea-engineering", "baseToken": "<token>"}
-{"type": "suggestion.reject", "markId": "<id>", "by": "ai:andrea-engineering", "baseToken": "<token>"}
-```
-
-`suggestion.resolve` is not supported — use accept or reject instead.
-
-**Whole-doc rewrite (last resort):**
-```json
-{"type": "rewrite.apply", "content": "full new markdown", "by": "ai:andrea-engineering", "baseToken": "<token>"}
-```
-
-Prefer `find_replace_in_doc` or block-level `/edit/v2` operations first. `rewrite.apply` is broad, disruptive, and blocked while live clients are connected.
-
-**Block-level edits via `/edit/v2`** (separate endpoint, separate shape):
-```bash
-curl -X POST "https://www.proofeditor.ai/api/agent/{slug}/edit/v2" \
-  -H "Content-Type: application/json" \
-  -H "x-share-token: <token>" \
-  -H "X-Agent-Id: ai:andrea-engineering" \
-  -H "Idempotency-Key: <uuid>" \
-  -d '{
-    "by": "ai:andrea-engineering",
-    "baseToken": "mt1:<token>",
-    "operations": [
-      {"op": "replace_block", "ref": "b3", "block": {"markdown": "Updated paragraph."}},
-      {"op": "insert_after", "ref": "b3", "blocks": [{"markdown": "## New section"}]}
-    ]
-  }'
-```
-
-Per-op body shape (singular `block` vs plural `blocks` is load-bearing — sending the wrong one returns 422):
-
-| op | body fields |
-|---|---|
-| `replace_block` | `ref`, `block: {markdown}` |
-| `insert_after` | `ref`, `blocks: [{markdown}, ...]` |
-| `insert_before` | `ref`, `blocks: [{markdown}, ...]` |
-| `delete_block` | `ref` |
-| `replace_range` | `fromRef`, `toRef`, `blocks: [{markdown}, ...]` |
-| `find_replace_in_block` | `ref`, `find`, `replace`, `occurrence: "first" \| "all"` |
-| `find_replace_in_doc` | `find`, `replace`, `occurrence: "first" \| "all"`, optional `fromRef`, `toRef`, `block_filter` |
-
-Read `/snapshot` to get block `ref` IDs and `mutationBase.token`. `ref` values are opaque request tokens tied to the snapshot/baseToken; re-read `/snapshot` before follow-up block edits if writes have landed. `operations` commits atomically — either every op lands or none do — so one `/edit/v2` call can batch dozens of block edits safely and efficiently. Successful full responses include the next `mutationBase.token` and fresh `snapshot.blocks[].ref` values for chaining.
-
-For literal doc-wide sweeps, prefer `find_replace_in_doc` over many block replacements or a whole-doc rewrite. Validate large batches with `?dryRun=1` or `?validate=1`; use `?return=minimal` when you only need `ok`, `revision`, `appliedCount`, and the next `mutationBase`.
-
-**Editing while a client is connected is fine.** `/edit/v2`, `suggestion.add` (including `status: "accepted"`), and all comment ops work during active collab. Only `rewrite.apply` is blocked by `LIVE_CLIENTS_PRESENT` — it would clobber in-flight Yjs edits.
-
-**When the loop breaks.** If a mutation keeps failing after a fresh read and one retry, or state across reads looks inconsistent, call `POST https://www.proofeditor.ai/api/bridge/report_bug` with the failing request ID, slug, and raw response. The server enriches and files an issue.
-
-### Known Limitations (Web API)
-
-- Bridge-style endpoints (`/d/{slug}/bridge/*`) require client version headers (`x-proof-client-version`, `x-proof-client-build`, `x-proof-client-protocol`) and return 426 CLIENT_UPGRADE_REQUIRED without them. Use `/api/agent/{slug}/ops` instead.
-
-## Local Bridge (macOS App)
-
-Requires Proof.app running. Bridge at `http://localhost:9847`.
-
-**Required headers:**
-- `X-Agent-Id: ai:andrea-engineering` (identity for presence; keep aligned with `by`)
-- `Content-Type: application/json`
-- `X-Window-Id: <uuid>` (when multiple docs open)
-
-### Key Endpoints
-
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| GET | `/windows` | List open documents |
-| GET | `/state` | Read markdown, cursor, word count |
-| GET | `/marks` | List all suggestions and comments |
-| POST | `/marks/suggest-replace` | `{"quote":"old","by":"ai:andrea-engineering","content":"new"}` |
-| POST | `/marks/suggest-insert` | `{"quote":"after this","by":"ai:andrea-engineering","content":"insert"}` |
-| POST | `/marks/suggest-delete` | `{"quote":"delete this","by":"ai:andrea-engineering"}` |
-| POST | `/marks/comment` | `{"quote":"text","by":"ai:andrea-engineering","text":"comment"}` |
-| POST | `/marks/reply` | `{"markId":"<id>","by":"ai:andrea-engineering","text":"reply"}` |
-| POST | `/marks/resolve` | `{"markId":"<id>","by":"ai:andrea-engineering"}` |
-| POST | `/marks/accept` | `{"markId":"<id>"}` |
-| POST | `/marks/reject` | `{"markId":"<id>"}` |
-| POST | `/rewrite` | Last-resort whole-doc replacement: `{"content":"full markdown","by":"ai:andrea-engineering"}` |
-| POST | `/presence` | `{"status":"reading","summary":"..."}` |
-| GET | `/events/pending` | Poll for user actions |
-
-### Presence Statuses
-
-`thinking`, `reading`, `idle`, `acting`, `waiting`, `completed`
+Do not load both unless the task explicitly crosses transports. The workflows below define the user-facing jobs; the selected transport reference defines the wire contract.
 
 ## Workflow: Review a Shared Document
 

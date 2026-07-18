@@ -1,6 +1,6 @@
-# Media-Analyzer Sub-agent Prompt Template
+# Media-Analyzer Subagent Prompt Template
 
-The orchestrator spawns one media-analyzer sub-agent per feedback item that has media. Fill every slot at spawn time.
+The orchestrator spawns one media-analyzer subagent per feedback item that has media. Fill every slot at spawn time.
 
 ## Template
 
@@ -52,9 +52,9 @@ Write your full bug-report-shaped finding to this path, and this path only:
 | Variable | Source | Description |
 |---|---|---|
 | `{persona_file}` | `references/agents/media-analyzer.md` content | The media-analyzer persona (contract, output shape, privacy rule) |
-| `{skill_dir}` | Orchestrator | Absolute path of the ce-sweep skill directory, so the sub-agent can run the bundled analyzer (its shell state is not inherited) |
+| `{skill_dir}` | Orchestrator | Absolute path of the ce-sweep skill directory, so the subagent can run the bundled analyzer (its shell state is not inherited) |
 | `{item_id}` | Sweep state | The sweep's identifier for this feedback item |
 | `{origin_ref}` | Sweep state | Source connector name plus the item's id/url in that source |
 | `{media_paths}` | Fetch step output | Absolute paths to downloaded media in the run's scratch directory |
-| `{scratch_artifact_path}` | Orchestrator | The single file the sub-agent may write its full finding to |
+| `{scratch_artifact_path}` | Orchestrator | The single file the subagent may write its full finding to |
 | `{sensitive_flag}` | Sweep state | Whether this item or its source is marked sensitive |

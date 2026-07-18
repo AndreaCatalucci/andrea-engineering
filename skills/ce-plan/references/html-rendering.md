@@ -73,7 +73,7 @@ Honor user style preferences in this order (highest to lowest):
 
 1. **In-session conversation** — explicit direction the user gave this run.
 2. **Preferred stylesheet reference** named in loaded agent-instruction
-   context (typically `AGENTS.md` / `CLAUDE.md`, but scan loaded context;
+   context (typically `AGENTS.md`, but scan loaded context;
    don't enumerate locations). The reference may be a file path
    (`docs/style.css`), a URL, a named library ("Tailwind"), or a style
    brand ("Stripe docs"). Agent-instruction files carry deliberate

@@ -1,6 +1,6 @@
 # Intake
 
-Classify the request into exactly one input shape — concept, diff, idea, or work-recap window — before any grounding runs. Parse by reasoning over the user's prompt; do not depend on argument-token substitution mechanics, which vary by harness.
+Classify the request into exactly one input shape—concept, diff, idea, or work-recap window—before grounding. Parse the user's Codex prompt directly.
 
 ## Flag tokens
 

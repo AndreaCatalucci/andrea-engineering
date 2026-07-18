@@ -1,27 +1,22 @@
 # Watch loop — scheduling, state, dedup, edge cases
 
-Read this once per babysit session, before acting on the first tick's output. It defines *how ticks are scheduled per harness*, the *on-disk state contract*, the *claim→act→confirm dedup protocol* that makes ticks idempotent and crash-safe, and the *edge-case handling*. SKILL.md owns the ordering invariant; this file owns the mechanics.
+Read this once per babysit session, before acting on the first tick's output. It defines *how Codex sustains ticks*, the *on-disk state contract*, the *claim→act→confirm dedup protocol* that makes ticks idempotent and crash-safe, and the *edge-case handling*. SKILL.md owns the ordering invariant; this file owns the mechanics.
 
 ## How the watch sustains itself
 
-A skill's turn ends when it returns, so *the skill sets up its own loop* — nothing re-invokes it by magic. The robust, cross-harness-verified way is **not** to call a specific per-harness scheduler; it is to run a cheap deterministic background change-detector and **stay in-session**, woken when it signals:
+A skill's turn ends when it returns, so *the skill sets up its own loop* — nothing re-invokes it by magic. Run a cheap deterministic background change-detector and keep the active Codex task alive until it signals:
 
 - **`pr-snapshot watch`** is that detector — same fetch→diff on an interval, **no agent tokens**, prints one `BABYSIT_WAKE {reason,url,...}` line *only* on an actionable change or a stop condition (`actionable` / `terminal` / `blocked-external` / `blocked-failing` — a dispatched check left terminally red — / `needs-human` / `merge-ready` after settle / `max-runtime` / `stop-signal`), then exits.
-- The agent **backgrounds `watch` and waits for that line** with its harness's *background-and-wake* capability, runs a tick, and re-arms. The loop lives **in the current session**, so it keeps every decision the conversation made — declined nits, a reviewer judged wrong, the user's mid-run steering — and spends reasoning only when something changed.
+- Codex starts `watch` with `exec_command`, retains the returned session ID, and polls for the sentinel with `write_stdin`. It then runs a tick and re-arms. The loop lives **in the current task**, so it keeps every decision the conversation made — declined nits, a reviewer judged wrong, the user's mid-run steering — and spends reasoning only when something changed.
 
-The needed capability is generic — *run a background process and be woken when it emits a line, without ending the turn* — so **describe the capability and use whatever tool the harness has**, rather than hardcoding a scheduler. A skill drives **tool calls**, never user-typed slash commands. Known instances (examples, not a required list; verified live this session):
+Use Codex's native long-running command lifecycle:
 
-| Harness | Background-and-wake tool the agent uses | Durable beyond the session? |
-|---------|-----------------------------------------|-----------------------------|
-| Claude Code (CLI) | background `Bash` + a `Monitor`/wait; or `ScheduleWakeup` under `/loop` | No (session-bound) — cron for durable |
-| Grok (CLI/TUI) | background `run_terminal_command` + `get_command_or_subagent_output`; `scheduler_create --durable` for a cross-session schedule | Yes via `scheduler_create --durable` (60s min, 7d) |
-| Cursor (CLI) | `Shell` background + `notify_on_output` sentinel (its `/loop` is user-typed, **not** skill-invocable) | No (session-bound) |
-| Codex (CLI) | a runtime-owned background exec that re-runs the tick (a detached `nohup` is **reaped** when the tool call ends) | No (session-bound) |
-| GUI apps / headless / unknown | none reliable → **checkpoint** | — |
+1. Launch `pr-snapshot watch` with `exec_command` using a short initial yield, so the call returns control with a live session ID instead of blocking until the detector exits.
+2. Retain that ID and poll it with an empty `write_stdin` call.
+3. Keep each wait bounded to at most 60 seconds. If nothing changed, post only a useful periodic status update and wait again.
+4. When `BABYSIT_WAKE` arrives, let the command exit, run one reasoning tick, and launch a fresh watch against the new state.
 
-**Checkpoint (the floor):** when no background-and-wake capability exists, run one tick, persist, report, and print the exact re-run command (`/ce-babysit-pr <PR-url>`) — monitoring is *paused*, say so plainly. Because every tick is disk-resumable, checkpoint is the same loop hand-cranked; the in-session watch only automates the crank. Never fake a loop with a foreground `sleep` (blocked on Claude Code, discouraged elsewhere) or a detached `nohup` (reaped/unsupported on several harnesses).
-
-**Durability:** the in-session watch dies with the session; re-invoking resumes from disk (`/tmp` persists across ticks). For an unattended multi-day watch, escalate to a durable scheduler (Grok `scheduler_create --durable`, or cron running `<cli> exec "/ce-babysit-pr <url>"`) — a fresh headless run is context-blind, so persist consequential decisions to disk. **Shell env vars do not persist between separate tool calls** on any harness — re-set `SKILL_DIR`/`STATE_DIR` inline in every command.
+**Durability:** the watch dies with the Codex task or command session; re-invoking resumes from disk (`/tmp` persists across ticks). Do not install cron jobs or detached schedulers unless the user separately requested durable automation. A resumed task may lack the earlier conversation, so persist consequential decisions to disk. **Shell variables do not persist between separate Codex exec calls** — re-set `SKILL_DIR`/`STATE_DIR` inline in every command.
 
 ## Cadence (the watch interval)
 
@@ -33,7 +28,7 @@ The needed capability is generic — *run a background process and be woken when
 
 ## Pipeline mode bound (`mode:pipeline`)
 
-An orchestrator (`lfg`) drives ticks in-line and needs the loop to terminate. Run ticks back-to-back until the stop below. **To wait for CI to progress between ticks, use the harness's native non-blocking wait — never a bare foreground `sleep`** (blocked on Claude Code, discouraged elsewhere): Claude Code's `Monitor` until-loop; Grok's `get_command_or_subagent_output(timeout_ms=…)` or a `monitor`; Cursor's `Await` on a backgrounded `gh pr checks --watch`. If the harness has no non-blocking wait, do one tick and return control to the orchestrator rather than busy-spinning. Loop until:
+An orchestrator (`lfg`) drives ticks in-line and needs the loop to terminate. Run ticks back-to-back until the stop below. To wait for CI between ticks, start `gh pr checks --watch` or `pr-snapshot watch` with `exec_command` and poll it with `write_stdin` — never use a bare foreground `sleep`. Loop until:
 
 - **CI is clean** (`all_checks_ok` — every check terminal, **none failing**, and at least one observed) **and** the actionable backlog is empty — success. A terminal-but-**red** check `ce-debug` left as a residual (`has_failing_checks` true) or an empty rollup (`checks_present` false — Actions has not created check-runs yet, not that CI passed) is **not** success: keep ticking until they clear/materialize or the time budget expires, then return with residuals or `no-checks-observed`; or
 - a **budget** is hit: default **3 CI fix rounds** per head-lineage (mirrors `lfg`'s historical cap) and an overall time cap (~30-45 min). On budget-exhaust, the still-red checks and any `needs-human` items become residuals.

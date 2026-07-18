@@ -1,6 +1,6 @@
 # Nuxt dev-server recipe (auto-detect fallback)
 
-Loaded when `detect-project-type.sh` returns `nuxt` and there is no `.claude/launch.json` to consult.
+Loaded when `detect-project-type.sh` returns `nuxt`.
 
 ## Signature
 
@@ -32,24 +32,6 @@ Prefer the package manager indicated by the lockfile:
 ## Port
 
 Default: `3000`. Nuxt respects `--port <port>` and the `PORT` env var. Overrides follow the cascade in `references/dev-server-detection.md`.
-
-## Stub generation
-
-```json
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Nuxt dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 3000
-    }
-  ]
-}
-```
-
-Substitute the resolved package manager (`npm` / `pnpm` / `yarn` / `bun`) and port.
 
 ## Common gotchas
 

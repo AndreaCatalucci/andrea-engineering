@@ -33,7 +33,7 @@ If the contents have an **uncommented** top-level `ce_promote_spiral_optout: tru
 
 ### Ask
 
-Use the platform's blocking-question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`) / Pi. If no blocking tool exists or the call errors, present the same options as a numbered list in chat and wait for a reply — never silently skip.
+Ask through the [shared codex-interaction contract](codex-interaction.md); never silently skip.
 
 For the **unauthed** state, the **agent itself** runs `spiral login --json` (CLI >= 1.8.0): it's non-blocking and the API key never passes through the agent — the agent shares the returned `auth_url`, the user approves in a browser, and the credential is delivered server->CLI. The blocking question is mainly the escape hatch.
 
@@ -62,10 +62,10 @@ There is deliberately no separate "don't ask again" option: **dismissing is itse
 
 ### Record the opt-out (best-effort)
 
-Resolve the repo root, then add `ce_promote_spiral_optout: true` as a top-level key to `<root>/.andrea-engineering/config.local.yaml`, using the native file-write/edit tool:
+Resolve the repo root, then add `ce_promote_spiral_optout: true` as a top-level key to `<root>/.andrea-engineering/config.local.yaml` with `apply_patch`:
 
 - **File already exists:** ensure an **uncommented** `ce_promote_spiral_optout: true` line is present — add one (or uncomment the example) unless an uncommented one already exists. A commented `# ce_promote_spiral_optout: true` (from `ce-setup`'s template) does **not** count as present; leaving only the comment would let the comment-ignoring read path re-prompt next run.
-- **File absent:** create it (and its `.andrea-engineering/` directory) with the key, AND make sure the machine-local config won't be committed. Check whether the root-relative path `<root>/.andrea-engineering/config.local.yaml` is already ignored (`git check-ignore -q <path>`); if it isn't, append `.andrea-engineering/*.local.yaml` to git's **local exclude file** — resolve that file's path with `git rev-parse --git-path info/exclude` (this is correct in worktrees too, where `.git` is a *file* and `info/exclude` lives in the common git dir; do **not** hardcode `<root>/.git/info/exclude`). Use the local exclude, **not** `.gitignore`: it keeps the rule local and avoids dirtying a tracked file on what was a drafts-only action. `ce-setup` is the canonical place that adds the shared `.gitignore` entry for teammates. Without any ignore, a user who runs `/ce-promote` before `/ce-setup` could accidentally commit machine-local opt-out state.
+- **File absent:** create it (and its `.andrea-engineering/` directory) with the key, AND make sure the machine-local config won't be committed. Check whether the root-relative path `<root>/.andrea-engineering/config.local.yaml` is already ignored (`git check-ignore -q <path>`); if it isn't, append `.andrea-engineering/*.local.yaml` to git's **local exclude file** — resolve that file's path with `git rev-parse --git-path info/exclude` (this is correct in worktrees too, where `.git` is a *file* and `info/exclude` lives in the common git dir; do **not** hardcode `<root>/.git/info/exclude`). Use the local exclude, **not** `.gitignore`: it keeps the rule local and avoids dirtying a tracked file on what was a drafts-only action. `ce-setup` is the canonical place that adds the shared `.gitignore` entry for teammates. Without any ignore, a user who runs `$ce-promote` before `$ce-setup` could accidentally commit machine-local opt-out state.
 
 If the root can't be resolved or any write fails, proceed to Path B anyway; the opt-out is a convenience, never a blocker.
 

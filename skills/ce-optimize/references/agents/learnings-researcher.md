@@ -25,7 +25,7 @@ If `CONCEPTS.md` does not exist, skip this step entirely and proceed to Step 1.
 
 The `docs/solutions/` directory contains documented learnings with YAML frontmatter. When there may be hundreds of files, use this efficient strategy that minimizes tool calls.
 
-> **Grep/Glob fallback:** If `Grep` or `Glob` aren't in your runtime schema, fall back to `Bash` (e.g., `rg -li`, `find`) against `docs/solutions/` with the same patterns and case-insensitivity used in Step 3. Prefer the native tools when present.
+Use `rg --files docs/solutions` for discovery and `rg -li` for content filtering, with the patterns and case-insensitivity used in Step 3.
 
 ### Step 1: Extract Keywords from the Work Context
 
@@ -59,7 +59,7 @@ The caller's context determines which dimensions carry weight. A code-bug query 
 
 ### Step 2: Probe Discovered Subdirectories
 
-Use the native file-search/glob tool (e.g., Glob in Claude Code) to discover which subdirectories actually exist under `docs/solutions/` at invocation time. Do not assume a fixed list — subdirectory names are per-repo convention and may include any of:
+Use `rg --files docs/solutions` to discover which subdirectories actually exist at invocation time. Do not assume a fixed list — subdirectory names are per-repo convention and may include any of:
 
 - Bug-shaped: `build-errors/`, `test-failures/`, `runtime-errors/`, `performance-issues/`, `database-issues/`, `security-issues/`, `ui-bugs/`, `integration-issues/`, `logic-errors/`
 - Knowledge-shaped: `architecture-patterns/`, `design-patterns/`, `tooling-decisions/`, `conventions/`, `workflow/`, `workflow-issues/`, `developer-experience/`, `documentation-gaps/`, `best-practices/`, `skill-design/`, `integrations/`
@@ -69,7 +69,7 @@ Narrow the search to the discovered subdirectories that match the caller's Domai
 
 ### Step 3: Content-Search Pre-Filter (Critical for Efficiency)
 
-**Use the native content-search tool (e.g., Grep in Claude Code) to find candidate files BEFORE reading any content.** Run multiple searches in parallel, case-insensitive, returning only matching file paths:
+**Use `rg` to find candidate files BEFORE reading content.** Run multiple case-insensitive searches and return only matching file paths:
 
 ```
 # Search for keyword matches in frontmatter fields (run in PARALLEL, case-insensitive).

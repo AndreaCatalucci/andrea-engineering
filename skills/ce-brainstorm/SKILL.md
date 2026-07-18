@@ -1,6 +1,6 @@
 ---
 name: ce-brainstorm
-description: 'Turn vague or ambitious ideas into a confirmed, requirements-only direction by resolving dependent decisions one at a time. Use to brainstorm, scope, decide what to build, expose blind spots, or frame product work before planning. Not for executing clear work, debugging, code review, or deciding whether to adopt a named external technology for a project (use ce-pov).'
+description: 'Shape a vague or ambitious idea into confirmed, requirements-only direction. Use for exploratory product framing before planning; not execution, debugging, code review, or project-specific technology verdicts.'
 ---
 
 # Brainstorm a Feature or Improvement
@@ -23,7 +23,7 @@ Do not implement code. Do not write a plan, invoke a handoff, or take downstream
 8. **Confirm the whole.** Individual answers are provisional parts of a whole. End with a concise synthesis and wait for explicit confirmation before any artifact or handoff.
 9. **Define scope before dialogue.** Do not begin the decision interview until research supports a manageable scope thesis. Push back on work too broad for one coherent brainstorm.
 
-Use `request_user_input` when it cleanly presents 2–3 real choices; otherwise ask directly in chat. Either way, ask exactly one question. A useful decision turn normally has this shape:
+Before the first decision question, read and follow [`references/codex-interaction.md`](references/codex-interaction.md). A useful decision turn normally has this shape:
 
 ```text
 <brief context or consequence>
@@ -104,7 +104,7 @@ For software work, search for the topic, similar behavior, relevant plans, conve
 - **Standard:** inline research, roughly 20 targeted reads at most.
 - **Deep:** inline when the footprint is coherent. Create a grounding dossier of at most 150 lines with `file:line` evidence when the footprint is broad enough to justify one.
 
-The repo-profile cache may provide stable orientation. If needed, run `scripts/repo-profile-cache.py get`. On a miss, read `references/agents/repo-profiler.md`, derive its compact profile inline, and persist it with the same script. Never dispatch a profiler. If caching fails, continue with targeted inline research.
+The repo-profile cache may provide stable orientation. If needed, set `SKILL_DIR` to this skill's directory and run `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get`. On a miss, read `references/agents/repo-profiler.md`, derive its compact profile inline, and persist it with the same script. Never dispatch a profiler. If caching fails, continue with targeted inline research. The protocol lives in `references/repo-profile-cache.md`.
 
 Use one extraction-only scout for Deep grounding only when the footprint is broad, unfamiliar, or cross-cutting enough that inline research would crowd out the interview. Read `references/delegation-budgets.md` before dispatching. Otherwise keep research in the main thread.
 

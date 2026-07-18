@@ -1,6 +1,6 @@
 # Ideation Artifact Contract
 
-Load this content contract at save time with exactly one renderer: `html-rendering.md` or `markdown-rendering.md`.
+Load this content contract at save time with exactly one renderer: `references/html-rendering.md` or the canonical `references/markdown-rendering.md`.
 
 The artifact is a ranked, critiqued candidate set plus the evidence and rejection record needed to judge it. It is not a requirements document, implementation plan, or status tracker.
 

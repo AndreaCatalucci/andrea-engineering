@@ -68,7 +68,7 @@ On collision, record the no-op in the completion report's Coverage section so th
 
 ## Concurrent edit safety
 
-Document edits happen via the platform's edit tool (Edit in Claude Code, or equivalent). Before every append, re-read the document from disk to reduce the window for user-in-editor concurrent-write collisions. If the document's mtime or content has changed unexpectedly between a prior read and the append attempt, abort the append and surface the situation via the failure path below. The user may be editing in their editor during the review session and simultaneous writes would corrupt the document.
+Document edits happen via `apply_patch`. Before every append, re-read the document from disk to reduce the window for concurrent-write collisions. If the document's mtime or content has changed unexpectedly between a prior read and the append attempt, abort the append and surface the situation via the failure path below. The user may be editing the file during the review session and simultaneous writes would corrupt it.
 
 The orchestrator only holds the most recent read in memory, not a persistent lock — interactive review doesn't need lock coordination; it needs observation-before-write.
 
@@ -76,7 +76,7 @@ The orchestrator only holds the most recent read in memory, not a persistent loc
 
 ## Failure path
 
-When the append cannot complete — document is read-only on disk, path is invalid, the platform's edit tool returns an error, concurrent-edit collision detected, or any other write failure — surface the failure inline to the user via the platform's blocking question tool with the following sub-question:
+When the append cannot complete — document is read-only on disk, path is invalid, `apply_patch` returns an error, concurrent-edit collision detected, or any other write failure — surface the failure inline and ask the following sub-question through the shared Codex interaction contract:
 
 **Stem:** `Couldn't append the finding to Open Questions. What should the agent do?`
 

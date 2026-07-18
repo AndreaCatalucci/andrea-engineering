@@ -97,7 +97,7 @@ Strengthening [section names] — [brief reason for each, e.g., "decision ration
 
 For each selected section, choose the smallest useful agent set. Do **not** run every agent. Use at most **1-3 agents per section** and usually no more than **8 agents total**.
 
-The names below are skill-local prompt asset file stems under `references/agents/`, not standalone agent types. For each selected name, read `references/agents/<name>.md` and seed a generic subagent with that prompt content plus the section context described below. Do not use `subagent_type`, typed `Agent` names, or platform-level CE agent registration.
+The names below are skill-local prompt asset file stems under `references/agents/`, not standalone agent types. For each selected name, read `references/agents/<name>.md` and seed a generic Codex subagent with that prompt content plus the section context described below. Do not use separately registered custom-agent types.
 
 **Deterministic Section-to-Agent Mapping:**
 
@@ -174,7 +174,7 @@ Signals that justify artifact-backed mode:
 
 If artifact-backed mode is not clearly warranted, stay in direct mode.
 
-Artifact-backed mode uses a per-run OS-temp scratch directory. Create it once before dispatching sub-agents and capture its **absolute path** — pass that absolute path to each sub-agent so they write to it directly. Do not use `.context/`; the artifacts are per-run throwaway that are cleaned up when deepening ends (see 5.3.6b), matching the repo Scratch Space convention for one-shot artifacts. Do not pass unresolved shell-variable strings to sub-agents; they need the resolved absolute path.
+Artifact-backed mode uses a per-run OS-temp scratch directory. Create it once before dispatching subagents and capture its **absolute path** — pass that absolute path to each subagent so they write to it directly. Do not use `.context/`; the artifacts are per-run throwaway that are cleaned up when deepening ends (see 5.3.6b), matching the repo Scratch Space convention for one-shot artifacts. Do not pass unresolved shell-variable strings to subagents; they need the resolved absolute path.
 
 ```bash
 SCRATCH_DIR="$(mktemp -d -t ce-plan-deepen-XXXXXX)"
@@ -185,7 +185,7 @@ Refer to the echoed absolute path as `<scratch-dir>` throughout the rest of this
 
 ## 5.3.6 Run Targeted Research
 
-Launch the selected local prompt assets as generic subagents in parallel using the execution mode chosen above. If the current platform does not support parallel dispatch, run them sequentially instead. Omit the `mode` parameter when dispatching so the user's configured permission settings apply.
+Launch the selected local prompt assets with `spawn_agent` using bounded parallelism. Queue any remainder when Codex's active-agent slots are full.
 
 Prefer local repo and institutional evidence first. Use external research only when the gap cannot be closed responsibly from repo context or already-cited sources.
 
@@ -210,7 +210,7 @@ In interactive mode, present each agent's findings to the user before integratio
 
 1. **Summarize the agent and its target section** — e.g., "The architecture-strategist reviewed Key Technical Decisions and found:"
 2. **Present the findings concisely** — bullet the key points, not the raw agent output. Include enough context for the user to evaluate: what the agent found, what evidence supports it, and what plan change it implies.
-3. **Ask the user** using the platform's blocking question tool when available (see Interaction Method):
+3. **Ask the user** through the [shared codex-interaction contract](codex-interaction.md):
    - **Accept** — integrate these findings into the plan
    - **Reject** — discard these findings entirely
    - **Discuss** — the user wants to talk through the findings before deciding

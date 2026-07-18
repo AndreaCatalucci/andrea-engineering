@@ -3,17 +3,17 @@ name: ce-compound
 description: Document one recently solved problem or durable project learning in docs/solutions/, with optional project-vocabulary updates. Use after verified, non-trivial work is complete.
 ---
 
-# /ce-compound
+# $ce-compound
 
 Capture one verified learning while its evidence is fresh. The root agent owns research, synthesis, writing, and validation so the final document preserves the full problem-solving narrative without subagent handoffs.
 
 ## Usage
 
 ```text
-/ce-compound [optional context]
-/ce-compound history:true [optional context]
-/ce-compound deep:true [optional context]
-/ce-compound mode:headless [optional flags and context]
+$ce-compound [optional context]
+$ce-compound history:true [optional context]
+$ce-compound deep:true [optional context]
+$ce-compound mode:headless [optional flags and context]
 ```
 
 - `history:true` searches prior sessions for relevant failed approaches or recurring evidence. Do not search session history otherwise.
@@ -88,7 +88,7 @@ Do not edit other solution documents during capture. Cross-document consolidatio
 
 Run only with `history:true`.
 
-Use the bundled `scripts/session-history/` tooling to find sessions for the current repo and, when useful, the current branch. Apply a strict relevance gate before extraction: candidates must concern the same concrete problem, component, failure mode, or solution mechanism.
+Use the bundled `scripts/session-history/` tooling to find Codex sessions for the current repository. Apply a strict relevance gate before extraction: candidates must concern the same concrete problem, component, failure mode, or solution mechanism.
 
 If relevant candidates exist, read `references/agents/session-historian.md` and synthesize the evidence in the root agent. Do not dispatch a historian. Incorporate useful failed approaches or recurring patterns and mark historical-session material as `(session history)`. If scripts are unavailable or no relevant sessions exist, continue without history and report that outcome.
 

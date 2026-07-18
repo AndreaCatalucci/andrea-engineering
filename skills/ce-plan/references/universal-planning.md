@@ -8,7 +8,7 @@ The detection stub in SKILL.md routes here for anything that isn't clearly softw
 
 - **Is this actually a software task?** The key distinction is task-type, not topic-domain. A study guide about Rust is non-software (producing educational content). A Rust library refactor is software (modifying code). If this is actually software, return to Phase 0.2 in the main SKILL.md.
 - **Is this a trivial single-fact lookup?** Only a question answerable from one fact with no research, retrieval, or judgment skips planning — answer it directly and stop, in the user's terms. Do not narrate that it "isn't a planning task" or explain the routing; that is process exhaust (see Veil of value below). Examples: "zsh: command not found: brew", "what's the capital of France." A question that needs multiple steps, any retrieval, or synthesis to answer well does **not** qualify: it is an answer-seeking task (see Disposition below), not a quick-help exit. When unsure, do not exit.
-- **Pipeline mode?** If invoked from LFG or any `disable-model-invocation` context: output "This is a non-software task. The LFG pipeline requires ce-work, which only supports software tasks. Use `/ce-plan` directly for non-software planning." and stop.
+- **Pipeline mode?** If invoked from LFG or another headless workflow: output "This is a non-software task. The LFG pipeline requires ce-work, which only supports software tasks. Use `$ce-plan` directly for non-software planning." and stop.
 - **Unified artifact guard.** Universal-planning outputs are not software implementation plans. Do not label them `artifact_contract: ce-unified-plan/v1` and do not produce a `/goal` launch block unless the deliverable itself is a complete software implementation plan with Product Contract, Planning Contract, Implementation Units, Verification Contract, and Definition of Done.
 
 Once past these checks, commit to the task — do not bail because it looks like a "lookup" or "research question." The user invoked the planning tool on purpose. Then choose the disposition below.
@@ -38,7 +38,7 @@ Say how the question will be answered, right-sized to it: a light question gets 
 
 ### Execute the plan
 
-Carry out the approach. When the answer depends on facts the model can't reliably supply from memory — current data, recent events, specifics that drift — gather them using the **Research decomposition pattern** under Step 1 below (decompose into focused questions, dispatch in parallel via the platform's subagent/web primitive, collate). Skip research for anything the model already knows well.
+Carry out the approach. When the answer depends on facts the model cannot reliably supply from memory—current data, recent events, or specifics that drift—use the **Research decomposition pattern** under Step 1: decompose focused questions, dispatch with Codex `spawn_agent` and web search, then collate. Skip research for stable facts already known well.
 
 **Ground answers about the user's own code, repo, or named artifacts in the actual sources — not memory.** When the question references local code, a specific file, a named CLI or service, or "our X", read those sources first (and any resource the user named — see Core Principle 8 in SKILL.md). "The model already knows the topic" covers general knowledge only, never the contents of the user's codebase: a comparison or recommendation about local code that was never read is ungrounded. Inspect, then answer.
 
@@ -58,7 +58,7 @@ The plan-of-attack and the answer are for the caller; the skill's internal machi
 
 Register example, for "how often does he star things — is this a big deal?":
 
-> Wrong: "Quick note first: /ce-plan builds implementation plans, so I ignored the template and just answered the question. Here's what the data says..."
+> Wrong: "Quick note first: $ce-plan builds implementation plans, so I ignored the template and just answered the question. Here's what the data says..."
 
 Leaks the skill's name, narrates an internal routing decision, apologizes for deviating — the caller sees the seams of the tool.
 
@@ -84,7 +84,7 @@ Evaluate two things before planning:
 | **None** | Generic, timeless, or conceptual plan (study curriculum methodology, project management approach, personal goal breakdown) | Skip research. Model knowledge is sufficient. After structuring the plan, offer: "I based this on general knowledge. Want me to search for [specific thing research would improve]?" — e.g., sourced recipes, current product recommendations, expert frameworks. Only if the user accepts. |
 | **Recommended** | Plan references specific locations, venues, dates, prices, schedules, seasonal availability, or current events — anything where stale information would break the plan. | Research before planning with the root agent, then collate findings before structuring the plan. |
 
-When research is recommended, do it — don't just offer. Stale recommendations (closed restaurants, rethemed attractions, outdated prices) are worse than no recommendations. The user invoked `/ce-plan` because they want a good plan, not a disclaimer about training data.
+When research is recommended, do it — don't just offer. Stale recommendations (closed restaurants, rethemed attractions, outdated prices) are worse than no recommendations. The user invoked `$ce-plan` because they want a good plan, not a disclaimer about training data.
 
 **Research decomposition pattern:**
 1. Identify 2-5 independent research questions based on the task. Good questions target facts the model is least confident about: current prices, hours, availability, recent changes, seasonal specifics.
@@ -98,7 +98,7 @@ Example for "plan a date night in Seattle this Saturday":
 
 ## Step 1b: Focused Q&A
 
-Ask up to 3 questions targeting the unknowns that would most change the plan. Use `request_user_input` when available; otherwise ask in chat and wait.
+Ask up to 3 questions targeting the unknowns that would most change the plan, using the [shared codex-interaction contract](codex-interaction.md).
 
 **How to ask well:**
 - Offer informed options, not open-ended blanks. Instead of "When are you going?", try "Mid-week visits have 30-40% shorter lines — are you flexible on timing?" The question should give the user a frame of reference, not just extract information.

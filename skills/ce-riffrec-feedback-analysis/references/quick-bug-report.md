@@ -4,7 +4,7 @@ Use this path when the input is a short recording (under ~60 seconds), the user 
 
 ## Workflow
 
-1. Run the analyzer to a temp directory so nothing pollutes the repo (`SKILL_DIR` is the directory containing the `ce-riffrec-feedback-analysis` SKILL.md; set it in the same command — shell state does not persist between Bash calls):
+1. Run the analyzer to a temp directory so nothing pollutes the repo (`SKILL_DIR` is the directory containing the `ce-riffrec-feedback-analysis` SKILL.md; set it in the same command because Codex shell calls do not share shell state):
 
    ```bash
    SKILL_DIR="<absolute path of the directory containing the ce-riffrec-feedback-analysis SKILL.md>";

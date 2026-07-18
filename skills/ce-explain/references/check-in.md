@@ -15,7 +15,7 @@ In diff mode, word the offer without describing the change's content or purpose 
 The prediction must come before any interpretation reaches the user, or the mechanic is dead on arrival.
 
 1. Show only the raw change reference: the diff or its stat summary, with zero commentary.
-2. Ask for the prediction with the blocking question tool: what does this change do, and why was it made? Free-text is the primary answer path; options, if offered, must be genuinely competing readings, not one right answer plus padding.
+2. Ask for the prediction through the [shared codex-interaction contract](codex-interaction.md): what does this change do, and why was it made? Free-text is the primary answer path; options, if offered, must be genuinely competing readings, not one right answer plus padding.
 3. **End the turn.** In the no-blocking-tool fallback, ask in chat and stop. Never place any explanation in the same message as the prediction prompt.
 4. After the prediction lands, compose and present the reveal. Name the gaps explicitly: what the prediction got right, what it missed, what it got wrong and why the reality differs. The gap-naming is the teaching — a reveal that doesn't reference the prediction wastes the prediction.
 

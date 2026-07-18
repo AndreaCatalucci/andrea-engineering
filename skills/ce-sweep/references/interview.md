@@ -1,12 +1,12 @@
 # Sweep First-Run Interview
 
-Loaded by `SKILL.md` when `/ce-sweep` runs with no `feedback_sources` configured. Captures the setup that will be merged into `<repo-root>/.andrea-engineering/config.local.yaml` (the unified CE local config, gitignored, machine-local) and re-read on every subsequent run.
+Loaded by `SKILL.md` when `$ce-sweep` runs with no `feedback_sources` configured. Captures the setup that will be merged into `<repo-root>/.andrea-engineering/config.local.yaml` (the unified CE local config, gitignored, machine-local) and re-read on every subsequent run.
 
-This interview is **interactive only**. The caller refuses first-run setup in headless mode — a scheduled or piped run with no config aborts and tells the user to run `/ce-sweep` interactively once. Do not attempt to infer sources, actions, or approvals without asking.
+This interview is **interactive only**. The caller refuses first-run setup in headless mode — a scheduled or piped run with no config aborts and tells the user to run `$ce-sweep` interactively once. Do not attempt to infer sources, actions, or approvals without asking.
 
 ## Interaction Method
 
-Ask **one question at a time** using the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension). Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors — never silently skip a question or assume a default without surfacing it.
+Ask **one question at a time** through the [shared codex-interaction contract](codex-interaction.md). Never silently skip a question or assume a default without surfacing it.
 
 ## Overall Rules
 
@@ -157,12 +157,12 @@ Then surface the resulting Sweep section to the user in chat and offer **one rou
 
 **Ask:** "Want the sweep to run on a recurring schedule so feedback gets triaged automatically, or run it on demand? On-demand works fully without a schedule."
 
-- **On demand** -> nothing to register. Note that `/ce-sweep` is ready to run any time.
-- **Recurring** -> hand off to whichever scheduling primitive the harness exposes — the in-plugin `schedule` skill if it is installed, otherwise name the platform-native mechanism (cron, GitHub Actions, the host's own automation) and emit a brief hint of what would need to run. **The registered invocation must include `mode:headless`** — e.g. `/ce-sweep mode:headless` — so the scheduled run knows it is unattended and defers instead of prompting. Never schedule inline; always hand off to the scheduling primitive.
+- **On demand** -> nothing to register. Note that `$ce-sweep` is ready to run any time.
+- **Recurring** -> confirm the cadence, then create a Codex automation whose prompt invokes `ce-sweep mode:headless`. The explicit mode ensures unattended runs defer instead of prompting.
 
 Declining a schedule leaves on-demand use fully working.
 
-**End the interview:** tell the user setup is complete and the first sweep can run now with `/ce-sweep`.
+**End the interview:** tell the user setup is complete and the first sweep can run now with `$ce-sweep`.
 
 ---
 

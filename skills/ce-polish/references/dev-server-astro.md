@@ -1,6 +1,6 @@
 # Astro dev-server recipe (auto-detect fallback)
 
-Loaded when `detect-project-type.sh` returns `astro` and there is no `.claude/launch.json` to consult.
+Loaded when `detect-project-type.sh` returns `astro`.
 
 ## Signature
 
@@ -32,24 +32,6 @@ Prefer the package manager indicated by the lockfile:
 ## Port
 
 Default: `4321`. Astro respects `--port <port>` and the `server.port` field in `astro.config.*`. Overrides follow the cascade in `references/dev-server-detection.md`.
-
-## Stub generation
-
-```json
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Astro dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 4321
-    }
-  ]
-}
-```
-
-Substitute the resolved package manager (`npm` / `pnpm` / `yarn` / `bun`) and port.
 
 ## Common gotchas
 

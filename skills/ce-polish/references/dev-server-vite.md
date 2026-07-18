@@ -1,6 +1,6 @@
 # Vite dev-server recipe (auto-detect fallback)
 
-Loaded when `detect-project-type.sh` returns `vite` and there is no `.claude/launch.json` to consult.
+Loaded when `detect-project-type.sh` returns `vite`.
 
 ## Signature
 
@@ -24,23 +24,7 @@ Vite's `--strictPort` flag causes the dev server to fail rather than increment t
 
 ## Host binding
 
-Vite binds to `127.0.0.1` by default. For polish running inside a devcontainer or WSL, users may need `--host 0.0.0.0` in `runtimeArgs`.
-
-## Stub generation
-
-```json
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Vite dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 5173
-    }
-  ]
-}
-```
+Vite binds to `127.0.0.1` by default. When Codex runs the project inside a dev container or WSL, add `--host 0.0.0.0` to the dev command if localhost is not reachable from the browser.
 
 ## Common gotchas
 

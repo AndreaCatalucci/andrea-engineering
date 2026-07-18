@@ -45,8 +45,8 @@ that could not be expressed compactly.
 
 ## Interaction and Safety
 
-- When a blocking decision is genuinely necessary, ask one question at a time with `request_user_input` when available; otherwise ask in chat and wait.
-- In pipeline or `disable-model-invocation` contexts, do not block. Make reversible choices, expose assumptions, and force Markdown output.
+- When a blocking decision is genuinely necessary, read and follow [`references/codex-interaction.md`](references/codex-interaction.md).
+- In pipeline or headless contexts, do not block. Make reversible choices, expose assumptions, and force Markdown output.
 - Use repo-relative paths inside plans. Absolute paths are permitted only in the chat handoff so the artifact is clickable.
 - Honor user-named files, URLs, CLIs, tools, and prior artifacts. Discover them before substituting.
 - A direct invocation always stays in a planning workflow. If the prompt lacks a feature description, ask what to plan.

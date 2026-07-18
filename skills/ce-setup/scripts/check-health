@@ -10,7 +10,6 @@ set -o pipefail
 # Format: name|capability
 
 deps=(
-  "agent-browser|browser testing, dogfood QA, and visual polish inspection"
   "gh|GitHub PR, issue, and review workflows"
   "jq|JSON inspection in shell-based workflows"
   "ast-grep|syntax-aware structural code search"

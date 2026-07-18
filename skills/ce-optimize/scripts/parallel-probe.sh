@@ -87,14 +87,14 @@ if [[ -n "$MEASUREMENT_CMD" ]]; then
 fi
 
 # Check 2: SQLite databases in the measurement workdir or declared shared files
-SQLITE_FILES=$(find "${SCAN_PATHS[@]}" -maxdepth 4 -type f \( -name '*.db' -o -name '*.sqlite' -o -name '*.sqlite3' \) ! -path '*/.git/*' ! -path '*/node_modules/*' ! -path '*/.claude/*' ! -path '*/.context/*' ! -path '*/.worktrees/*' 2>/dev/null | head -10 || true)
+SQLITE_FILES=$(find "${SCAN_PATHS[@]}" -maxdepth 4 -type f \( -name '*.db' -o -name '*.sqlite' -o -name '*.sqlite3' \) ! -path '*/.git/*' ! -path '*/node_modules/*' ! -path '*/.context/*' ! -path '*/.worktrees/*' 2>/dev/null | head -10 || true)
 if [[ -n "$SQLITE_FILES" ]]; then
   FILE_COUNT=$(echo "$SQLITE_FILES" | wc -l | tr -d ' ')
   add_blocker "shared_file" "Found $FILE_COUNT SQLite database file(s)" "Copy database files into each experiment worktree"
 fi
 
 # Check 3: Lock/PID files in the measurement workdir or declared shared files
-LOCK_FILES=$(find "${SCAN_PATHS[@]}" -maxdepth 4 -type f \( -name '*.lock' -o -name '*.pid' \) ! -path '*/.git/*' ! -path '*/node_modules/*' ! -path '*/.claude/*' ! -path '*/.context/*' ! -path '*/.worktrees/*' ! -name 'package-lock.json' ! -name 'yarn.lock' ! -name 'bun.lock' ! -name 'bun.lockb' ! -name 'Gemfile.lock' ! -name 'poetry.lock' ! -name 'Cargo.lock' 2>/dev/null | head -10 || true)
+LOCK_FILES=$(find "${SCAN_PATHS[@]}" -maxdepth 4 -type f \( -name '*.lock' -o -name '*.pid' \) ! -path '*/.git/*' ! -path '*/node_modules/*' ! -path '*/.context/*' ! -path '*/.worktrees/*' ! -name 'package-lock.json' ! -name 'yarn.lock' ! -name 'bun.lock' ! -name 'bun.lockb' ! -name 'Gemfile.lock' ! -name 'poetry.lock' ! -name 'Cargo.lock' 2>/dev/null | head -10 || true)
 if [[ -n "$LOCK_FILES" ]]; then
   FILE_COUNT=$(echo "$LOCK_FILES" | wc -l | tr -d ' ')
   add_blocker "lock_file" "Found $FILE_COUNT lock/PID file(s) that may cause contention" "Ensure measurement command cleans up lock files, or run in serial mode"

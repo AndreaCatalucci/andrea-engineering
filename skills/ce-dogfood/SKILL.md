@@ -1,6 +1,6 @@
 ---
 name: ce-dogfood
-description: "Hands-off, diff-scoped browser QA of the active branch: maps user flows, drives a real browser, autonomously fixes small breakages with regression tests and commits, judges experience against product personas, and writes a durable dogfood report. Manual invocation only."
+description: "Run hands-off, diff-scoped browser QA with autonomous fixes and a durable report. Use when asked to dogfood or QA a branch or PR in a real browser; not for narrow scripted browser checks."
 ---
 
 # Dogfood
@@ -9,20 +9,14 @@ Act as a QA engineer who dogfoods the **active branch** end-to-end: understand e
 
 This is **diff-scoped**, not whole-app exploration. You test what *this branch* introduced or modified versus the trunk.
 
-## Use `agent-browser` Only For Browser Automation
+## Use the Codex Browser
 
-This workflow drives the browser exclusively through the `agent-browser` CLI. Do not use Chrome MCP tools (`mcp__claude-in-chrome__*`), any browser MCP integration, or other built-in browser-control tools. If the platform offers multiple ways to control a browser, always choose `agent-browser`. Use the direct binary, never `npx agent-browser` (the direct binary uses the fast Rust client).
+This workflow drives the browser through Codex's in-app Browser. Load and follow the `browser:control-in-app-browser` skill before browser actions. Use the Browser's visible page state, screenshots, and console evidence; do not substitute an unrelated browser CLI.
 
 ## Prerequisites
 
 - A local dev server you can start (`bin/dev`, `rails server`, `npm run dev`, etc.).
-- `agent-browser` installed. Check:
-
-  ```bash
-  command -v agent-browser >/dev/null 2>&1 && echo "Ready" || echo "NOT INSTALLED"
-  ```
-
-  If not installed, stop and tell the user to install `agent-browser` (run `/ce-setup` to print the current install command), then re-run this skill — this workflow cannot function without it.
+- The `browser:control-in-app-browser` skill is available. If it is unavailable, stop and report that this workflow requires the Codex in-app Browser.
 
 ## Reusing Compound-Engineering Skills
 
@@ -41,8 +35,8 @@ This workflow drives the browser exclusively through the `agent-browser` CLI. Do
 0. Scope        Pick the branch, get onto it (offer worktree), never touch the trunk
 1. Analyze      Diff branch vs trunk, understand every change
 2. Map+Matrix   Map user flows as Mermaid flowcharts, then derive the test matrix as a task list
-3. Serve        Detect port, start dev server, open agent-browser
-4. Execute      Work the matrix one item at a time with agent-browser
+3. Serve        Detect port, start dev server, open it in the Codex Browser
+4. Execute      Work the matrix one item at a time in the Codex Browser
 5. Fix loop     On failure: fix -> add regression test -> commit -> continue
 6. Report       Write durable doc to docs/dogfood-reports/ (flows, matrix, fixes, learnings, verdict)
 ```
@@ -55,17 +49,17 @@ Parse the arguments you were invoked with: a PR number, a branch name, or blank 
    - **PR number:** the target *is the PR* — carry the number through every later step (trunk check, isolation, checkout). Read its head only for display (`gh pr view <number> --json headRefName,isCrossRepository`), but do **not** reduce it to a bare branch name: a fork PR's head can even be named `main`/`master`. Do not check out yet.
    - **Branch name:** the target is that branch.
    - **Blank:** the target is the current branch.
-2. **Refuse to run on the trunk — branch/blank targets only.** If a *branch-name or blank* target resolves to the trunk (`main`/`master`/the detected default), stop — there is no diff to dogfood. A **PR is always diffable** (it has a base), so this check never applies to a PR target; never refuse `/ce-dogfood <number>` just because the PR's head branch happens to be named `main`.
-3. **Decide isolation by what you're testing; let `ce-worktree` own the worktree mechanics.** Do not re-derive worktree detection or creation here — `ce-worktree` handles existing-isolation detection, the harness-native tool, attaching to a ref, and the "already checked out" constraint, and reports its decision back. The only call this skill makes is *whether to ask for isolation at all*:
+2. **Refuse to run on the trunk — branch/blank targets only.** If a *branch-name or blank* target resolves to the trunk (`main`/`master`/the detected default), stop — there is no diff to dogfood. A **PR is always diffable** (it has a base), so this check never applies to a PR target; never refuse `$ce-dogfood <number>` just because the PR's head branch happens to be named `main`.
+3. **Decide isolation by what you're testing; let `ce-worktree` own the worktree mechanics.** Do not re-derive worktree detection or creation here — `ce-worktree` handles existing Codex isolation, attaching to a ref, and the "already checked out" constraint, and reports its decision back. The only call this skill makes is *whether to ask for isolation at all*:
    - **Blank / current-branch target:** do **not** isolate — dogfood in place. You are already on the branch under test, the fix-commits belong on it, and git cannot check the same branch out in a second worktree anyway. (If you happen to already be in a worktree, that is fine — you are simply dogfooding here.)
-   - **A PR or a different named branch:** this is an existing ref to test without disturbing your current checkout. Offer isolation (platform's blocking question tool). On **yes**, invoke `ce-worktree` to isolate **that target ref** — it attaches a worktree to the ref (or, if already isolated, checks it out in place; or reports "already checked out at `<path>` — work there" when the ref is live elsewhere). Act on `ce-worktree`'s verdict; the primary checkout is never switched. On **no**, check the target out in place (`gh pr checkout <number>` for a PR, `git checkout <branch>` for a branch), confirming first if uncommitted changes would be disturbed.
+   - **A PR or a different named branch:** this is an existing ref to test without disturbing your current checkout. Read and follow [`references/codex-interaction.md`](references/codex-interaction.md), then offer isolation. On **yes**, invoke `ce-worktree` to isolate **that target ref** — it attaches a worktree to the ref (or, if already isolated, checks it out in place; or reports "already checked out at `<path>` — work there" when the ref is live elsewhere). Act on `ce-worktree`'s verdict; the primary checkout is never switched. On **no**, check the target out in place (`gh pr checkout <number>` for a PR, `git checkout <branch>` for a branch), confirming first if uncommitted changes would be disturbed.
 4. **Resume if a prior run exists.** Look for an existing report at `docs/dogfood-reports/*-<branch-slug>-dogfood.md` (see the branch-slug rule under Resumability). If one is found with unfinished scenarios, ask whether to resume it or start fresh. To resume, re-hydrate the task list from its matrix: `Pass`/`Fixed`/`Skipped` stay done; `Pending` and `in_progress` become the remaining auto-runnable work. The two `Blocked` states are **not** auto-runnable — `Blocked (needs human verify)` and `Blocked (human decision)` are waiting on a person, so surface them to the user and ask how to proceed rather than silently re-queuing them.
 
 ### Resumability (stop and return at any point)
 
 This workflow is designed to be interrupted and resumed. Two pieces of state make that safe:
 
-- **The task list** (the harness's task tool — `TaskCreate`/`TaskUpdate` on Claude Code, `update_plan` on Codex, or the equivalent elsewhere) is the live to-do — one task per matrix scenario. Mark each `in_progress` when you start it and `completed` only when it genuinely passes.
+- **The Codex plan** (`update_plan`) is the live to-do — one task per matrix scenario. Mark each `in_progress` when you start it and `completed` only when it genuinely passes.
 - **The report doc** at `docs/dogfood-reports/<YYYY-MM-DD>-<branch-slug>-dogfood.md` is the durable checkpoint that survives across sessions. `<branch-slug>` is the branch name lowercased with every run of non-alphanumeric characters (slashes included) collapsed to a single `-` (e.g. `feature/Foo_Bar` -> `feature-foo-bar`). **Create it as soon as the matrix exists (end of Phase 2) by instantiating `references/dogfood-report-template.md`** (read that template now if you haven't) so the checkpoint carries the template-owned section shape from the start — then fill in every scenario at `Pending`, and **update it incrementally** — after each scenario is judged and after each fix is committed — not only at the end. An interrupted run must leave a template-shaped checkpoint, not a bare matrix.
 
 Because tasks are session-scoped but the report doc is on disk, the report is the source of truth for resuming. Always keep the two in sync so a later run (or a teammate) can pick up exactly where this one stopped.
@@ -133,34 +127,20 @@ Walk each flowchart and turn every node and branch into one or more test scenari
 
 Map changed files to concrete routes (views -> their pages, components -> pages rendering them, layouts -> all pages, stylesheets -> visual regression on key pages) and attach those routes to the flows that exercise them.
 
-**Load the matrix as a task list** (the harness's task tool, as above), one task per scenario, so progress is tracked and nothing is skipped. Order tasks by flow, following the flowcharts, not by file.
+**Load the matrix into `update_plan`**, one task per scenario, so progress is tracked and nothing is skipped. Order tasks by flow, following the flowcharts, not by file.
 
 ### Phase 3: Detect Port and Start the Dev Server
 
 Determine the port (priority: explicit `--port` > a port explicitly stated in your in-context project instructions > `package.json` dev script > `.env*` `PORT=` > default `3000`). If a server is already listening on it, reuse it. Otherwise start the project's dev command (`bin/dev`, `rails server`, `npm run dev`, etc.) in the background and poll the port until it accepts connections before opening the browser. This skill is hands-off, so start the server automatically without asking — do not block on a confirmation.
 
-```bash
-agent-browser open "http://localhost:${PORT}"
-agent-browser snapshot -i
-```
+Open `http://localhost:${PORT}` in the Codex in-app Browser and inspect the rendered page before starting the matrix.
 
 ### Phase 4: Execute the Matrix
 
 Work the task list **one item at a time**. For each scenario, mark the task `in_progress`, then:
 
 1. **Document** what you're testing (the journey and the expected outcome).
-2. **Drive it** with agent-browser — navigate, snapshot for interactive refs, click, fill, submit, follow the journey to its real end state:
-
-   ```bash
-   agent-browser open "http://localhost:${PORT}/<route>"
-   agent-browser snapshot -i
-   agent-browser click @e1
-   agent-browser fill @e2 "value"
-   agent-browser screenshot "$(mktemp -d)/<scenario>.png"   # scratch dir, not the repo root
-   agent-browser errors      # check console/page errors
-   ```
-
-   Write transient screenshots to OS temp (e.g. `mktemp -d`), never the repo root. Only copy a screenshot into the report's location if you intend to embed it in the final report.
+2. **Drive it** with the Codex Browser — navigate, inspect visible and interactive state, click, fill, submit, and follow the journey to its real end state. Capture a screenshot when visual evidence materially helps and inspect console/network failures exposed by the Browser. Keep transient screenshots out of the repository; only save one beside the report when it will be embedded in that report.
 
 3. **Judge** both correctness and experience: right data, right destination, sensible content, no console errors, and does it feel aligned with the product?
 4. **Walk it as each persona.** Re-run the journey in your head from each primary persona's perspective (from Phase 1) and ask where they'd feel a **paper cut** — a small friction that wouldn't fail a functional test but degrades the experience: a confusing label, an extra click, an unexpected jump, a slow-feeling step, missing feedback, copy that doesn't match how that persona thinks. A scenario can be functionally `Pass` yet still carry paper cuts. Note each paper cut, which persona feels it, and its severity.

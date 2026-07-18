@@ -19,7 +19,7 @@ If `status` is `failed`, stop shipping and surface `reason`. If `degraded`, note
 
 Only when the caller reached this file **without** already running review (no review output in hand): invoke `ce-code-review` once, then proceed to apply. Do not invoke when the caller already ran review (e.g., ce-work shipping step 3a).
 
-Invoke the skill explicitly — do not treat a casual "review my changes" prompt as a substitute unless the harness routed it to `ce-code-review`.
+Load and follow `ce-code-review` explicitly; do not substitute a casual inline review.
 
 ```
 ce-code-review mode:agent plan:<plan-path> base:<merge-base-or-ref>
@@ -91,7 +91,7 @@ After eligibility filtering, **dispatch subagents for all remaining applicable f
 Use **only** when **all** of the following hold:
 
 - Exactly **one** eligible finding after JSON filtering, **and**
-- The orchestrator **already** has that file's relevant region in context from Phase 2 work this session (no new Read/Grep expedition)
+- The orchestrator **already** has that file's relevant region in context from Phase 2 work this session (no new filesystem search)
 
 Otherwise dispatch a subagent — even for a single finding. When unsure, dispatch.
 

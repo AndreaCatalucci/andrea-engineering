@@ -1,11 +1,11 @@
 ---
 name: ce-setup
-description: "Check Andrea Engineering health and repo-local config."
+description: "Check Andrea Engineering health and repo-local configuration. Use when diagnosing plugin setup, optional tool availability, or local configuration safety."
 ---
 
 # Andrea Engineering Setup
 
-Use Codex's blocking question tool when available. Otherwise present numbered choices in chat and wait. Never silently skip a consent gate or auto-configure.
+Before asking for consent or configuration input, read and follow [`references/codex-interaction.md`](references/codex-interaction.md).
 
 Check optional tool capabilities and repair repo-local configuration. Do not bulk-install optional dependencies.
 
@@ -20,7 +20,7 @@ if [ -f "$SKILL_DIR/scripts/check-health" ]; then bash "$SKILL_DIR/scripts/check
 
 If the script is unavailable, perform the inline equivalent:
 
-1. Check optional tools with `command -v`: `agent-browser`, `gh`, `jq`, `ast-grep`, `ffmpeg`.
+1. Check optional tools with `command -v`: `gh`, `jq`, `ast-grep`, `ffmpeg`.
 2. If inside a git repo, resolve the repo root with `git rev-parse --show-toplevel`.
 3. Check for obsolete `andrea-engineering.local.md` at the repo root.
 4. Check whether `.andrea-engineering/config.local.yaml` exists and, if it does, whether `git check-ignore -q .andrea-engineering/config.local.yaml` succeeds.

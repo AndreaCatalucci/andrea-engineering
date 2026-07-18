@@ -53,7 +53,7 @@ from datetime import datetime, timezone
 
 # Bump when the profile schema changes so a newer reader never reuses an
 # entry written under an older (narrower) schema.
-PROFILE_SCHEMA_VERSION = "1"
+PROFILE_SCHEMA_VERSION = "2"
 
 CACHE_ROOT = "/tmp/andrea-engineering/repo-profile"
 
@@ -126,19 +126,18 @@ _TOPOLOGY = {
 
 # Path prefixes whose contents shape the profile (conventions / CI / deploy).
 _INPUT_PREFIXES = (
-    ".cursor/", ".github/workflows/", ".circleci/",
+    ".github/workflows/", ".circleci/",
     "terraform/", "k8s/", "kubernetes/",
 )
 
 # Root-level instruction/doc files cached in the profile. Matched ONLY at the
-# repo root — subdirectory-scoped instruction files (e.g. nested CLAUDE.md /
-# AGENTS.md) are NOT cached; consumers re-glob those fresh, so a subdir change
+# repo root — subdirectory-scoped `AGENTS.md` files are NOT cached; consumers
+# re-glob those fresh, so a subdir change
 # must not invalidate the root profile.
 _ROOT_DOCS = {
-    "AGENTS.md", "CLAUDE.md", "GEMINI.md",
+    "AGENTS.md",
     "CONCEPTS.md", "STRATEGY.md",
     "ARCHITECTURE.md", "README.md", "CONTRIBUTING.md",
-    ".cursorrules",  # legacy root-level Cursor rules (the profiler reads it)
 }
 
 # Runtime / tool version selectors that pin a language or tool version OUTSIDE

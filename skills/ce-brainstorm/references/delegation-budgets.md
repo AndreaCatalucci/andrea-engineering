@@ -6,4 +6,4 @@ Read this only when dispatching the conditional Deep grounding scout, claim veri
 - **Claim verifier:** about 15 targeted reads; return only confirmed/refuted/unverifiable per claim with evidence.
 - **Slack researcher:** follow its reference's search and output caps.
 
-Keep dialogue, approaches, synthesis, and plan authoring in the main conversation. If delegation is unavailable, perform the work inline with the same budget.
+Keep dialogue, approaches, synthesis, and plan authoring in the main conversation. Dispatch bounded research with `spawn_agent` and queue work when all Codex agent slots are occupied.

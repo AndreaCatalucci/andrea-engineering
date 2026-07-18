@@ -1,6 +1,6 @@
 ---
 name: ce-test-xcode
-description: "Build and test iOS apps on simulator with XcodeBuildMCP."
+description: "Build and test iOS apps on a simulator with XcodeBuildMCP. Use when asked to compile, launch, or verify an iOS project or affected test targets."
 ---
 
 # Xcode Test Skill
@@ -18,11 +18,7 @@ Build, install, and test iOS apps on the simulator using XcodeBuildMCP. Captures
 
 ### 0. Verify XcodeBuildMCP is Available
 
-Check that the XcodeBuildMCP MCP server is connected by calling its `list_simulators` tool.
-
-MCP tool names vary by platform:
-- Claude Code: `mcp__xcodebuildmcp__list_simulators`
-- Other platforms: use the equivalent MCP tool call for the `XcodeBuildMCP` server's `list_simulators` method
+Check that the XcodeBuildMCP server is connected in Codex by calling its `list_simulators` tool from the available MCP tools.
 
 If the tool is not found or errors, inform the user they need to add the XcodeBuildMCP MCP server:
 
@@ -35,7 +31,7 @@ Install via Homebrew:
 Or via npx (no global install needed):
   npx -y xcodebuildmcp@latest mcp
 
-Then add "XcodeBuildMCP" as an MCP server in your agent configuration
+Then add XcodeBuildMCP as an MCP server in Codex
 and restart your agent.
 ```
 
@@ -107,7 +103,7 @@ Pause for human input when testing touches flows that require device interaction
 | Location | "Allow location access and verify map updates" |
 | SwiftUI Text links | "Please tap on [element description] manually — automated taps cannot trigger inline text links" |
 
-Ask the user using the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension). Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question:
+Read and follow [`references/codex-interaction.md`](references/codex-interaction.md), then ask:
 
 ```
 Human Verification Needed
@@ -192,13 +188,13 @@ After testing:
 
 ```bash
 # Test with default scheme
-/ce-test-xcode
+$ce-test-xcode
 
 # Test specific scheme
-/ce-test-xcode MyApp-Debug
+$ce-test-xcode MyApp-Debug
 
 # Test after making changes
-/ce-test-xcode current
+$ce-test-xcode current
 ```
 
 ## Integration with ce-code-review

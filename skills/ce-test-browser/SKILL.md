@@ -1,32 +1,28 @@
 ---
 name: ce-test-browser
-description: Run browser tests for pages affected by the current branch or PR.
+description: "Run browser tests for pages affected by the current branch or PR. Use when asked to verify changed web flows in Codex's in-app browser; not for broad autonomous dogfooding."
 ---
 
 # Browser Test Skill
 
-Run end-to-end browser tests on pages affected by a PR or branch using the best approved browser driver available in the active harness.
+Run end-to-end browser tests on pages affected by a PR or branch using Codex's in-app browser.
 
 ## Modes
 
-- **Manual (default):** the user controls the dev server. When the fallback driver is `agent-browser`, ask whether to run headed or headless.
-- **Pipeline (`mode:pipeline`):** invoked by LFG or another automated runner. The run is unattended — never block on a question. Read `references/pipeline-orchestration.md` from this skill's directory and follow it; it overrides the free-port scan (step 4), dev-server startup (step 5), and visibility prompts (step 6). It still uses the preferred port that step 4 computes.
+- **Manual (default):** the user controls the dev server. Verify it is running before browser work.
+- **Pipeline (`mode:pipeline`):** invoked by LFG or another automated runner. The run is unattended — never block on a question. Read `references/pipeline-orchestration.md` from this skill's directory and follow it; it overrides manual port handling (step 4) and dev-server verification (step 5). It still uses the preferred port that step 4 computes.
 
-## Browser Driver Policy
+## Codex Browser Policy
 
-Select the driver before the first browser action:
+Before the first browser action, load and follow the `browser:control-in-app-browser` skill. Use its Codex-owned in-app browser for navigation, rendered and interactive state, clicks, form input, screenshots, and console inspection.
 
-1. **Prefer a host-native integrated browser.** Use a browser-control surface embedded in or directly owned by the active harness when it can navigate local URLs, inspect rendered and interactive state, click/fill/press, capture screenshots, and inspect console errors. A separately configured browser extension or integration is not host-native. Load and follow the selected capability's own instructions before browser work.
-2. **Otherwise fall back to `agent-browser`.** Read `references/agent-browser-driver.md` before running any command.
-3. **Do not introduce a third browser stack.** Never install or substitute standalone Playwright, Puppeteer, a separately configured browser extension or MCP, or other ad hoc browser automation. A Playwright API exposed inside the selected host-native browser remains host-native; it is not standalone Playwright.
-
-Use one driver for the entire run. A selected host-native driver may fall back to `agent-browser` only if initialization fails before the first route is tested. After testing begins, do not mix driver sessions, element references, screenshots, or authentication state.
+Use one in-app browser session for the entire run. Do not switch to another browser stack. If the Codex browser cannot initialize or reach a required local URL, report the exact failure and stop browser testing.
 
 ## Workflow
 
-### 1. Select the Browser Driver
+### 1. Initialize the Codex Browser
 
-Apply the Browser Driver Policy above and record the selected driver. This also requires a git repository with changes to test.
+Load `browser:control-in-app-browser` and initialize one in-app browser session. This workflow also requires a git repository with changes to test.
 
 ### 2. Determine Test Scope
 
@@ -50,7 +46,7 @@ git diff --name-only main...[branch]
 Map each changed file to the route(s) that render it, then build the list of URLs to test. The table below is a starting point of common patterns, not an exhaustive rule set — apply judgment for the project's actual layout:
 
 | File Pattern | Route(s) |
-|-------------|----------|
+| --- | --- |
 | `app/views/users/*` | `/users`, `/users/:id`, `/users/new` |
 | `app/controllers/settings_controller.rb` | `/settings` |
 | `app/javascript/controllers/*_controller.js` | Pages using that Stimulus controller |
@@ -88,7 +84,7 @@ Manual mode uses this preferred port as-is — the user controls their own serve
 
 ### 5. Verify the Dev Server Is Running
 
-Confirm the server is up before asking the headed/headless question — a manual run with no server stops here, so asking first would waste the question.
+Confirm the server is up before opening the Codex browser. A manual run with no server stops here.
 
 ```bash
 if lsof -i ":${PORT}" -sTCP:LISTEN -t >/dev/null 2>&1; then
@@ -103,28 +99,15 @@ else
 fi
 ```
 
-In pipeline mode, do not stop here — `references/pipeline-orchestration.md` auto-starts the server in the background instead.
+In pipeline mode, do not stop here — `references/pipeline-orchestration.md` starts the server in a persistent Codex terminal session instead.
 
-### 6. Set Browser Visibility and Verify the Root
+### 6. Open the Codex Browser and Verify the Root
 
-Visibility is independent from unattended execution:
-
-- **Host-native integrated browser:** keep its normal integrated surface visible and non-blocking so the user can watch progress when useful. Do not repeatedly steal focus as routes change. This applies in both manual and pipeline modes.
-- **`agent-browser` fallback, pipeline mode:** run headless without asking.
-- **`agent-browser` fallback, manual mode:** ask the user whether to run headed or headless using the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension). Fall back to presenting options in chat only when no blocking tool exists in the harness or the call errors. Never silently skip the question:
-
-  ```
-  Do you want to watch the browser tests run?
-
-  1. Headed (watch) - Opens a visible browser window
-  2. Headless (faster) - Runs without a visible window
-  ```
-
-Then use the selected driver to navigate to `http://localhost:<port>`, capture its rendered or interactive state, and confirm the root is served before iterating.
+Navigate the Codex in-app browser to `http://localhost:<port>`, inspect fresh rendered or interactive state, and confirm the root is served before iterating. Keep the integrated surface non-blocking and do not repeatedly steal focus as routes change. This applies in both manual and pipeline modes.
 
 ### 7. Test Each Affected Page
 
-For each affected route, use the selected driver to navigate and capture fresh rendered or interactive state.
+For each affected route, use the Codex in-app browser to navigate and capture fresh rendered or interactive state.
 
 **Verify key elements:**
 - Page title/heading present
@@ -133,23 +116,23 @@ For each affected route, use the selected driver to navigate and capture fresh r
 - Forms have expected fields
 - No new console errors attributable to the tested flow
 
-**Test critical interactions:** derive locators or element references from the selected driver's latest inspected state, perform the click/fill/press action, then inspect the resulting state. Do not guess selectors or reuse stale references.
+**Test critical interactions:** derive locators or element references from the latest inspected browser state, perform the click/fill/press action, then inspect the resulting state. Do not guess selectors or reuse stale references.
 
-**Take screenshots:** capture viewport and full-page evidence when the selected driver supports it. Materialize screenshots as local artifacts when a later workflow or report needs file paths; otherwise in-app evidence is sufficient.
+**Take screenshots:** capture viewport and full-page evidence with the in-app browser. Materialize screenshots as local artifacts when a later workflow or report needs file paths; otherwise in-app evidence is sufficient.
 
 ### 8. Human Verification (When Required)
 
 Pause for human input when testing touches flows that require external interaction. **Pipeline mode:** do not pause — log each such flow as Skip with the reason and continue.
 
 | Flow Type | What to Ask |
-|-----------|-------------|
+| --- | --- |
 | OAuth | "Please sign in with [provider] and confirm it works" |
 | Email | "Check your inbox for the test email and confirm receipt" |
 | Payments | "Complete a test purchase in sandbox mode" |
 | SMS | "Verify you received the SMS code" |
 | External APIs | "Confirm the [service] integration is working" |
 
-Ask the user (using the platform's question tool, or present numbered options and wait):
+Read and follow [`references/codex-interaction.md`](references/codex-interaction.md), then ask:
 
 ```
 Human Verification Needed
@@ -168,10 +151,10 @@ Did it work correctly?
 When a test fails (**pipeline mode:** do not ask how to proceed — capture the error screenshot and repro steps, log the failure, and continue):
 
 1. **Document the failure:**
-   - Capture a screenshot of the error state with the selected driver
+   - Capture a screenshot of the error state with the Codex in-app browser
    - Note the exact reproduction steps
 
-2. **Ask the user how to proceed:**
+2. **Read [`references/codex-interaction.md`](references/codex-interaction.md), then ask the user how to proceed:**
 
    ```
    Test Failed: [route]
@@ -200,7 +183,7 @@ After all tests complete, present a summary:
 ### Pages Tested: [count]
 
 | Route | Status | Notes |
-|-------|--------|-------|
+| --- | --- | --- |
 | `/users` | Pass | |
 | `/settings` | Pass | |
 | `/dashboard` | Fail | Console error: [msg] |
@@ -221,20 +204,13 @@ After all tests complete, present a summary:
 
 ## Quick Usage Examples
 
-```bash
-# Test current branch changes (auto-detects port)
-/ce-test-browser
-
-# Test specific PR
-/ce-test-browser 847
-
-# Test specific branch
-/ce-test-browser feature/new-dashboard
-
-# Test on a specific port
-/ce-test-browser --port 5000
+```text
+Run $ce-test-browser for the current branch.
+Run $ce-test-browser for PR 847.
+Run $ce-test-browser for branch feature/new-dashboard.
+Run $ce-test-browser for the current branch on port 5000.
 ```
 
-## Driver Reference
+## Codex Browser Reference
 
-When `agent-browser` is selected as the fallback, read `references/agent-browser-driver.md` from this skill's directory before running its commands. Host-native drivers follow their harness-provided instructions instead.
+The `browser:control-in-app-browser` skill is authoritative for Codex browser operation. Reload it when browser-tool behavior or available actions are unclear.

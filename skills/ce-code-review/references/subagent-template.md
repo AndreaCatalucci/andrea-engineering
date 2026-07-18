@@ -1,6 +1,6 @@
-# Sub-agent Prompt Template
+# Subagent Prompt Template
 
-This template is used by the orchestrator to spawn each reviewer sub-agent. Variable substitution slots are filled at spawn time.
+This template is used by the orchestrator to spawn each reviewer subagent. Variable substitution slots are filled at spawn time.
 
 ---
 
@@ -22,7 +22,7 @@ You produce up to two outputs depending on whether a run ID was provided:
 
 1. **Artifact file (when run ID is present).** If a Run ID appears in <review-context> below, WRITE your full analysis (all schema fields, including why_it_matters, evidence, and suggested_fix) as JSON to:
    /tmp/andrea-engineering/ce-code-review/{run_id}/{reviewer_name}.json
-   This is the ONE write operation you are permitted to make. Use the platform's file-write tool.
+   This is the ONE write operation you are permitted to make. Use `apply_patch`.
    If the write fails, continue -- the compact return still provides everything the merge needs.
    If no Run ID is provided (the field is empty or absent), skip this step entirely -- do not attempt any file write.
 
@@ -131,7 +131,7 @@ False-positive categories to actively suppress. Do NOT emit a finding when any o
 - **Suggestions that restate what the code already does in different words.** "Consider extracting this into a helper" when the code is already a small helper, "consider adding a guard" when a guard one line up already enforces it.
 - **Generic "consider adding" advice without a concrete failure mode.** If you cannot name what breaks, the finding is not actionable. Either find the failure mode or suppress.
 - **Issues with a relevant lint-ignore comment.** Code that carries an explicit lint disable comment for the rule you are about to flag (`eslint-disable-next-line no-unused-vars`, `# rubocop:disable Style/StringLiterals`, `# noqa: E501`, etc.) — suppress unless the suppression itself violates a project-standards rule that explicitly forbids disabling that lint for this code shape. The author already chose to suppress; re-flagging it via a different reviewer creates noise and ignores their decision.
-- **General code-quality concerns not codified in CLAUDE.md / AGENTS.md.** "This file is getting long," "this method has too many parameters," "this is hard to read" — without a project-standards rule to anchor the concern, these are subjective and waste reviewer time. If the project explicitly bans long files or sets a parameter-count limit in its standards, that is a project-standards finding; otherwise suppress.
+- **General code-quality concerns not codified in `AGENTS.md`.** "This file is getting long," "this method has too many parameters," "this is hard to read" — without a project-standards rule to anchor the concern, these are subjective and waste reviewer time. If the project explicitly bans long files or sets a parameter-count limit in its standards, that is a project-standards finding; otherwise suppress.
 - **Speculative future-work concerns with no current signal.** "This might break under load," "what if the requirements change," "this could be hard to test later" — not findings unless the diff introduces concrete evidence the concern is reachable now.
 
 **Advisory observations — route to advisory autofix_class, do not force a decision.** If the honest answer to "what actually breaks if we do not fix this?" is "nothing breaks, but…", the finding is advisory. Set `autofix_class: advisory` and `confidence: 50` so synthesis routes the finding to a soft bucket rather than surfacing it as a primary action item. Do not suppress — the observation may have value; it just does not warrant user judgment. Typical advisory shapes: design asymmetry the PR improves but does not fully resolve, opportunity to consolidate two similar helpers when neither is broken, residual risk worth noting in the report.
@@ -180,7 +180,7 @@ Changed files: {file_list}
 Diff:
 {diff}
 
-(For a large staged review, `{file_list}` and `{diff}` may be **file paths** rather than inline content. When a value above is a path, Read that file to get the full list/diff before reviewing — never treat the path string itself as the content to review.)
+(For a large staged review, `{file_list}` and `{diff}` may be **file paths** rather than inline content. When a value above is a path, read that file before reviewing — never treat the path string itself as the content to review.)
 </review-context>
 ```
 

@@ -8,7 +8,7 @@
 
 This content is loaded when a synthesis-summary phase fires in ce-plan. There are two variants — they share structure but differ in timing and content focus:
 
-- **Solo variant** (Phase 0.7): fires after Phase 0.4 bootstrap and Phase 0.6 depth classification, before Phase 1 research begins. Catches scope misinterpretation before sub-agent dispatch is spent. Full breadth — problem frame, intended behavior, success criteria, in/out scope.
+- **Solo variant** (Phase 0.7): fires after Phase 0.4 bootstrap and Phase 0.6 depth classification, before Phase 1 research begins. Catches scope misinterpretation before subagent dispatch is spent. Full breadth — problem frame, intended behavior, success criteria, in/out scope.
 - **Brainstorm-sourced variant** (Phase 5.1.5): fires after Phase 1 research, before Phase 5.2 plan-write. Focuses on plan-time decisions (which files/modules to touch, which patterns extended vs. introduced new, test scope, refactor scope). Brainstorm-validated WHAT is assumed and not re-stated.
 
 Both variants share the two-stage shape, the keep test for call-outs, soft-cut behavior, and the doc-shape routing. In non-interactive (headless) mode, both compose the internal draft and skip stage 2 — the user-facing compression is moot when there is no synchronous user. The internal draft dissolves into the plan body the same way, with Inferred bets routing to a `## Assumptions` section. See "Headless mode (shared)" below for the full routing.
@@ -243,7 +243,7 @@ Each guard is an explicit conditional in SKILL.md, not implicit. R2 solo does NO
 
 **Counter-warning for rich-context invocations.** When the inference source is *not* just Phase 0.4 bootstrap — e.g., a prior in-conversation validation agent, completed sibling work units earlier in the same session, or a planning artifact already in the conversation — the temptation is to dump that material into call-outs verbatim. The granularity rules tighten in this case, not loosen: the agent has more material to compress, not more material to expose. A bet that's already been validated upstream is **Stated** (internal), not Inferred (internal); a bet whose specifics belong in plan-body is named at decision-level in the call-out regardless of how much detail upstream context provided. If recent turns produced detailed code, file paths, or research artifacts, expect the internal draft to over-share and compress proactively before stage 2.
 
-**Why pre-research, not pre-write**: research effort would be wasted if scope is wrong. Catching scope errors before sub-agent dispatch (Phase 1.1's repo-research-analyst, learnings-researcher, etc.) saves token and time cost.
+**Why pre-research, not pre-write**: research effort would be wasted if scope is wrong. Catching scope errors before subagent dispatch (Phase 1.1's repo-research-analyst, learnings-researcher, etc.) saves token and time cost.
 
 ### Stage 2 template (solo)
 
@@ -263,7 +263,7 @@ Based on your request, here's the scope I'm proposing to plan against:
 **Call outs:** (omit this header when zero forks survived the keep test)
 - [decision-level fork in 1-2 lines: name the choice and optional one-clause trade-off in parens. NO multi-sentence rationale, NO "my default is X" pitch — those belong in Key Technical Decisions in the plan body, not the synthesis]
 
-Confirm and I'll proceed to research, drawing on this scope. (You can also redirect to /ce-brainstorm if this is bigger than you initially thought — I'll stop here and load it for you.)
+Confirm and I'll proceed to research, drawing on this scope. (You can also redirect to $ce-brainstorm if this is bigger than you initially thought — I'll stop here and load it for you.)
 ```
 
 **Auto-proceed template (fires only for Lightweight with zero call-outs):**
@@ -336,18 +336,16 @@ Track which call-outs the user touched per round. The soft-cut blocking question
 
 **Identity across rounds is by decision dimension, not surface wording.** A revision may cause stage 2 to re-derive — the same underlying fork can come back rephrased, merged with another call-out, or split into two. "Same call-out" means the same decision being made (e.g., "where does the scan run" stays one decision whether it's worded as "promote scans the working-dir snapshot" or "scan target: pre-copy working dir"). When a re-cut collapses multiple prior call-outs into one, the new combined call-out inherits the "touched" status of any of its constituents — soft-cut fires if any of those underlying decisions was already revised once before.
 
-When the soft-cut fires, use the platform's blocking question tool with two options:
+When the soft-cut fires, ask through the [shared codex-interaction contract](codex-interaction.md) with two options:
 
 - `Proceed and continue to [research / plan-write]`
 - `Hold off — keep discussing before continuing`
-
-Fall back to numbered list in chat only when no blocking tool exists or the call errors. Never silently skip.
 
 ---
 
 ## Headless mode (shared)
 
-When the skill is invoked from an automated workflow such as LFG or any `disable-model-invocation` context, the skill runs in non-interactive mode (no synchronous user). The artifact is read by downstream skills (ce-doc-review, ce-work) and human reviewers (PR review).
+When the skill is invoked from an automated workflow such as LFG or another headless context, it runs in non-interactive mode. The artifact is read by downstream skills (`ce-doc-review`, `ce-work`) and human reviewers.
 
 **Stage 2 is moot in headless mode.** Compose the internal draft (stage 1) as usual, but skip the chat-time compression — there is no synchronous user to confirm to, no call-outs to derive, no auto-proceed announcement. Route the internal draft directly into the plan body via the doc-shape table below.
 
@@ -374,8 +372,8 @@ This restores the audit visibility the original design intended (un-validated be
 
 If the user response indicates they're in the wrong skill or want a different workflow:
 
-- **Solo variant**: common redirects include "this is bigger than I thought — let me brainstorm first" (suggest `/ce-brainstorm`), "this is just a fix, no plan needed" (suggest `/ce-work`), or "I need to investigate first" (suggest `/ce-debug`).
-- **Brainstorm-sourced variant**: less common, but possible — "actually this scope is wrong, take it back to brainstorm" (suggest `/ce-brainstorm` to revise the upstream doc).
+- **Solo variant**: common redirects include "this is bigger than I thought — let me brainstorm first" (suggest `$ce-brainstorm`), "this is just a fix, no plan needed" (suggest `$ce-work`), or "I need to investigate first" (suggest `$ce-debug`).
+- **Brainstorm-sourced variant**: less common, but possible — "actually this scope is wrong, take it back to brainstorm" (suggest `$ce-brainstorm` to revise the upstream doc).
 
 In either case: stop ce-plan, suggest the alternative skill, offer to load it in-session. Don't push back or argue — the user's redirect signal is the deliberate choice.
 

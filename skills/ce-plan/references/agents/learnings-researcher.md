@@ -25,7 +25,7 @@ If `CONCEPTS.md` does not exist, skip this step entirely and proceed to Step 1.
 
 The `docs/solutions/` directory contains documented learnings with YAML frontmatter. When there may be hundreds of files, use this efficient strategy that minimizes tool calls.
 
-> **Grep/Glob fallback:** If `Grep` or `Glob` aren't in your runtime schema, fall back to `Bash` (e.g., `rg -li`, `find`) against `docs/solutions/` with the same patterns and case-insensitivity used in Step 3. Prefer the native tools when present.
+Use `rg --files docs/solutions` for discovery and `rg -li` for content filtering, with the patterns and case-insensitivity used in Step 3.
 
 ### Step 1: Extract Keywords from the Work Context
 

@@ -1,9 +1,9 @@
 ---
 name: ce-promote
-description: "Draft launch or promotion copy for a shipped feature."
+description: "Draft launch or promotion copy for a shipped feature. Use when the user asks for release announcements, social posts, launch copy, or channel-specific promotion."
 ---
 
-# /ce-promote
+# $ce-promote
 
 Turn a feature that just shipped into copy-pasteable, user-facing announcement copy — right inside the engineering workflow.
 
@@ -16,10 +16,10 @@ After you ship, the messaging shouldn't wait for a separate marketing pass. `ce-
 ## Usage
 
 ```bash
-/ce-promote                                   # Derive what shipped from context, draft defaults
-/ce-promote [free-form description]           # You describe what shipped
-/ce-promote a tweet thread and a LinkedIn post   # Request specific channels
-/ce-promote 3 tweet options for the new export feature
+$ce-promote                                   # Derive what shipped from context, draft defaults
+$ce-promote [free-form description]           # You describe what shipped
+$ce-promote a tweet thread and a LinkedIn post   # Request specific channels
+$ce-promote 3 tweet options for the new export feature
 ```
 
 ## Phase 1 — Figure out what shipped
@@ -69,13 +69,13 @@ Never let a Spiral failure, timeout, or odd output block or slow the skill — w
 
 When Spiral isn't ready, offer to set it up **once** — unless the user previously opted out. The point is one proactive nudge, never a recurring one, and never a blocker: a decline always proceeds to Path B. **Any dismissal records the opt-out**, so a single first-run decline stops the offer for good in this repo — the user is never asked twice.
 
-Read `references/spiral-cli.md` for the exact setup prompt (built with the platform's blocking-question tool), the connect/install steps, and how the opt-out is recorded so later runs skip this. In short:
+Read `references/spiral-cli.md` for the exact setup prompt, asked through the [shared codex-interaction contract](references/codex-interaction.md), plus the connect/install steps and how the opt-out is recorded so later runs skip this. In short:
 
 - **Unauthed** → the agent runs `spiral login --json` (CLI >= 1.8.0; non-blocking, the API key never passes through the agent). On `status: already_authenticated` → use Path A. On `status: pending` → surface the `auth_url`, the user approves in their browser, then poll `spiral auth status --json` until `authenticated: true` → Path A. Never have the user paste a key into chat. (Older CLI without agent login → suggest `npm i -g @every-env/spiral-cli@latest`, or have the user run `spiral login` themselves.) Escape hatch: "or the agent can just draft directly, without Spiral's personalization and humanization."
 - **Absent** → guide the user to install + connect in one step via the pairing-code command from Settings → Connect an Agent.
 - **Decline** → record the opt-out (best-effort) and go to Path B.
 
-Skip Path 0 entirely — straight to Path B — when the opt-out is already recorded, or when running headless / non-interactive (no human to answer). If a human is present but no blocking-question tool is available, do **not** skip — fall back to a numbered list of the two options in chat and wait for a reply (per the Ask section of `references/spiral-cli.md`).
+Skip Path 0 entirely — straight to Path B — when the opt-out is already recorded, or when running headless / non-interactive (no human to answer). Otherwise use the shared interaction contract; do not silently skip the setup choice.
 
 ### Path A — Spiral ready (voice-matched)
 
@@ -129,9 +129,9 @@ Show every draft as a clean, copy-pasteable block, labeled by channel. For each:
 ## Examples
 
 **Single-channel variations — "3 tweet options":**
-> User: `/ce-promote 3 tweet options for the new one-click CSV export`
+> User: `$ce-promote 3 tweet options for the new one-click CSV export`
 > → Summarize the value. Spiral path: `spiral write "3 tweet options for one-click CSV export" --instant --num-drafts 3 --json` (no cue words). No-Spiral path: write 3 distinct tweets directly. Present all three.
 
 **Multi-channel set — "a campaign across X, LinkedIn, and email":**
-> User: `/ce-promote draft a launch across X, LinkedIn, and email`
+> User: `$ce-promote draft a launch across X, LinkedIn, and email`
 > → Spiral path: `spiral write "announcing one-click CSV export — a launch across X, LinkedIn, and email" --instant --json` returns a set of drafts per channel (Spiral decides the count — often several), each carrying its `channel`. (`--num-drafts` ignored here.) No-Spiral path: draft one X post, one LinkedIn post, one email directly. Present every returned draft, grouped by channel.

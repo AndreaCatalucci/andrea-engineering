@@ -15,7 +15,7 @@ autonomously with lfg`, and the lfg option is also hidden for non-software
 brainstorms (`execution` other than `code`). Count the visible options for the
 current state and choose the rendering mode accordingly:
 
-- **Up to three visible options:** use `request_user_input` when available.
+- **Up to three visible options:** use the [shared codex-interaction contract](codex-interaction.md).
 - **More than three options, or the tool is unavailable:** render a numbered list in chat and wait. Do not trim legitimate destinations. Include: "Pick a number or describe what you want."
 
 Never silently skip the question.
@@ -88,19 +88,12 @@ above the menu. Do not show the closing summary yet.
 
 **If user selects "Ship it autonomously with `lfg`":**
 
-Immediately invoke the `lfg` skill in the current session through Codex's
-skill-invocation primitive, passing the unified plan artifact path as its
-argument so `lfg`'s `ce-plan` step enriches *this* requirements-only artifact in
-place rather than bootstrapping a new plan. `lfg` then owns the full pipeline
-autonomously — plan, implement (`ce-work` in `return-to-caller` mode), simplify,
-independent code review and applied fixes, commit/push/open PR, and CI watch to
-green. Do not also start a `/goal` or load `ce-work` directly — `lfg`
-orchestrates them. Unlike a goal tool, `lfg` is host-agnostic: it works wherever
-skills run (plus `git`/`gh` for the PR/CI tail, which it guards when absent).
-
-Where the host exposes no skill-invocation primitive, print the `lfg <plan-path>`
-invocation for the user to run and note that it will plan, build, review, and
-open a PR from this artifact.
+Load and follow the Codex `lfg` skill immediately, passing the unified plan
+artifact path so its `ce-plan` step enriches *this* requirements-only artifact
+in place rather than bootstrapping a new plan. `lfg` then owns the full pipeline:
+plan, implement (`ce-work` in `return-to-caller` mode), simplify, independently
+review and apply fixes, commit, push, open the PR, and watch CI to green. Do not
+load `ce-work` directly; `lfg` orchestrates it.
 
 Do not print the closing summary first.
 
@@ -124,7 +117,7 @@ the lfg software gate, or residual findings on account of Proof).
 
 If the upload fails (network error, Proof API down), retry once after a short wait. If it still fails, tell the user the upload didn't succeed and briefly explain why, then return to the handoff options — don't leave them wondering why the option did nothing.
 
-**If user selects "Open in browser":** Display the absolute path to the `.html` unified plan. Use Codex's in-app browser when available; otherwise let the user open the path. Then return to the handoff options.
+**If user selects "Open in browser":** Load `browser:control-in-app-browser`, display the absolute path to the `.html` unified plan in Codex's in-app browser, then return to the handoff options.
 
 **If the user indicates they're finished** (says "done"/"that's all", or dismisses the menu without picking an option): display the closing summary (see 4.3) and end the turn.
 

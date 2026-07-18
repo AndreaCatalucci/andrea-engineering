@@ -10,7 +10,7 @@ Before analyzing the spec in isolation, search the codebase for context. This pr
 
 This context shapes every subsequent phase. Gaps are only gaps if the codebase doesn't already handle them.
 
-> **Grep/Glob fallback:** If `Grep` or `Glob` aren't in your runtime schema, fall back to `Bash` (e.g., `rg -li`, `find`) with the same patterns and case-insensitivity as Phase 1. Prefer the native tools when present.
+Use `rg --files` for file discovery and `rg -li` for content search, preserving Phase 1's patterns and case-insensitivity.
 
 ## Phase 2: Map User Flows
 

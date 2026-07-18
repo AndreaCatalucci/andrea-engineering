@@ -1,6 +1,6 @@
 # SvelteKit dev-server recipe (auto-detect fallback)
 
-Loaded when `detect-project-type.sh` returns `sveltekit` and there is no `.claude/launch.json` to consult.
+Loaded when `detect-project-type.sh` returns `sveltekit`.
 
 ## Signature
 
@@ -32,24 +32,6 @@ Prefer the package manager indicated by the lockfile:
 ## Port
 
 Default: `5173` (inherited from Vite). SvelteKit respects `--port <port>` flag and Vite's `server.port` config in `vite.config.ts`. Overrides follow the cascade in `references/dev-server-detection.md`.
-
-## Stub generation
-
-```json
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "SvelteKit dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 5173
-    }
-  ]
-}
-```
-
-Substitute the resolved package manager (`npm` / `pnpm` / `yarn` / `bun`) and port.
 
 ## Common gotchas
 

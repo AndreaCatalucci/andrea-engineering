@@ -1,575 +1,196 @@
 #!/usr/bin/env python3
-"""Extract the conversation skeleton from a Claude Code, Codex, Cursor, or Pi JSONL session file.
+"""Extract a compact conversation skeleton from a current Codex JSONL session.
 
 Usage:
-  cat <session.jsonl> | python3 extract-skeleton.py
-  cat <session.jsonl> | python3 extract-skeleton.py --output PATH
+  python3 extract-skeleton.py < session.jsonl
+  python3 extract-skeleton.py --output PATH < session.jsonl
 
-Auto-detects platform (Claude Code, Codex, Cursor, or Pi) from the JSONL structure.
-Extracts:
-  - User messages (text only, no tool results)
-  - Assistant text (no thinking/reasoning blocks)
-  - Collapsed tool call summaries (consecutive same-tool calls grouped)
-
-Consecutive tool calls of the same type are collapsed:
-  3+ Read calls -> "[tools] 3x Read (file1, file2, +1 more) -> all ok"
-Codex call/result pairs are deduplicated (only the result with status is kept).
-
-When --output PATH is given, the extracted skeleton is written to PATH and
-stdout receives only a one-line JSON status (_meta with wrote/bytes/stats).
-This lets callers route bulk content to a scratch file without round-tripping
-extraction bytes through orchestrator tool results.
-
-Without --output, extracted content goes to stdout and ends with a _meta line.
+The skeleton includes user messages, assistant output text, and collapsed tool
+summaries. Reasoning and tool output are intentionally omitted.
 """
+
 import argparse
 import io
+import json
 import os
 import sys
-import json
-import re
 
-parser = argparse.ArgumentParser(add_help=True)
+
+parser = argparse.ArgumentParser()
 parser.add_argument(
     "--output",
     metavar="PATH",
-    help="Write extracted skeleton to PATH instead of stdout. Stdout receives a one-line _meta status.",
+    help="Write the skeleton to PATH and emit only status on stdout.",
 )
 args = parser.parse_args()
 
-# Capture-and-redirect when --output is set: prints in the rest of the script
-# go to the buffer; at the end the buffer is written to PATH and a status
-# line is emitted to the real stdout.
-_original_stdout = sys.stdout
+original_stdout = sys.stdout
 if args.output:
     sys.stdout = io.StringIO()
 
-stats = {"lines": 0, "parse_errors": 0, "user": 0, "assistant": 0, "tool": 0, "summary": 0}
-
-# Claude Code wrapper tags to strip from user message content.
-# Strip entirely (tag + content): framework noise and raw command output.
-# Strip tags only (keep content): command-message, command-name, command-args, user_query.
-_STRIP_BLOCK = re.compile(
-    r"<(?:task-notification|local-command-caveat|local-command-stdout|local-command-stderr|system-reminder)[^>]*>.*?</(?:task-notification|local-command-caveat|local-command-stdout|local-command-stderr|system-reminder)>",
-    re.DOTALL,
-)
-_STRIP_TAG = re.compile(
-    r"</?(?:command-message|command-name|command-args|user_query)[^>]*>"
-)
+stats = {
+    "lines": 0,
+    "parse_errors": 0,
+    "user": 0,
+    "assistant": 0,
+    "tool": 0,
+}
+calls = {}
+completed_tools = []
 
 
-def clean_text(text):
-    """Strip framework wrapper tags from message text (Claude and Cursor)."""
-    text = _STRIP_BLOCK.sub("", text)
-    text = _STRIP_TAG.sub("", text)
-    text = re.sub(r"\n{3,}", "\n\n", text).strip()
-    return text
+def output_text(output):
+    if isinstance(output, str):
+        return output
+    if not isinstance(output, list):
+        return ""
+    return "\n".join(
+        block.get("text", "")
+        for block in output
+        if isinstance(block, dict) and isinstance(block.get("text"), str)
+    )
 
-# Buffer for pending tool entries: [{"ts", "name", "target", "status"}]
-pending_tools = []
+
+def call_target(payload):
+    raw = payload.get("arguments", payload.get("input", ""))
+    if not isinstance(raw, str):
+        return ""
+    try:
+        parsed = json.loads(raw)
+    except (json.JSONDecodeError, ValueError):
+        return raw.strip().splitlines()[0][:120] if raw.strip() else ""
+    if not isinstance(parsed, dict):
+        return str(parsed)[:120]
+    for key in ("cmd", "path", "file_path", "query", "question", "target"):
+        value = parsed.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip().splitlines()[0][:120]
+    return ""
+
+
+def failed_status(payload):
+    text = output_text(payload.get("output", ""))
+    if payload.get("is_error") is True:
+        return "error"
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    if lines and lines[0] in ("Script failed", "Script error:"):
+        return "error"
+    marker = "Process exited with code "
+    status_text = "\n".join(lines[:8])
+    if marker in status_text:
+        try:
+            code = int(status_text.split(marker, 1)[1].split("\n", 1)[0])
+            return "ok" if code == 0 else f"error(exit {code})"
+        except (IndexError, ValueError):
+            return "error"
+    return "ok"
 
 
 def flush_tools():
-    """Print buffered tool entries, collapsing consecutive same-name groups."""
-    if not pending_tools:
+    if not completed_tools:
         return
-
-    # Group consecutive entries by tool name
-    groups = []
-    for entry in pending_tools:
-        if groups and groups[-1][0]["name"] == entry["name"]:
-            groups[-1].append(entry)
-        else:
-            groups.append([entry])
-
-    for group in groups:
-        name = group[0]["name"]
-        if len(group) <= 2:
-            # Print individually
-            for e in group:
-                status = f" -> {e['status']}" if e.get("status") else ""
-                ts_prefix = f"[{e['ts']}] " if e.get("ts") else ""
-                print(f"{ts_prefix}[tool] {name} {e['target']}{status}")
-                stats["tool"] += 1
-        else:
-            # Collapse
-            ts = group[0].get("ts", "")
-            targets = [e["target"] for e in group if e.get("target")]
-            ok = sum(1 for e in group if e.get("status") == "ok")
-            err = sum(1 for e in group if e.get("status") and e["status"] != "ok")
-            no_status = len(group) - ok - err
-
-            # Show first 2 targets, then "+N more"
-            if len(targets) > 2:
-                target_str = ", ".join(targets[:2]) + f", +{len(targets) - 2} more"
-            elif targets:
-                target_str = ", ".join(targets)
-            else:
-                target_str = ""
-
-            if no_status == len(group):
-                status_str = ""
-            elif err == 0:
-                status_str = " -> all ok"
-            else:
-                status_str = f" -> {ok} ok, {err} error"
-
-            ts_prefix = f"[{ts}] " if ts else ""
-            print(f"{ts_prefix}[tools] {len(group)}x {name} ({target_str}){status_str}")
-            stats["tool"] += len(group)
-
-    pending_tools.clear()
+    if len(completed_tools) <= 2:
+        for entry in completed_tools:
+            suffix = f" {entry['target']}" if entry["target"] else ""
+            print(f"[{entry['ts']}] [tool] {entry['name']}{suffix} -> {entry['status']}")
+    else:
+        names = [entry["name"] for entry in completed_tools]
+        shown = ", ".join(names[:3])
+        if len(names) > 3:
+            shown += f", +{len(names) - 3} more"
+        failures = sum(entry["status"] != "ok" for entry in completed_tools)
+        status = "all ok" if failures == 0 else f"{failures} error"
+        print(
+            f"[{completed_tools[0]['ts']}] [tools] {len(completed_tools)} calls"
+            f" ({shown}) -> {status}"
+        )
+    stats["tool"] += len(completed_tools)
+    completed_tools.clear()
 
 
-def _safe_slice(value, n):
-    """Slice value if it is a string; otherwise return ''.
-
-    Some Claude Code / MCP tool inputs put structured data (dicts, lists) in
-    fields like `query` or `prompt`. `dict[:N]` raises TypeError, so guard
-    every slice with an isinstance check.
-    """
-    return value[:n] if isinstance(value, str) else ""
-
-
-def summarize_claude_tool(block):
-    """Extract name and target from a Claude Code tool_use block."""
-    name = block.get("name", "unknown")
-    inp = block.get("input", {})
-    fp = inp.get("file_path")
-    p = inp.get("path")
-    target = (
-        (fp if isinstance(fp, str) else None)
-        or (p if isinstance(p, str) else None)
-        or _safe_slice(inp.get("command"), 120)
-        or _safe_slice(inp.get("pattern"), 200)
-        or _safe_slice(inp.get("query"), 80)
-        or _safe_slice(inp.get("prompt"), 80)
-        or ""
-    )
-    if isinstance(target, str) and len(target) > 120:
-        target = target[:120]
-    return name, target
-
-
-def handle_claude(obj):
-    msg_type = obj.get("type")
-    ts = obj.get("timestamp", "")[:19]
-
-    if msg_type == "user":
-        msg = obj.get("message", {})
-        content = msg.get("content", "")
-
-        if isinstance(content, list):
-            for block in content:
-                if block.get("type") == "tool_result":
-                    is_error = block.get("is_error", False)
-                    status = "error" if is_error else "ok"
-                    tool_use_id = block.get("tool_use_id")
-                    matched = False
-                    if tool_use_id:
-                        for entry in pending_tools:
-                            if entry.get("id") == tool_use_id:
-                                entry["status"] = status
-                                matched = True
-                                break
-                    if not matched:
-                        # Fallback: assign to earliest pending entry without a status
-                        for entry in pending_tools:
-                            if not entry.get("status"):
-                                entry["status"] = status
-                                break
-
-            texts = [
-                c.get("text", "")
-                for c in content
-                if c.get("type") == "text" and len(c.get("text", "")) > 10
-            ]
-            content = " ".join(texts)
-
-        if isinstance(content, str):
-            content = clean_text(content)
-            if len(content) > 15:
-                flush_tools()
-                print(f"[{ts}] [user] {content[:800]}")
-                print("---")
-                stats["user"] += 1
-
-    elif msg_type == "assistant":
-        msg = obj.get("message", {})
-        content = msg.get("content", [])
-        if isinstance(content, list):
-            has_text = False
-            for block in content:
-                if block.get("type") == "text":
-                    text = clean_text(block.get("text", ""))
-                    if len(text) > 20:
-                        if not has_text:
-                            flush_tools()
-                            has_text = True
-                        print(f"[{ts}] [assistant] {text[:800]}")
-                        print("---")
-                        stats["assistant"] += 1
-                elif block.get("type") == "tool_use":
-                    name, target = summarize_claude_tool(block)
-                    entry = {"ts": ts, "name": name, "target": target}
-                    tool_id = block.get("id")
-                    if tool_id:
-                        entry["id"] = tool_id
-                    pending_tools.append(entry)
-
-
-def handle_codex(obj):
-    msg_type = obj.get("type")
-    ts = obj.get("timestamp", "")[:19]
-
-    if msg_type == "event_msg":
-        p = obj.get("payload", {})
-        if p.get("type") == "user_message":
-            text = p.get("message", "")
-            if isinstance(text, str) and len(text) > 15:
-                parts = text.split("</system_instruction>")
-                user_text = parts[-1].strip() if parts else text
-                if len(user_text) > 15:
-                    flush_tools()
-                    print(f"[{ts}] [user] {user_text[:800]}")
-                    print("---")
-                    stats["user"] += 1
-
-        elif p.get("type") == "exec_command_end":
-            # This is the deduplicated result — has status info
-            command = p.get("command", [])
-            cmd_str = command[-1] if command else ""
-            output = p.get("aggregated_output", "")
-
-            status = "ok"
-            if "Process exited with code " in output:
-                try:
-                    code = int(output.split("Process exited with code ")[1].split("\n")[0])
-                    if code != 0:
-                        status = f"error(exit {code})"
-                except (IndexError, ValueError):
-                    pass
-
-            if cmd_str:
-                # Shorten common patterns for readability
-                short_cmd = cmd_str[:120]
-                pending_tools.append({"ts": ts, "name": "exec", "target": short_cmd, "status": status})
-
-    elif msg_type == "response_item":
-        p = obj.get("payload", {})
-        if p.get("type") == "message" and p.get("role") == "assistant":
-            for block in p.get("content", []):
-                if block.get("type") == "output_text" and len(block.get("text", "")) > 20:
-                    flush_tools()
-                    print(f"[{ts}] [assistant] {block['text'][:800]}")
-                    print("---")
-                    stats["assistant"] += 1
-
-        # Skip function_call — exec_command_end is the deduplicated version with status
-
-
-def _pi_text_content(content):
-    if isinstance(content, str):
-        return [content]
-    if not isinstance(content, list):
-        return []
-    return [
-        block.get("text", "")
-        for block in content
-        if isinstance(block, dict) and block.get("type") == "text"
-    ]
-
-
-def _pi_active_path_objects(objects):
-    """Return only entries on Pi's active leaf-to-root path."""
-    by_id = {
-        obj.get("id"): obj
-        for obj in objects
-        if isinstance(obj.get("id"), str) and obj.get("type") != "session"
-    }
-    leaf_id = None
-    for obj in objects:
-        if obj.get("type") != "session" and isinstance(obj.get("id"), str):
-            leaf_id = obj["id"]
-    if not leaf_id:
-        return objects
-
-    active_ids = set()
-    current = leaf_id
-    while isinstance(current, str) and current and current not in active_ids:
-        active_ids.add(current)
-        parent = by_id.get(current, {}).get("parentId")
-        current = parent if isinstance(parent, str) else None
-    return [
-        obj
-        for obj in objects
-        if obj.get("type") == "session" or obj.get("id") in active_ids
-    ]
-
-
-def _pi_context_objects(objects):
-    """Return Pi entries that participate in active LLM context."""
-    active = _pi_active_path_objects(objects)
-    compactions = [obj for obj in active if obj.get("type") == "compaction"]
-    if not compactions:
-        return active
-
-    first_kept = compactions[-1].get("firstKeptEntryId")
-    if not isinstance(first_kept, str):
-        return active
-
-    latest_compaction_id = compactions[-1].get("id")
-    started = False
-    found_first_kept = False
-    context = [obj for obj in active if obj.get("type") == "session"]
-    context.append(compactions[-1])
-    for obj in active:
-        if obj.get("type") == "session":
-            continue
-        if obj.get("id") == first_kept:
-            started = True
-            found_first_kept = True
-        if obj.get("id") == latest_compaction_id:
-            continue
-        if started:
-            context.append(obj)
-    return context if found_first_kept and len(context) > 1 else active
-
-
-def handle_pi(obj):
-    """Pi sessions: type='message' with message.role and content blocks."""
-    entry_type = obj.get("type")
-    ts = obj.get("timestamp", "")[:19]
-
-    if entry_type in ("compaction", "branch_summary"):
-        text = clean_text(obj.get("summary", ""))
-        if len(text) > 15:
-            flush_tools()
-            print(f"[{ts}] [summary] {text[:800]}")
-            print("---")
-            stats["summary"] += 1
+def handle_event_message(obj, payload):
+    if payload.get("type") != "user_message":
         return
-
-    if entry_type == "custom_message":
-        text = clean_text(" ".join(_pi_text_content(obj.get("content", []))))
-        if len(text) > 15:
-            flush_tools()
-            print(f"[{ts}] [summary] {text[:800]}")
-            print("---")
-            stats["summary"] += 1
+    text = payload.get("message", "")
+    if not isinstance(text, str):
         return
-
-    if entry_type != "message":
+    text = text.split("</system_instruction>")[-1].strip()
+    if len(text) <= 15:
         return
+    flush_tools()
+    print(f"[{obj.get('timestamp', '')[:19]}] [user] {text[:800]}")
+    print("---")
+    stats["user"] += 1
 
-    msg = obj.get("message", {})
-    role = msg.get("role", "")
-    content = msg.get("content", [])
 
-    if role == "bashExecution":
-        exit_code = msg.get("exitCode")
-        if msg.get("cancelled"):
-            status = "cancelled"
-        elif exit_code in (None, 0):
-            status = "ok"
-        else:
-            status = f"error(exit {exit_code})"
-        command = _safe_slice(msg.get("command"), 120)
-        pending_tools.append({"ts": ts, "name": "bash", "target": command, "status": status})
-        return
+def handle_response_item(obj, payload):
+    item_type = payload.get("type")
+    timestamp = obj.get("timestamp", "")[:19]
 
-    if role == "custom":
-        text = clean_text(" ".join(_pi_text_content(content)))
-        if len(text) > 15:
-            flush_tools()
-            print(f"[{ts}] [summary] {text[:800]}")
-            print("---")
-            stats["summary"] += 1
-        return
-
-    if role == "user":
-        text = clean_text(" ".join(_pi_text_content(content)))
-        if len(text) > 15:
-            flush_tools()
-            print(f"[{ts}] [user] {text[:800]}")
-            print("---")
-            stats["user"] += 1
-
-    elif role == "assistant":
-        if isinstance(content, str):
-            text = clean_text(content)
-            if len(text) > 20:
-                flush_tools()
-                print(f"[{ts}] [assistant] {text[:800]}")
-                print("---")
-                stats["assistant"] += 1
-            return
-
-        has_text = False
-        for block in (content if isinstance(content, list) else []):
-            if not isinstance(block, dict):
+    if item_type == "message" and payload.get("role") == "assistant":
+        for block in payload.get("content", []):
+            if not isinstance(block, dict) or block.get("type") != "output_text":
                 continue
-            if block.get("type") == "text":
-                text = clean_text(block.get("text", ""))
-                if len(text) > 20:
-                    if not has_text:
-                        flush_tools()
-                        has_text = True
-                    print(f"[{ts}] [assistant] {text[:800]}")
-                    print("---")
-                    stats["assistant"] += 1
-            elif block.get("type") == "toolCall":
-                name = block.get("name", "unknown")
-                args = block.get("arguments", {})
-                if not isinstance(args, dict):
-                    args = {}
-                target = (
-                    _safe_slice(args.get("path"), 200)
-                    or _safe_slice(args.get("file_path"), 200)
-                    or _safe_slice(args.get("command"), 120)
-                    or _safe_slice(args.get("pattern"), 200)
-                    or _safe_slice(args.get("query"), 80)
-                    or _safe_slice(args.get("prompt"), 80)
-                    or ""
-                )
-                if isinstance(target, str) and len(target) > 120:
-                    target = target[:120]
-                entry = {"ts": ts, "name": name, "target": target}
-                tool_id = block.get("id")
-                if tool_id:
-                    entry["id"] = tool_id
-                pending_tools.append(entry)
-
-    elif role == "toolResult":
-        tool_call_id = msg.get("toolCallId")
-        is_error = bool(msg.get("isError"))
-        if isinstance(content, list):
-            is_error = is_error or any(
-                isinstance(block, dict) and block.get("type") == "toolError"
-                for block in content
-            )
-        status = "error" if is_error else "ok"
-        if tool_call_id:
-            for entry in pending_tools:
-                if entry.get("id") == tool_call_id:
-                    entry["status"] = status
-                    break
-        else:
-            for entry in pending_tools:
-                if not entry.get("status"):
-                    entry["status"] = status
-                    break
-
-
-def handle_cursor(obj):
-    """Cursor agent transcripts: role-based, no timestamps, same content structure as Claude."""
-    role = obj.get("role")
-    content = obj.get("message", {}).get("content", [])
-
-    if role == "user":
-        texts = []
-        for block in (content if isinstance(content, list) else []):
-            if block.get("type") == "text":
-                texts.append(block.get("text", ""))
-        text = clean_text(" ".join(texts))
-        if len(text) > 15:
+            text = block.get("text", "")
+            if not isinstance(text, str) or len(text) <= 20:
+                continue
             flush_tools()
-            # No timestamps available in Cursor transcripts
-            print(f"[user] {text[:800]}")
+            print(f"[{timestamp}] [assistant] {text[:800]}")
             print("---")
-            stats["user"] += 1
+            stats["assistant"] += 1
+        return
 
-    elif role == "assistant":
-        has_text = False
-        for block in (content if isinstance(content, list) else []):
-            if block.get("type") == "text":
-                text = block.get("text", "")
-                # Skip [REDACTED] placeholder blocks
-                if len(text) > 20 and text.strip() != "[REDACTED]":
-                    if not has_text:
-                        flush_tools()
-                        has_text = True
-                    print(f"[assistant] {text[:800]}")
-                    print("---")
-                    stats["assistant"] += 1
-            elif block.get("type") == "tool_use":
-                name = block.get("name", "unknown")
-                inp = block.get("input", {})
-                p = inp.get("path")
-                fp = inp.get("file_path")
-                target = (
-                    (p if isinstance(p, str) else None)
-                    or (fp if isinstance(fp, str) else None)
-                    or _safe_slice(inp.get("command"), 120)
-                    or _safe_slice(inp.get("pattern"), 200)
-                    or _safe_slice(inp.get("glob_pattern"), 200)
-                    or _safe_slice(inp.get("target_directory"), 200)
-                    or ""
-                )
-                if isinstance(target, str) and len(target) > 120:
-                    target = target[:120]
-                # No status info available — Cursor doesn't log tool results
-                pending_tools.append({"ts": "", "name": name, "target": target})
+    if item_type in ("function_call", "custom_tool_call"):
+        call_id = payload.get("call_id")
+        if call_id:
+            calls[call_id] = {
+                "ts": timestamp,
+                "name": payload.get("name", "tool"),
+                "target": call_target(payload),
+            }
+        return
 
+    if item_type not in ("function_call_output", "custom_tool_call_output"):
+        return
+    call_id = payload.get("call_id")
+    entry = calls.pop(call_id, {"ts": timestamp, "name": "tool", "target": ""})
+    entry["status"] = failed_status(payload)
+    completed_tools.append(entry)
 
-# Auto-detect platform from first few lines, then process all
-detected = None
-buffer = []
 
 for line in sys.stdin:
     line = line.strip()
     if not line:
         continue
-    buffer.append(line)
     stats["lines"] += 1
-
-    # Scan until a decisive record appears (short-circuits once detected).
-    # Claude Code sessions front-load 10+ non-message metadata records
-    # (last-prompt, custom-title, attachments, ...), so capping detection to
-    # the first N lines silently misroutes them to the codex handler and
-    # produces an empty skeleton with parse_errors: 0 (issue #923).
-    if not detected:
-        try:
-            obj = json.loads(line)
-            if obj.get("type") == "session" and "cwd" in obj:
-                detected = "pi"
-            elif obj.get("type") in ("user", "assistant"):
-                detected = "claude"
-            elif obj.get("type") in ("session_meta", "turn_context", "response_item", "event_msg"):
-                detected = "codex"
-            elif obj.get("role") in ("user", "assistant") and "type" not in obj:
-                detected = "cursor"
-        except (json.JSONDecodeError, KeyError):
-            pass
-
-handlers = {"claude": handle_claude, "codex": handle_codex, "cursor": handle_cursor, "pi": handle_pi}
-handler = handlers.get(detected, handle_codex)
-
-objects = []
-for line in buffer:
     try:
-        objects.append(json.loads(line))
-    except (json.JSONDecodeError, KeyError):
+        obj = json.loads(line)
+        payload = obj.get("payload", {})
+        if obj.get("type") == "event_msg":
+            handle_event_message(obj, payload)
+        elif obj.get("type") == "response_item":
+            handle_response_item(obj, payload)
+    except (json.JSONDecodeError, ValueError, KeyError, TypeError):
         stats["parse_errors"] += 1
 
-if detected == "pi":
-    objects = _pi_context_objects(objects)
-
-for obj in objects:
-    try:
-        handler(obj)
-    except KeyError:
-        stats["parse_errors"] += 1
-
-# Flush any remaining buffered tools
+for entry in calls.values():
+    entry["status"] = "missing output"
+    completed_tools.append(entry)
 flush_tools()
-
 print(json.dumps({"_meta": True, **stats}))
 
 if args.output:
     body = sys.stdout.getvalue()
-    sys.stdout = _original_stdout
-    with open(args.output, "w") as f:
-        f.write(body)
-    bytes_written = os.path.getsize(args.output)
-    print(json.dumps({"_meta": True, "wrote": args.output, "bytes": bytes_written, **stats}))
+    sys.stdout = original_stdout
+    with open(args.output, "w") as output_file:
+        output_file.write(body)
+    print(
+        json.dumps(
+            {
+                "_meta": True,
+                "wrote": args.output,
+                "bytes": os.path.getsize(args.output),
+                **stats,
+            }
+        )
+    )

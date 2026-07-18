@@ -198,7 +198,7 @@ Mixed use is common: instrument first to localize, then attach a debugger at the
 | Language | Interactive breakpoint | Attach to running process |
 |----------|------------------------|---------------------------|
 | Python | `breakpoint()` in code, or `python -m pdb script.py` | `python -m pdb -p <pid>` (Python 3.14+ only); on earlier versions, instrument the target with `rpdb` / `remote-pdb` and connect after it triggers |
-| Node.js | `debugger;` in code + `node --inspect-brk`, then connect via Chrome DevTools or VS Code | `kill -SIGUSR1 <pid>` to enable the inspector on the running process (Linux/macOS), then connect Chrome DevTools or VS Code to the default port 9229 |
+| Node.js | `debugger;` in code + `node --inspect-brk`, then connect via Chrome DevTools | `kill -SIGUSR1 <pid>` to enable the inspector on the running process (Linux/macOS), then connect Chrome DevTools to the default port 9229 |
 | Ruby | `binding.irb` (stdlib), `binding.pry` (pry gem), `debugger` (debug gem), `rdbg` | `rdbg --attach <pid>` with `debug` gem loaded |
 | Go | `dlv debug` or `dlv test`, then `break`, `continue`, `print` | `dlv attach <pid>` |
 | Rust / C / C++ | `lldb target/debug/binary` or `gdb binary`, then `break`, `run`, `print` | `lldb -p <pid>` / `gdb -p <pid>` |
@@ -270,23 +270,7 @@ The defining rule: if the bug is sensitive to observation, the fix must survive 
 
 ## Browser Debugging
 
-When investigating UI bugs with `agent-browser` or equivalent tools:
-
-```bash
-# Open the affected page
-agent-browser open http://localhost:${PORT:-3000}/affected/route
-
-# Capture current state
-agent-browser snapshot -i
-
-# Interact with the page
-agent-browser click @ref          # click an element
-agent-browser fill @ref "text"    # fill a form field
-agent-browser snapshot -i         # capture state after interaction
-
-# Save visual evidence
-agent-browser screenshot bug-evidence.png
-```
+Load `browser:control-in-app-browser`, open the affected route in Codex's in-app browser, and inspect the visible and interactive state. Reproduce the exact user flow, take screenshots before and after the failure, and record the relevant console and network evidence.
 
 **Port detection:** If your in-context project instructions explicitly state the dev-server port, use it (don't grep instruction prose for a port — it's false-positive-prone); otherwise check `package.json` dev scripts, then `.env` files, falling back to `3000`.
 

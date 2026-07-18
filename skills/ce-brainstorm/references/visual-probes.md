@@ -18,7 +18,7 @@ Do not use a visual probe for product goals, scope boundaries, success criteria,
 
 When grounding identifies an inherently visual topic, the offer must fire before the **first** decision about shape, behavior, state, layout, flow, or a diagram is raised in *any* form — plain chat or a blocking question.
 
-**Timing is state-based, not memory-based.** Anchor the check to the decision you are about to raise: offer unless this specific decision has already been through it. Do not raise the shape decision through `request_user_input` or chat until the user declines visual or visual feedback returns.
+**Timing is state-based, not memory-based.** Anchor the check to the decision you are about to raise: offer unless this specific decision has already been through it. Do not raise the shape decision until the user declines visual or visual feedback returns.
 
 **An ASCII preview or text mockup embedded inside the question's choices does NOT satisfy the offer** — that shortcut is exactly what this gate exists to stop. The offer is its own prior question with two options (sketch vs describe); only after the user chooses does the shape decision proceed.
 
@@ -26,7 +26,7 @@ When grounding identifies an inherently visual topic, the offer must fire before
 
 Ask once at the decision point. Do not enable a session-wide mode.
 
-Use `request_user_input` for the opt-in when available. Otherwise ask in chat and wait. Use two clear options:
+Ask through the [shared codex-interaction contract](codex-interaction.md) with two clear options:
 
 - Visual sketch — create rough options in a local browser
 - Text description — keep the decision in chat
@@ -75,7 +75,7 @@ SKILL_DIR="<absolute path of the ce-brainstorm skill directory>";
 node "$SKILL_DIR/scripts/visual-probe-server.js" start --root /tmp/andrea-engineering/ce-brainstorm-visual/<run-id>
 ```
 
-Append `--foreground` to that `start` command for foreground mode. Status and stop take the same anchor — and because `SKILL_DIR` does not persist between Bash invocations, each must re-set it in its own call rather than reuse the `start` block's value:
+Append `--foreground` to that `start` command for foreground mode. Status and stop take the same anchor — and because `SKILL_DIR` does not persist between Codex shell calls, each must re-set it in its own call rather than reuse the `start` block's value:
 
 ```bash
 SKILL_DIR="<absolute path of the ce-brainstorm skill directory>";
@@ -85,20 +85,20 @@ node "$SKILL_DIR/scripts/visual-probe-server.js" status --root /tmp/andrea-engin
 
 If `SKILL_DIR` cannot be resolved to a concrete skill directory, do not guess from the project CWD — use the text path.
 
-The helper creates `screens/` and `state/`, serves the newest `.html` file in `screens/`, writes `state/display-info.json`, and exposes `/version` so the browser can poll for screen changes. The browser reloads only when the newest screen changes; it must not continually reload on a timer. `/version` polling does not count as activity, so an abandoned browser tab cannot keep the server alive forever. Detached servers monitor the owning harness process when it can be resolved, and all servers exit after an idle timeout. The helper has no click tracking or browser-to-agent event path.
+The helper creates `screens/` and `state/`, serves the newest `.html` file in `screens/`, writes `state/display-info.json`, and exposes `/version` so the browser can poll for screen changes. The browser reloads only when the newest screen changes; it must not continually reload on a timer. `/version` polling does not count as activity, so an abandoned browser tab cannot keep the server alive forever. Detached servers monitor the owning Codex process when it can be resolved, and all servers exit after an idle timeout. The helper has no click tracking or browser-to-agent event path.
 
 If the helper path is unavailable or Codex cannot display a local URL cleanly, say so briefly and use the text path. Do not build a custom event system or long-lived server to compensate.
 
 ## Launch in Codex
 
-In the Codex app, use the in-app browser when available. If detached processes are reaped or the URL dies after the tool call, run `start --foreground` through a long-running terminal session. In Codex CLI, print the returned URL for the user to open. If no stable browser surface exists, use the text path.
+Use the Codex in-app Browser. Run `start --foreground` through a persistent Codex terminal session so the probe URL remains live, then open that URL in the Browser. If the Browser is unavailable, use the text path.
 - **Remote or containerized sessions:** if `localhost` is not reachable from the user's browser, start with `--host 0.0.0.0` and tell the user which host/port to open. If that cannot be made clear, use the text path.
 
 Never force the visual path because a local server exists. If the Codex browser flow gets in the way, switch back to text.
 
 ## Post-Artifact Feedback
 
-After showing the visual artifact, use `request_user_input` for bounded feedback when available; otherwise ask in chat. Feedback remains chat-based, not browser event capture.
+After showing the visual artifact, ask for bounded feedback through the shared codex-interaction contract. Feedback remains chat-based, not browser event capture.
 
 Use a bounded interactive question when the expected response is a small choice set:
 

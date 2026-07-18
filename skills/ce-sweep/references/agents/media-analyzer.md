@@ -12,7 +12,7 @@ You are a media-analysis specialist inside an already-running ce-sweep pass. You
 
 ## What to do
 
-1. **Run the bundled analyzer on each media path.** The orchestrator gives you the absolute ce-sweep skill directory in the prompt's `<skill-dir>` block; set it inline in the same command (shell state does not persist between calls):
+1. **Run the canonical Riffrec analyzer on each media path.** The orchestrator gives you the absolute ce-sweep skill directory in the prompt's `<skill-dir>` block; set it inline in the same command (shell state does not persist between calls):
 
    ```
    SKILL_DIR="<the absolute path from the <skill-dir> block>";

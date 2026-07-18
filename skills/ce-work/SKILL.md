@@ -49,7 +49,7 @@ Determine how to proceed based on what was provided in `<input_document>` (after
    |-----------|---------|--------|
    | **Trivial** | 1-2 files, no behavioral change (typo, config, rename) | Proceed to Phase 1 step 2 (environment setup), then implement directly — no task list, no execution loop. Apply Test Discovery if the change touches behavior-bearing code |
    | **Small / Medium** | Clear scope, under ~10 files | Build a task list from discovery. Proceed to Phase 1 step 2 |
-   | **Large** | Cross-cutting, architectural decisions, 10+ files, touches auth/payments/migrations | Inform the user this would benefit from `/ce-brainstorm` or `/ce-plan` to surface edge cases and scope boundaries. Honor their choice. If proceeding, build a task list and continue to Phase 1 step 2 |
+   | **Large** | Cross-cutting, architectural decisions, 10+ files, touches auth/payments/migrations | Inform the user this would benefit from `$ce-brainstorm` or `$ce-plan` to surface edge cases and scope boundaries. Honor their choice. If proceeding, build a task list and continue to Phase 1 step 2 |
 
 ---
 
@@ -111,8 +111,8 @@ Determine how to proceed based on what was provided in `<input_document>` (after
    **Option B: Use a worktree (recommended for parallel development)**
    ```bash
    skill: ce-worktree
-   # Ensures isolation: detects an existing worktree, prefers the harness's
-   # native worktree tool, else creates one from the default branch
+   # Ensures isolation: detects an existing Codex worktree, otherwise creates
+   # one with git from the default branch
    ```
 
    **Option C: Continue on the default branch**
@@ -331,7 +331,7 @@ Determine how to proceed based on what was provided in `<input_document>` (after
 
 When all Phase 2 tasks are complete and execution transitions to quality check, you must read `references/shipping-workflow.md` for the full shipping workflow. Do not skip this.
 
-**Code review: one portable path.** Review with `ce-code-review`, which self-sizes (lite roster for small low-risk code-only diffs, full roster otherwise). No harness-native review detection and no escalation tiers — the size/sensitive-surface judgment lives inside `ce-code-review`. Skip dedicated review only for a purely mechanical diff (formatting, dep-bumps, lint-only, generated). Full rules (autonomous Residual Gate, infra fallback) in `shipping-workflow.md`.
+**Code review:** Review with `ce-code-review`, which self-sizes to a lite roster for small low-risk code-only diffs and the full roster otherwise. Skip dedicated review only for a purely mechanical diff. Full rules live in `shipping-workflow.md`.
 
 **Review is two steps — review, then fix.** `ce-code-review` is review-only. It returns findings (markdown or `mode:agent` JSON); it never edits the checkout, commits, or applies fixes.
 
@@ -364,44 +364,3 @@ Return `status: complete` only when behavior-bearing work has verification evide
 
 In return-to-caller mode, execute inline or with selective subagents. Do not
 start a goal; the caller owns the remaining lifecycle.
-
-## Key Principles
-
-### Start Fast, Execute Faster
-
-- Get clarification once at the start, then execute
-- Don't wait for perfect understanding - ask questions and move
-- The goal is to **finish the feature**, not create perfect process
-
-### The Plan is Your Guide
-
-- Work documents should reference similar code and patterns
-- Load those references and follow them
-- Don't reinvent - match what exists
-
-### Test As You Go
-
-- Run tests after each change, not at the end
-- Fix failures immediately
-- Continuous testing prevents big surprises
-
-### Quality is Built In
-
-- Review every non-mechanical diff with `ce-code-review` (it self-sizes; see `shipping-workflow.md`)
-
-### Ship Complete Features
-
-- Mark all tasks completed before moving on
-- Don't leave features 80% done
-- A finished feature that ships beats a perfect feature that doesn't
-
-## Common Pitfalls to Avoid
-
-- **Analysis paralysis** - Don't overthink, read the plan and execute
-- **Skipping clarifying questions** - Ask now, not after building wrong thing
-- **Ignoring plan references** - The plan has links for a reason
-- **Testing at the end** - Test continuously or suffer later
-- **Forgetting to track progress** - Update task status as you go or lose track of what's done
-- **80% done syndrome** - Finish the feature, don't move on early
-- **Skipping review without reason** — review every non-mechanical diff with `ce-code-review`; skip only for a purely mechanical diff or when it is genuinely unavailable, and document the skip reason
-- **Re-scoping the plan into human-time phases** - The plan's Implementation Units define the scope of execution. Do not invent session-sized phases. Delegate only under Phase 1 Step 4; if a plan remains too large, suggest returning to `/ce-plan` to reduce scope.

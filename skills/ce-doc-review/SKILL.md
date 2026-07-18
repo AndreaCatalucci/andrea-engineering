@@ -9,8 +9,7 @@ Review requirements or plan documents through multi-persona analysis. Dispatches
 
 ## Interactive mode rules
 
-- **Pre-load the platform question tool before any question fires.** In Claude Code, `AskUserQuestion` is a deferred tool — its schema is not available at session start. At the start of Interactive-mode work (before the routing question, per-finding walk-through questions, bulk-preview Proceed/Cancel, and Phase 5 terminal question), call `ToolSearch` with query `select:AskUserQuestion` to load the schema. Load it once, eagerly, at the top of the Interactive flow — do not wait for the first question site. On Codex, Gemini, and Pi this preload is not required.
-- **The numbered-list fallback applies only when the harness genuinely lacks a blocking question tool** — `ToolSearch` returns no match, the tool call explicitly fails, or the runtime mode does not expose it (e.g., Codex edit modes where `request_user_input` is unavailable). A pending schema load is not a fallback trigger; call `ToolSearch` first per the pre-load rule. In genuine-fallback cases, present options as a numbered list and wait for the user's reply — never silently skip the question. Rendering a question as narrative text because the tool feels inconvenient, because the model is in report-formatting mode, or because the instruction was buried in a long skill is a bug. A question that calls for a user decision must either fire the tool or fall back loudly.
+- Before the first user decision, read and follow [`references/codex-interaction.md`](references/codex-interaction.md). Reuse that contract for the routing question, per-finding walkthrough, bulk preview, and terminal question.
 
 ## Phase 0: Detect Mode
 
@@ -29,20 +28,20 @@ The caller receives findings with their original classifications intact and deci
 Callers invoke headless mode by including `mode:headless` in the skill arguments, e.g.:
 
 ```
-Skill("ce-doc-review", "mode:headless docs/plans/my-plan.md")
+$ce-doc-review mode:headless docs/plans/my-plan.md
 ```
 
 If `mode:headless` is not present, the skill runs in its default interactive mode with the routing question, walk-through, and bulk-preview behaviors documented in `references/walkthrough.md` and `references/bulk-preview.md`.
 
 ## Phase 1: Get and Analyze Document
 
-**If a document path is provided:** Read it, then proceed. If the Read fails or the file is not on disk, apply the missing-document gate below instead of continuing.
+**If a document path is provided:** Read it, then proceed. If the file cannot be read from disk, apply the missing-document gate below instead of continuing.
 
-**If no document is specified (interactive mode):** Ask which document to review, or find the most recent in `docs/brainstorms/` or `docs/plans/` using a file-search/glob tool (e.g., Glob in Claude Code).
+**If no document is specified (interactive mode):** Ask which document to review, or find the most recent in `docs/brainstorms/` or `docs/plans/` with `rg --files`.
 
-**If no document is specified (headless mode):** Output "Review failed: headless mode requires a document path. Re-invoke with: Skill(\"ce-doc-review\", \"mode:headless <path>\")" without dispatching agents.
+**If no document is specified (headless mode):** Output "Review failed: headless mode requires a document path. Re-invoke with: `$ce-doc-review mode:headless <path>`" without dispatching agents.
 
-**Missing-document gate — verify before any dispatch.** Persona reviewers read documents from the filesystem, and several run without Bash, so they cannot read git refs — a path that exists only on a branch that is not checked out wastes the entire persona team discovering they cannot proceed (issue #925). Before Phase 2, confirm every resolved document path is readable on disk (the Read above succeeded). Location does not matter: an absolute path outside the checkout (e.g. `/tmp/plan.md`) or a doc in another checkout reviews fine. If any path is not readable, do not dispatch any personas:
+**Missing-document gate — verify before any dispatch.** Persona reviewers read documents from the filesystem, so a path that exists only on a branch that is not checked out is unavailable to them. Before Phase 2, confirm every resolved document path is readable on disk. Location does not matter: an absolute path outside the checkout (e.g. `/tmp/plan.md`) or a doc in another checkout reviews fine. If any path is not readable, do not dispatch any personas:
 
 - **Interactive mode:** stop and name the missing path(s): "Document(s) not found on disk: <paths>. If they only exist on another branch, check it out (or use a worktree) and re-invoke; otherwise correct the path(s)."
 - **Headless mode:** output "Review failed: document(s) not found on disk: <paths>. Check out the branch containing them (or pass paths to files on disk) and re-invoke." and return without dispatching agents.
@@ -156,15 +155,11 @@ Add activated conditional personas:
 
 ### Dispatch
 
-Dispatch generic subagents using **bounded parallelism** with the platform's subagent primitive (e.g., `Agent` in Claude Code, `spawn_agent` in Codex) where available; otherwise run the work inline or serially. Omit the `mode` parameter so the user's configured permission settings apply. Respect the current harness's active-subagent limit: queue selected reviewers, dispatch only as many as the harness accepts, and fill freed slots as reviewers complete. Treat active-agent/thread/concurrency-limit spawn errors as backpressure, not reviewer failure: leave the reviewer queued and retry after a slot frees. Record a reviewer as failed only after a successful dispatch times out/fails, or when dispatch fails for a non-capacity reason.
+Dispatch generic Codex subagents using **bounded parallelism** with `spawn_agent`. Respect Codex's active-agent limit: queue selected reviewers, dispatch only as many as Codex accepts, and fill freed slots as reviewers complete. Treat capacity errors as backpressure, not reviewer failure: leave the reviewer queued and retry after a slot frees. Record a reviewer as failed only after a successful dispatch times out/fails, or when dispatch fails for a non-capacity reason.
 
-For each selected reviewer, read the matching skill-local prompt asset at `references/personas/<reviewer-name>.md` and pass its full content as `{persona_file}`. Do not dispatch standalone agents by type/name and do not rely on platform-level custom-agent registration.
+For each selected reviewer, read the matching skill-local prompt asset at `references/personas/<reviewer-name>.md` and pass its full content as `{persona_file}`. Do not rely on separately registered custom-agent types.
 
-**Model tiering lives here, not in prompt assets.** Local prompt files have no frontmatter and carry no model metadata. Apply these dispatch-time preferences when the platform exposes a known model override; otherwise omit the override and inherit the parent model rather than guessing a platform-specific model name:
-
-- `coherence-reviewer`: cheapest capable extraction/reasoning tier.
-- `design-lens-reviewer`, `scope-guardian-reviewer`: platform mid-tier model.
-- `security-lens-reviewer`, `feasibility-reviewer`, `product-lens-reviewer`, `adversarial-document-reviewer`: inherit the parent model unless the harness has an established high-capability review tier.
+Local prompt files have no frontmatter or model metadata. Let every reviewer inherit the parent Codex model.
 
 Each subagent receives the prompt built from the subagent template included below with these variables filled:
 
@@ -224,7 +219,7 @@ Cross-session persistence is out of scope. A new invocation of ce-doc-review on 
 
 **Error handling:** If a subagent fails or times out, proceed with findings from subagents that completed. Note the failed reviewer in the Coverage section. Do not block the entire review on a single reviewer failure.
 
-**Dispatch limit:** Even at maximum (7 agents), use bounded parallel dispatch. If the harness cap is lower than the selected team size, queue the remainder and launch them as active reviewers complete.
+**Dispatch limit:** Even at maximum (7 agents), use bounded parallel dispatch. If Codex's active-agent limit is lower than the selected team size, queue the remainder and launch them as active reviewers complete.
 
 ## Phases 3-5: Synthesis, Presentation, and Next Action
 
