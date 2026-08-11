@@ -3,10 +3,12 @@
   "title": "Code Review Findings",
   "description": "Structured output schema for code review sub-agents",
   "type": "object",
+  "additionalProperties": false,
   "required": ["reviewer", "findings", "residual_risks", "testing_gaps"],
   "properties": {
     "reviewer": {
       "type": "string",
+      "minLength": 1,
       "description": "Persona name that produced this output (e.g., 'correctness', 'security')"
     },
     "findings": {
@@ -14,6 +16,7 @@
       "description": "List of code review findings. Empty array if no issues found.",
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "required": [
           "title",
           "severity",
@@ -30,6 +33,7 @@
         "properties": {
           "title": {
             "type": "string",
+            "minLength": 1,
             "description": "Short, specific issue title. 10 words or fewer.",
             "maxLength": 100
           },
@@ -40,6 +44,7 @@
           },
           "file": {
             "type": "string",
+            "minLength": 1,
             "description": "Relative file path from repository root"
           },
           "line": {
@@ -49,6 +54,7 @@
           },
           "why_it_matters": {
             "type": "string",
+            "minLength": 1,
             "description": "Impact and failure mode -- not 'what is wrong' but 'what breaks'"
           },
           "autofix_class": {
@@ -67,6 +73,7 @@
           },
           "suggested_fix": {
             "type": ["string", "null"],
+            "minLength": 1,
             "description": "Concrete minimal fix the reviewer can defend from the diff and surrounding code. Propose one whenever any defensible code change is reachable from review context (parallel patterns, framework conventions, or the cited code itself). Imperfect information is not grounds for omission -- propose the most defensible default given what you can see, name any assumption you are making, and let the user override. 'I need <specific input> to commit' is a soft punt: the right question is 'what code change would I propose if I had to choose now?' and propose that, with the assumption named. Omit only when there is genuinely no code-level change to propose -- e.g., the finding is a question rather than a fix ('what is the intended SLA here?'), or the resolution is purely an organizational action with no code component (legal sign-off, business policy decision). These cases are rare in code review. A bad suggestion is still worse than none, but a soft punt is the failure mode this field is designed to prevent."
           },
           "confidence": {
@@ -77,7 +84,7 @@
           "evidence": {
             "type": "array",
             "description": "Code-grounded evidence: snippets, line references, or pattern descriptions. At least 1 item. For any finding at confidence anchor 75 or 100, the first item MUST be the verbatim motivating line(s) with file:line -- the exact code text that makes the finding true (the quote-the-line gate). A finding whose triggering line cannot be quoted must step down to anchor 50.",
-            "items": { "type": "string" },
+            "items": { "type": "string", "minLength": 1 },
             "minItems": 1
           },
           "pre_existing": {
@@ -90,12 +97,12 @@
     "residual_risks": {
       "type": "array",
       "description": "Risks the reviewer noticed but could not confirm as findings",
-      "items": { "type": "string" }
+      "items": { "type": "string", "minLength": 1 }
     },
     "testing_gaps": {
       "type": "array",
       "description": "Missing test coverage the reviewer identified",
-      "items": { "type": "string" }
+      "items": { "type": "string", "minLength": 1 }
     }
   },
 
@@ -129,9 +136,9 @@
       "release": "Operational or rollout follow-up."
     },
     "return_tiers": {
-      "description": "Finding fields are split into two tiers. The full schema (with all required fields) applies to the artifact file on disk. The compact return to the orchestrator omits detail-tier fields. Both are valid uses of this schema in different contexts.",
-      "merge_tier": "Returned to orchestrator: title, severity, file, line, confidence, autofix_class, owner, requires_verification, pre_existing, suggested_fix (optional), first_evidence (required for anchor 75/100; the verbatim first evidence line, used to enforce the quote-the-line gate in-band). Plus top-level reviewer, residual_risks, testing_gaps.",
-      "detail_tier": "Required in artifact file, omitted from compact return: why_it_matters, and the full evidence array (the compact return carries only first_evidence). The artifact file must pass full schema validation including all required fields. Headless output depends on why_it_matters and evidence being present in the artifact."
+      "description": "The reviewer writes one full checked file and normally returns only its receipt. The parent derives compact merge fields deterministically and reloads full details from source lineage before validation and output.",
+      "merge_tier": "Derived by review-artifact.py after parent acceptance: title, severity, file, line, confidence, autofix_class, owner, requires_verification, pre_existing, optional suggested_fix, first_evidence for anchor 75/100, reviewers, and source_keys.",
+      "detail_tier": "Stored only in the digest-checked reviewer file: why_it_matters and full evidence. hydrate-findings reloads these records from source-registry.json before validation and final output. The compact inline return exists only as a degraded write or validation fallback."
     }
   }
 }

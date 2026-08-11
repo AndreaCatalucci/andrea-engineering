@@ -98,20 +98,40 @@ Run a short inline fast pass for obvious high-signal defects. In default mode, l
 
 Create `/tmp/andrea-engineering/ce-code-review/<run-id>/`. Stage large diffs/file lists there once and pass paths instead of duplicating contents.
 
-Before dispatch, read:
+Set `SKILL_DIR` to this skill's absolute directory. Before dispatch, read:
 
 - `references/subagent-template.md`
 - `references/diff-scope.md`
-- `references/findings-schema.json`
 - each selected `references/personas/<name>.md`
 
-Spawn generic read-only Codex subagents with `spawn_agent`, passing the exact shared scope, intent, PR context, profile orientation, diff/files, run ID, and schema. Let every reviewer inherit the parent model. Respect Codex's active-agent limit with a bounded queue; capacity is backpressure, not reviewer failure.
+For each reviewer, write a complete packet JSON in the run directory using the
+fields in `subagent-template.md`. Include resolved intent and requirements, PR
+context, scope refs, profile orientation, applicable project-instruction text,
+up to three selected Known Pattern notes, and absolute paths for the protocol,
+persona, scope rules, schema, helper, staged files/diff, draft, and result. Do
+not put the schema, diff, or shared protocol inline in the launch prompt.
+
+Spawn each generic read-only Codex reviewer with `fork_turns="none"`. Pass only
+the absolute protocol and packet paths and ask it to return the helper receipt
+or documented inline fallback. Let every reviewer use the parent model. Respect
+the active-agent limit with a bounded queue; capacity is backpressure, not
+reviewer failure.
+
+Save each returned receipt and run `scripts/review-artifact.py accept-review`
+against the parent-allocated result path, reviewer name, and schema. For an
+inline fallback, save it and run `accept-inline`. A parent-side acceptance
+failure gets one repair request; after a second failure, mark that reviewer
+failed and record the degraded path in Coverage. Only checked projections enter
+merge. Combine their `sources` maps into `source-registry.json`.
 
 Remote reviewers inspect fetched refs with `git show` or diff hunks, never stale workspace files. Subagents may write only their run artifact under `/tmp`; they never edit the project.
 
 ### 5. Merge findings
 
-Read `references/merge-apply-contract.md` and run its merge stage. It owns schema validation, evidence gates, deduplication, confidence/corroboration, pre-existing separation, mode-aware demotion, stable numbering, triage groups, plan completeness, and protected-artifact filtering.
+Read `references/merge-apply-contract.md` and run its merge stage. It owns
+checked handoff handling, source lineage, evidence gates, deduplication,
+confidence/corroboration, pre-existing separation, mode-aware demotion, stable
+numbering, triage groups, plan completeness, and protected-artifact filtering.
 
 If every reviewer fails, return a degraded result with the reason. Otherwise continue even when some specialists fail and record them in Coverage.
 
@@ -119,7 +139,14 @@ If every reviewer fails, return a degraded result with the reason. Otherwise con
 
 Directly verify confidence-100 P2/P3 findings only when the cited line itself mechanically proves the issue. Runtime, cross-file, security, concurrency, performance, auth, and contract judgments never qualify.
 
-For all P0/P1 and other surviving consequential findings, read `references/validator-template.md` and dispatch one fresh validator with the complete finding array. Cap only the P2/P3 tail at 15 total items; never exclude P0/P1. Apply each returned verdict independently. On validator infrastructure failure, keep P0/P1 marked degraded and drop unvalidated P2/P3. Prune triage groups after drops.
+Before validation, hydrate source-backed findings through
+`scripts/review-artifact.py hydrate-findings`; do not reconstruct full evidence
+from compact projections. For all P0/P1 and other surviving consequential
+findings, read `references/validator-template.md`, write its complete
+`validator-packet.json`, and dispatch one validator with `fork_turns="none"`.
+Cap only the P2/P3 tail at 15 total items; never exclude P0/P1. Apply each
+returned verdict independently. On validator infrastructure failure, keep P0/P1
+marked degraded and drop unvalidated P2/P3. Prune triage groups after drops.
 
 ### 7. Apply fixes in default mode
 
@@ -164,9 +191,10 @@ After output, stop. Do not offer push/PR actions or run post-review triage.
 | `references/review-scope.md` | Scope, intent, plan discovery |
 | `references/repo-profile-cache.md` | Cache protocol details if needed |
 | `references/persona-catalog.md` | Reviewer selection |
-| `references/subagent-template.md` | Reviewer dispatch |
+| `references/subagent-template.md` | Lean reviewer protocol and packet |
 | `references/diff-scope.md` | Shared scope rules for reviewers |
 | `references/findings-schema.json` | Reviewer JSON contract |
+| `scripts/review-artifact.py` | Result validation, receipt acceptance, hydration |
 | `references/validator-template.md` | Single batched validation pass |
 | `references/merge-apply-contract.md` | Merge, apply, JSON, artifacts |
 | `references/review-output-template.md` | Markdown report skeleton |

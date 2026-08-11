@@ -2,19 +2,47 @@
 
 ## Merge
 
-1. Validate every compact reviewer return against `findings-schema.json`. Drop malformed findings and record counts.
-2. Discard findings outside the resolved diff unless the diff newly exposes a pre-existing issue. Separate genuine pre-existing findings from the verdict.
-3. Discard recommendations to delete or ignore protected planning/learning artifacts.
-4. Require `first_evidence` for confidence 75/100. Demote or suppress unsupported claims.
-5. Deduplicate by normalized file, nearby line bucket, and normalized title/root cause. Merge evidence, reviewers, and the strongest conservative route.
-6. Confidence uses anchors 0/25/50/75/100. Independent corroboration may promote one anchor; the orchestrator fast pass never promotes.
-7. Route weak testing-only findings to `testing_gaps` and weak maintainability/advisory findings to `residual_risks` rather than inflating actionable findings.
-8. Assign stable `#` values after filtering. Never renumber them later.
-9. Build triage groups only when they represent a real shared decision, root cause, or apply order. Groups supplement findings and reference stable numbers.
-10. Add plan-completeness findings from the resolved plan contract: explicit omissions P1/actionable; inferred omissions P3/advisory.
-11. Preserve agent-native, deployment, Known Pattern, residual-risk, and testing-gap outputs separately.
+1. Accept a normal reviewer receipt only through `review-artifact.py
+   accept-review`. Accept a write failure or reviewer-side validation failure
+   only through `accept-inline`. A parent-side failure gets one repair request;
+   after that, mark the reviewer failed and record the reason in Coverage.
+2. Merge only checked compact projections. Union every acceptance result's
+   `sources` into `source-registry.json`; duplicate keys with different entries
+   fail the run. Inline fallbacks have empty `source_keys` and remain visibly
+   degraded.
+3. Discard findings outside the resolved diff unless the diff newly exposes a
+   pre-existing issue. Separate genuine pre-existing findings from the verdict.
+4. Discard recommendations to delete or ignore protected planning/learning
+   artifacts.
+5. Require `first_evidence` for confidence 75/100. Demote or suppress an
+   unsupported inline claim; the helper already rejects unsupported normal
+   results.
+6. Deduplicate by normalized file, nearby line bucket, and normalized
+   title/root cause. Union `source_keys` and reviewers and choose the strongest
+   conservative route. Never replace source lineage with synthesized prose.
+7. Confidence uses anchors 0/25/50/75/100. Independent corroboration may
+   promote one anchor; the orchestrator fast pass never promotes.
+8. Route weak testing-only findings to `testing_gaps` and weak
+   maintainability/advisory findings to `residual_risks` rather than inflating
+   actionable findings.
+9. Assign stable `#` values after filtering. Never renumber them later.
+10. Build triage groups only when they represent a real shared decision, root
+    cause, or apply order. Groups supplement findings and reference stable
+    numbers.
+11. Add plan-completeness findings from the resolved plan contract: explicit
+    omissions P1/actionable; inferred omissions P3/advisory.
+12. Preserve agent-native, deployment, Known Pattern, residual-risk, and
+    testing-gap outputs separately.
 
 P0/P1 at confidence 50 may survive for validation rather than being silently lost. P2/P3 require stronger evidence or soft-bucket routing.
+
+Before independent validation and again before final output, write a hydration
+request containing each surviving finding's `source_keys` and run
+`review-artifact.py hydrate-findings --sources source-registry.json`. Reload
+full records from the digest-checked source files. Merge their evidence,
+reviewers, and strongest `why_it_matters` into the synthesized finding. Never
+ask a model to recreate missing detail. Inline fallback findings keep their
+compact evidence and Coverage warning.
 
 ## Apply (default local scope only)
 
@@ -91,6 +119,8 @@ Use `status:failed` with a reason for setup failure, `status:skipped` for scope 
 Always write under `/tmp/andrea-engineering/ce-code-review/<run-id>/`:
 
 - per-reviewer JSON;
+- accepted compact projections and `source-registry.json`;
+- hydration requests and hydrated full records;
 - synthesized and actionable findings;
 - advisory outputs;
 - `report.md` or `review.json`;

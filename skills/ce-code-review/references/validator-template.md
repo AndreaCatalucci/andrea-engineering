@@ -1,45 +1,41 @@
-# Batched Validator Prompt
+# Batched Validator Protocol
 
-Use this template for the single independent validation dispatch after finding synthesis.
+The parent writes `/tmp/andrea-engineering/ce-code-review/<run-id>/validator-packet.json`
+and dispatches one independent validator with `fork_turns="none"`. The launch
+prompt supplies only this protocol's absolute path and the packet path.
 
-```text
-You are an independent validator for a set of code-review findings. Another review produced these candidates. Verify each from fresh inspection; false positives are common and you have no obligation to agree.
+The packet contains the run ID, hydrated full findings path, staged diff and
+file-list paths, scope mode and fetched refs, intent, requirements, PR context,
+project orientation, applicable governing instructions, and up to three Known
+Pattern notes. It is complete; do not use inherited conversation history.
 
-<findings>
-{findings_json_array}
-</findings>
-
-<diff>
-{diff_or_staged_diff_path}
-</diff>
-
-<scope>
-{scope_mode_and_remote_head_ref}
-</scope>
-
-For each finding independently determine:
+For every supplied finding independently decide:
 
 1. Is the issue real in the code as written?
 2. Was it introduced or newly exposed by this diff?
-3. Is it already prevented by callers, guards, middleware, framework behavior, types, or parallel handling?
+3. Is it already prevented by callers, guards, middleware, framework behavior,
+   types, tests, or parallel handling?
 
-Read the cited code and relevant surrounding paths. In remote scope, inspect the remote head with `git show`; never inspect the stale workspace copy. In local scope, use read-only file/search/git tools as needed.
+Read the cited code and relevant surrounding paths yourself. Findings are
+candidates, not evidence of one another. In remote scope, inspect the supplied
+remote head with `git show` or the staged hunks; never inspect a stale workspace
+copy. Do not invent findings or edit files.
 
-Do not let one candidate corroborate another. Do not invent new findings. Do not edit files.
+Return only:
 
-Return only JSON:
-
+```json
 {
   "verdicts": [
     {
       "finding_number": 1,
       "validated": true,
-      "reason": "One sentence grounded in inspected evidence."
+      "reason": "One sentence grounded in independently inspected evidence."
     }
   ]
 }
-
-Return exactly one verdict for every supplied finding number. Reject when evidence is insufficient. If a cited file cannot be inspected, return `validated:false` with that reason.
 ```
 
-Each finding object should include its stable number, title, severity, file, line, confidence, originating reviewers, `why_it_matters` when available, and suggested fix when present.
+Return exactly one verdict for every finding number. Reject when evidence is
+insufficient or a cited file cannot be inspected. Each input finding includes
+its stable number, title, severity, file, line, confidence, source reviewers,
+full `why_it_matters`, evidence, and suggested fix when present.

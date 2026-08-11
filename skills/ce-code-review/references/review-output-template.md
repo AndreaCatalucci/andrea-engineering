@@ -158,7 +158,9 @@ This fails because of the **box-drawing `────` separators between items*
 
 When `mode:agent` is active, **do not** emit the markdown table report above. Emit **one parseable JSON object** as the primary response and write the same payload to `review.json` under `/tmp/andrea-engineering/ce-code-review/<run-id>/`.
 
-The contract is defined in SKILL.md under **`### JSON output format (`mode:agent` only)`**. Minimum fields: `status`, `verdict`, `scope`, `intent`, `reviewers`, `findings`, `actionable_findings`, `artifact_path`, `run_id`.
+The contract is defined in `merge-apply-contract.md`. Minimum keys are
+`"status"`, `"verdict"`, `"scope"`, `"intent"`, `"reviewers"`, `"findings"`,
+`"actionable_findings"`, `"artifact_path"`, and `"run_id"`.
 
 Key differences from the interactive markdown format:
 
