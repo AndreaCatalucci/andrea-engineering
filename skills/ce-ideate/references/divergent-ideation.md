@@ -1,88 +1,149 @@
-# Divergent Ideation (Phase 2)
+# Divergent Ideation
 
-Read this file at the start of Phase 2 — after Phase 1 grounding and any Phase 1.5 evidence scouts complete, and before building any ideation dispatch prompt. It defines the ideation fleet, dispatch payload, frames, compact candidate contract, and post-merge synthesis.
+Read this only at Phase 2. Generation must finish before critique begins.
 
-## Fleet
+## Dispatch the smallest complete fleet
 
-Dispatch parallel ideation subagents using the inherited Codex model. The default fleet is **5 agents covering all six frames**:
+Read `dispatch-contract.json`; it is authoritative for agent assignments,
+candidate quotas, and evidence-read budgets. Use these rules when applying it:
 
-- **3 agents**, one per evidence-driven frame: Pain and friction; Inversion, removal, or automation; Leverage and compounding.
-- **2 agents** for the remaining frames: one takes Cross-domain analogy; the other takes Assumption-breaking and reframing **plus** Constraint-flipping (cousins that productively share one context).
+- Issue themes replace named frames and use the contract's round-robin rule. If
+  issue evidence is insufficient, select the default-software entry.
+- Non-software depth selects the matching entry described in
+  `universal-ideation.md`.
+- Recovery runs only after the area check and treats each empty area as a
+  separate assignment.
 
-Fleet variants: **surprise-me** and **`go deep`** dispatch 6 agents, one frame each. **Issue-tracker mode** dispatches 4 agents only when issue-tracker intent was detected in Phase 0.2 AND the issue intelligence agent returned usable themes (see override below). The insufficient-issue-signal fallback from Phase 1 uses the default 5-agent fleet.
+Volume overrides change the explicit bucket bounds before dispatch. They do not
+erase a bucket or let a paired agent combine its quotas.
 
-Each frame targets ~6-8 ideas (a two-frame agent targets that per frame), yielding ~36-48 raw ideas in the default path or ~24-32 across 4 frames in issue-tracker mode; roughly 25-30 survive dedupe in the default path and fewer in the 4-frame path. Adjust per-frame targets when volume overrides apply (e.g., "100 ideas" raises it, "top 3" may lower the survivor count instead).
+Dispatch the initial fleet concurrently. If local capacity is smaller than the
+selected fleet, use a bounded queue and start the next assignment as soon as a
+slot opens. Recovery starts only after the whole initial fleet is accepted.
 
-## Dispatch Payload (cache-friendly, long-context ordered)
+## Build a fresh-context packet
 
-Build one shared grounding block and keep it byte-identical across every ideation dispatch this run — identical prefixes let platforms with prompt caching reuse the expensive part. Longform shared material goes first; the agent-specific task goes last:
+Spawn each agent with no inherited turns and supply:
 
-- `<grounding>` — the consolidated grounding summary, including the evidence gists and the absolute paths of the dossier files under `<scratch-dir>` (identical bytes across agents). Instruct each agent to read the dossier files before generating — they are the evidence layer its bases cite; the gists are orientation, not evidence. In elsewhere modes the only dossiers are user-supplied research dossiers (when present); otherwise the grounding summary itself is the evidence layer.
-- `<constraints>` — the user's prompt, the focus hint, and any *User-named references*: ideas that violate these are out regardless of basis
-- `<background>` — everything else in the grounding (codebase context, additional context, learnings, external context, user-supplied research): informative, not directive — it can supply an idea's basis, but it must not pull ideation toward whatever was loudest in the corpus when the user named a different focus
-- `<areas>` — the Phase 1.5 area list, when present
-- `<task>` — the frame assignment, per-frame volume target, ambition charter, verification-read budget, and compact candidate contract; generate raw candidates only
+1. `grounding`: the byte-identical summary and dossier paths;
+2. `constraints`: the user prompt, focus, and named directive files;
+3. `background`: codebase, learnings, external evidence, and research gists;
+4. `areas`: the declared area list, or an empty list;
+5. `assignment`: the exact candidate-file object: kind, stable assignment ID,
+   declared areas, and buckets with ID, minimum, and maximum;
+6. `bucket_instructions`: keyed by bucket ID, with the evidence-read allowance
+   and full frame instruction; a theme also includes its complete theme summary
+   and evidence, while recovery names the missing area;
+7. `paths`: absolute `skill_dir`, `helper_path`, `generator_protocol_path`,
+   scratch directory, draft path, authoritative result path, and expected-
+   assignment manifest path;
+8. the fixed protocol loaded from `generator_protocol_path`.
 
-The `<constraints>`/`<background>` split is the primary defense against grounding noise (an unrelated `FEEDBACK.md` the user did not name, a tangentially-cited prior-art result) shaping survivors against user intent — keep it mechanical via the tags, not prose hedging. User-supplied *research* artifacts are background even though user-named — supplying evidence is not issuing a directive; only directive files (per the Phase 1 routing test) ride in `<constraints>`.
+Before dispatch, the parent writes the expected-assignment manifest. It contains
+the exact `assignment` object and its allocated `result_path`; agents must not
+reconstruct either value. Copy the selected frame definitions below into the
+matching `bucket_instructions` so a fresh agent never needs conversation
+history or another instruction file to understand its assignment.
 
-**Ambition charter (include verbatim in every ideation dispatch):**
-
-> This ideation exists so the user can choose a direction worth building — the output's value is decided by whether one idea changes what they do next. Generate the smartest, most inventive ideas your frame can reach: ideas a strong team would say "we have to do this" about. Your first few ideas will be the obvious ones — treat them as warm-up, and keep only the ones that still earn their place after the non-obvious ideas exist. If an idea would appear in a generic listicle about this topic, sharpen it with grounding evidence or drop it. Anchor every idea in specific entries from the grounding.
-
-**Verification reads (repo mode).** After an agent makes its internal cut, it may spend up to 5 targeted reads (10 under `go deep`) following dossier `file:line` pointers to verify or deepen the bases of ideas it will submit. A `direct:` basis must quote a line the agent actually read — in a dossier or in the repo — never a guessed citation. Elsewhere modes verify against the user-supplied context — including reading user-research dossiers when present — instead of reading repo files.
+The fixed protocol stays unchanged across agents. Put long shared material
+before assignment-specific content. Dossier gists orient the agent; the dossier
+itself is evidence and must be read before citation.
 
 ## Frames
 
-Assign each subagent its frame (or frame pair) as a **starting bias, not a constraint**. Prompt each to begin from its assigned perspective but follow any promising thread -- cross-cutting ideas that span multiple frames are valuable.
+Frames are starting points, not walls:
 
-**Frame selection (mode-symmetric — same six frames in repo and elsewhere modes):**
+1. **Pain and friction** — recurring user, operator, or topic pain.
+2. **Inversion, removal, automation** — reverse, delete, or automate a step.
+3. **Assumption-breaking** — expose a fixed-looking choice and reframe it.
+4. **Leverage and compounding** — make future work cheaper or stronger.
+5. **Cross-domain analogy** — transfer a structurally similar pattern from a
+   non-obvious field.
+6. **Constraint-flipping** — invert or exaggerate the obvious constraint and
+   turn the useful result into a realistic direction.
 
-1. **Pain and friction** — user, operator, or topic-level pain points; what is consistently slow, broken, or annoying.
-2. **Inversion, removal, or automation** — invert a painful step, remove it entirely, or automate it away.
-3. **Assumption-breaking and reframing** — what is being treated as fixed that is actually a choice; reframe one level up or sideways.
-4. **Leverage and compounding** — choices that, once made, make many future moves cheaper or stronger; second-order effects.
-5. **Cross-domain analogy** — generate ideas by asking how completely different fields solve a structurally analogous problem. The grounding domain is the user's topic; the analogy domain is anywhere else (other industries, biology, games, infrastructure, history). Push past the obvious analogy to non-obvious ones.
-6. **Constraint-flipping** — invert the obvious constraint to its opposite or extreme. What if the budget were 10x or 0? What if the team were 100 people or 1? What if there were no users, or 1M? Use the resulting design as a candidate even if the constraint flip itself is not realistic.
+For surprise-me, tell each agent to find the subject most interesting from its
+frame. Different frames finding different subjects is intentional.
 
-**Issue-tracker mode override (repo mode only).** When issue-tracker intent is active and themes were returned by the issue intelligence agent: each high/medium-confidence theme becomes a frame. Pad with frames from the 6-frame default pool (in the order listed above) if fewer than 3 cluster-derived frames. Cap at 4 total — issue-tracker mode keeps its tighter dispatch by design.
+## Candidate file
 
-**Area spread instruction.** When an area list is present, instruct each subagent to distribute its ideas across multiple areas — the frame's point of view applies to every area, but ideas should not all cluster on one. Each idea must be tagged with the area it targets. The frame is a point of view; the area list is the surface map. A frame that plausibly reaches an area should produce at least one idea there before doubling up on a different area. When decomposition was skipped (atomic subject or surprise-me), omit the area instruction entirely — do not invent areas at dispatch time.
+Each agent writes one JSON document. The shape below is abbreviated; the real
+file must include enough candidates to satisfy every declared minimum.
 
-**Surprise-me mode addendum.** When Phase 0.2 routed to surprise-me, include this additional instruction in each subagent's dispatch prompt:
+```json
+{
+  "schema_version": 1,
+  "assignment": {
+    "kind": "frame",
+    "assignment_id": "default-01",
+    "areas": ["delivery"],
+    "buckets": [
+      {"id": "pain-and-friction", "minimum": 6, "maximum": 8},
+      {"id": "constraint-flipping", "minimum": 6, "maximum": 8}
+    ]
+  },
+  "candidates": [
+    {
+      "assignment": "pain-and-friction",
+      "title": "Concrete title",
+      "move": "One concrete direction.",
+      "area": "delivery",
+      "basis": "direct: path/file.py:42 shows the repeated wait",
+      "significance": "Why the evidence makes the move matter."
+    }
+  ]
+}
+```
 
-> No user-specified subject. Through your frame's point of view, explore the Phase 1 material and identify the subject(s) you find most interesting for this frame. Different frames finding different subjects is the feature — cross-subject divergence is what makes surprise-me valuable. Each idea still carries a basis; the basis may include identification of the subject itself (why *this* subject is worth ideating on through your point of view, citing what in the Phase 1 material signals it).
+Use assignment kind `theme` for issue themes, `recovery` for missing areas, and
+`universal` for non-software frames. Omit `area` only when the assignment's
+`areas` array is empty. The helper rejects unknown fields, invalid basis tags,
+undeclared areas, and incomplete bucket quotas.
 
-## Compact Candidate Contract (uniform across all frames, all modes)
+The agent seals the file with the packet's absolute `helper_path`, passing
+`--expected` with the expected-assignment manifest, and returns only its
+receipt. The parent saves that receipt as JSON and runs `accept-candidates`
+with the same `--expected` manifest. The helper binds the receipt to the exact
+assignment and allocated result path, then returns the only projected
+candidates used by merge.
 
-Explore broadly within each frame, then return every requested candidate in this compact form:
+Allow one repair for an invalid file or receipt. On a write failure, the agent
+may return one complete inline candidate document. The parent writes it to a
+draft, seals it through the same command, and accepts it only if validation
+passes. A second failure leaves the assignment missing and must be reported as
+degraded coverage.
 
-- **title**
-- **move** — one sentence stating the concrete direction
-- **area** — required when Phase 1.5 produced an area list. Pick the one area this idea most centrally targets; do not span. Omit entirely when decomposition was skipped.
-- **basis** (required, tagged) — one of:
-  - `direct:` quoted line / specific file / named issue / explicit user-supplied context
-  - `external:` named prior art, domain research, adjacent pattern, with source
-  - `reasoned:` explicit first-principles argument for why this move likely applies — not a gesture; the argument is written out
-- **significance** — one line connecting the basis to why the move matters
+## Merge without losing provenance
 
-Basis is required. If a subagent cannot articulate one, the idea does not surface. Do not pre-write downsides, confidence, complexity, visuals, or multi-paragraph rationale for raw candidates; the root agent develops only the survivors after verification.
+Merge only the projections returned by `accept-candidates`; do not run
+`project-candidates` afterward. Each projection already has its stable source
+key, deterministic `candidate_id`, and `parents` list.
 
-**Generation rules (uniform across frames, all modes):**
+Merge projections, then deduplicate semantically. A retained original keeps its
+single parent. A deduplicated candidate lists every merged parent and uses
+origin `deduped`. A cross-cutting or root-created combination lists all input
+parents and uses origin `synthesis`. Recovery projections use origin
+`recovery`. For a changed or new candidate, omit `candidate_id` from the draft;
+`seal-consolidated` computes all missing IDs from title, move, and parents in
+one pass. A supplied but stale ID fails validation. Never discard lineage.
 
-- Every idea carries an articulated basis. Unjustified speculation does not surface, regardless of how plausible it sounds.
-- Bias toward the basis type your frame naturally produces — pain/inversion/leverage tend toward `direct:`; analogy and constraint-flipping tend toward `reasoned:`; assumption-breaking is mixed — but don't exclude other basis types.
-- Apply the meeting-test internally as a default floor, but do not emit a self-attestation field; the independent verifier judges it. The floor is relaxed only when Phase 0.5 detected tactical focus signals.
-- Stay within the subject's identity. Product expansions, new surfaces, new markets, retirements, and architectural pivots are fair game when the basis supports them. Subject-replacement moves (abandoning the project, pivoting to unrelated domains, becoming a different organization) are out regardless of basis.
-- **Honor the asked scope.** When the focus hint names a part of the subject (a flow, a stage, a section, a feature within a larger product — e.g., "account settings", "onboarding flow", "pricing page copy", "gameplay rules"), ideate at full ambition *within that scope*. Expanding the surface to the whole subject — proposing fundamental changes to the broader product when the user named one slice — is a scope mismatch even when no subject-replacement occurred. Big-picture thinking still applies; it just operates inside the bounded surface the user named, not by widening the surface.
+In specified mode, add at most 3-5 genuinely stronger combinations. In
+surprise-me mode, allow 5-8 because different frames may discover complementary
+subjects. Do not pad these counts.
 
-## After All Sub-Agents Return
+Check declared areas after dedupe. If an area has no candidates, dispatch the
+recovery entry from the contract. Give each missing area its own bucket and
+apply its declared quota and evidence reads independently. Record any area
+beyond the contract's recovery cap rather than spawning more agents.
 
-1. Merge and dedupe into one master candidate list.
-2. Synthesize cross-cutting combinations -- scan for ideas from different frames that combine into something stronger. In specified mode, expect 3-5 additions at most. **In surprise-me mode, cross-cutting is the magic layer** — frames often converge on overlapping subjects or find complementary angles; expect 5-8 additions and give this step more attention. Surface combinations that span multiple frame-chosen subjects as a distinctive surprise-me output pattern.
-3. **Area-coverage check (when Phase 1.5 produced an area list; skipped otherwise).** Count ideas per area after dedupe. For any area with zero ideas, dispatch one recovery subagent using an unused frame or the frame whose point of view best fits the missing area — e.g., Pain & friction for usability areas, Cross-domain analogy for distribution or compounding areas. The recovery dispatch uses the same compact contract and returns ~3-5 ideas. **Cap recovery at 2 areas total** — if more than 2 areas are empty after the first round, accept thin coverage rather than fanning out further. After recovery returns, merge into the master list and dedupe again. Note empty areas that were not recovered in the rejection summary as "area: <name> — recovery skipped (cap reached)" so the gap is visible to the user.
-4. If a focus was provided, weight the merged list toward it without excluding stronger adjacent ideas.
-5. Spread ideas across multiple dimensions when justified: workflow/DX, reliability, extensibility, missing capabilities, docs/knowledge compounding, quality/maintenance, leverage on future work.
+Collect every accepted projection's source key into `source-registry.json` with
+exactly `schema_version`, `areas`, and `source_keys`. Seal the resulting
+`consolidated-candidates.json` with `seal-consolidated --sources
+<source-registry>`. The helper fills missing candidate IDs and rejects supplied
+stale IDs, unknown sources, undeclared areas, or incomplete lineage. Also write
+a best-effort `raw-candidates.md` checkpoint grouped by candidate ID and
+assignment. If that
+human-readable checkpoint fails, warn and continue; the checked JSON remains
+authoritative.
 
-**Checkpoint A (V17).** Immediately after cross-cutting synthesis, write `<scratch-dir>/raw-candidates.md` containing the consolidated candidates with agent attribution. This is best-effort and protects the expensive generation output before critique; continue with a warning if the write fails.
-
-When the merge, synthesis, and area-coverage steps are complete, return to SKILL.md Phase 2's closing instruction and load `references/post-ideation-workflow.md` before any critique begins.
+Pass the consolidated receipt, not repeated candidates, into Phase 3.

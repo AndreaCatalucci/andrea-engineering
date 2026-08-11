@@ -1,86 +1,95 @@
 # Post-Ideation Workflow
 
-Read this file after Phase 2 agents return and the root agent has merged and deduplicated their candidates.
+Read this after `consolidated-candidates.json` has been sealed. Critique starts
+here, never during generation.
 
-## Phase 3: Verify and Select
+## Phase 3: Verify and select
 
 ### Independent verification
 
-Dispatch one fresh-context verifier using the inherited Codex model. Give it only:
+Spawn one verifier with no inherited turns. Supply only:
 
-- The consolidated grounding summary and dossier paths
-- The merged candidate list
-- The per-idea basis contract
+- the compact grounding summary and evidence-dossier paths;
+- the absolute consolidated candidate path and checked digest;
+- `verifier_role: basis-integrity`;
+- absolute `skill_dir`, `helper_path`, `verifier_protocol_path`, draft path, and
+  authoritative verdict path;
+- the fixed protocol loaded from `verifier_protocol_path`.
 
-Ask it to attempt to refute each candidate: verify that `direct:` evidence exists, `external:` prior art is real and relevant, `reasoned:` arguments hold, and the move passes the meeting-test. Require a `sound`, `weak`, or `refuted` verdict with a one-line reason. Under `go deep`, dispatch one additional fresh-context critic focused on novelty and feasibility using the same payload.
+The verifier reads candidates by path, writes one verdict per `candidate_id`,
+seals the file with the packet's absolute `helper_path`, and returns a receipt.
+The parent reruns `receipt-verdicts` through the same helper against the
+allocated result path and requires an exact match. Under
+`go deep` or non-software Full, dispatch one additional verifier with
+`verifier_role: novelty-feasibility`. Give it distinct draft and authoritative
+result paths; the two verifiers share only read inputs and schema. Dispatch
+both together when capacity permits.
 
-If verification cannot run, filter in the root agent and record the degradation.
+Allow one repair. An inline fallback is acceptable only as one complete verdict
+document that the parent persists and seals through the same helper. If a
+verifier remains unavailable, record the degradation and continue with root
+critique; never imply independent verification ran.
 
 ### Root arbitration
 
-Review every candidate and make the final cut. Treat verifier verdicts as strong evidence, not authority; overrule only when the grounding supports the decision, and record why.
+Load the consolidated candidates and accepted verdict files once. Treat
+verdicts as strong evidence, not authority. Overrule one only when the
+grounding supports the decision and record why.
 
-Reject candidates that are:
+Reject candidates that are vague, duplicative, unsupported, contradicted,
+outside scope, below the ambition floor, too costly for their value, or better
+handled as an unresolved brainstorm. Do not generate replacements during this
+cut. Record every disposition by `candidate_id`, with one rejection reason or a
+survivor marker. Persist the complete list as `dispositions.json` in the run
+directory before developing survivors. Keep any unrecovered area as its own
+rejection row.
 
-- Vague, unactionable, duplicative, or already covered
-- Unsupported or contradicted by their stated basis
-- Below the meeting-test, unless tactical focus explicitly waived it
-- Too costly for their expected value
-- Outside the requested scope or a replacement for the subject
-- Better treated as an unresolved brainstorm variant
-
-Give every rejected idea a one-line reason. Do not generate replacements during filtering.
-
-Score survivors on groundedness, basis strength, expected value, novelty, pragmatism, leverage, implementation burden, overlap, and area spread. Evaluate area spread across the survivor set; note any area left empty after recovery.
-
-Keep 5–7 survivors by default. Tighten the cut if more survive; report fewer honestly rather than lowering the bar.
+Rank survivors using groundedness, basis strength, expected value, novelty,
+pragmatism, leverage, burden, overlap, and topic-area spread. Keep 5-7 by
+default; honor an explicit volume override. Tighten the bar when too many pass
+and report fewer honestly rather than lowering it.
 
 ### Develop survivors
 
-After the cut, expand only the survivors into the final artifact fields: concrete description, rationale, downsides, confidence, and complexity. Preserve the verified basis and area. Add nuance from the grounding, not invented support. If development exposes a weak premise, return the idea to arbitration instead of polishing it through.
+Only after the cut, expand survivors with a concrete description, rationale,
+downsides, confidence, and complexity. Preserve candidate ID, verified basis,
+and area. If expansion exposes a weak premise, return the candidate to
+arbitration instead of polishing through it.
 
-Completion criterion: every raw candidate has a recorded disposition; every survivor has a verified basis, complete artifact fields, and a scope/area check.
+Before delivery, confirm that every raw candidate has one disposition and every
+survivor has complete fields, a supporting basis, and a scope and area check.
 
-## Phase 4: Write and Deliver
+## Phase 4: Write and deliver
 
-Write the ideation artifact automatically.
+Resolve the destination:
 
-1. Resolve the target:
-   - Repo mode: create or use `docs/ideation/`.
-   - Elsewhere mode with an existing `docs/ideation/`: use it.
-   - Otherwise: use `<scratch-dir>` under `/tmp/andrea-engineering/ce-ideate/<run-id>/` and state that the path is temporary.
-2. Use `<dir>/YYYY-MM-DD-<topic>-ideation.<ext>`, or `open-ideation` when no topic exists. The extension follows `OUTPUT_FORMAT`.
-3. Read `references/ideation-sections.md` and only the matching renderer: `references/markdown-rendering.md` or `references/html-rendering.md`.
-4. Write the grounding context, topic areas when present, ranked ideas, and rejection summary according to those references.
-5. On resume, update the existing artifact in its current format and preserve prior useful content.
+- repository mode: create or use `docs/ideation/`;
+- elsewhere mode with an existing `docs/ideation/`: use it;
+- otherwise use the run scratch directory and identify it as temporary.
 
-If writing fails, report the failure and ask for a writable path. Do not lose the survivor list.
+Write `YYYY-MM-DD-<topic>-ideation.<ext>`, or `open-ideation` without a fixed
+topic. On explicit resume, preserve useful content and rejection history.
 
-Return a compact summary:
+Read `ideation-sections.md` and exactly one renderer: `markdown-rendering.md` or
+`html-rendering.md`. Write the relevant context, topic areas or skip reason,
+ranked ideas, and complete rejection summary. Rendering changes presentation,
+not content.
 
-- Raw, rejected, and surviving counts plus the absolute artifact path
-- One line per survivor: rank, title, area, confidence, and complexity
-- One sentence naming the top pick
-- Any area with zero survivors
-- Any verification degradation
+Return only:
 
-Do not reproduce the full artifact in chat, open applications, publish, commit, delete files, or present an action menu. End after delivery.
+- raw, rejected, and surviving counts plus the absolute document path;
+- one line per survivor with rank, title, area, confidence, and complexity;
+- the top pick;
+- any area with zero survivors;
+- any missing generation assignment or verification degradation.
 
-## Later Selected-Idea Handoff
+Do not reproduce the document, open applications, publish, commit, delete
+files, or present an action menu.
 
-Only when the user subsequently chooses an idea, build this compact capsule from the saved artifact and current context:
+## Later selected-idea handoff
 
-> Selected direction: <title and description>. Constraints: <known constraints>. Success criteria: <known outcomes>. Evidence: <basis>. Tradeoffs: <downsides>. Provenance: <path and idea title>.
-
-Route a software direction with clear constraints and success criteria to `ce-plan`. Route unresolved product meaning or scope to `ce-brainstorm`. Route non-software ideas to `ce-brainstorm`. Never route directly to implementation.
-
-## Quality Gate
-
-Before finishing, confirm:
-
-- Ideas were generated before critique.
-- Every survivor has a basis that supports its move.
-- Important direct evidence was checked.
-- Every rejection has a reason.
-- The survivor set passes ambition, scope, subject-identity, and area-spread checks.
-- The saved artifact contains the full reasoning; chat contains only orientation.
+Only after the user chooses an idea, build a compact capsule containing its
+title, move, constraints, desired outcomes, evidence, downsides, and source
+document. Send clear software directions to `ce-plan`; send unresolved product
+meaning, non-software directions, or scope questions to `ce-brainstorm`. Never
+route directly to implementation.

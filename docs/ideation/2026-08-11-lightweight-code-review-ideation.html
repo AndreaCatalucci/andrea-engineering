@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ideation: Lightweight code review</title>
+  <style>
+    :root { --page:#f7f7f4; --surface:#fff; --text:#202522; --muted:#5e6862; --border:#d9ded9; --accent:#245c46; --soft:#e8f1ec; --warn:#754b16; --warn-soft:#f7efe1; --shadow:0 8px 24px rgba(31,43,36,.07); }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:var(--page); color:var(--text); font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    .container { width:min(900px, calc(100% - 40px)); margin:0 auto; padding:54px 0 72px; }
+    header, section { scroll-margin-top:24px; }
+    header { margin-bottom:28px; }
+    .eyebrow { margin:0 0 6px; color:var(--accent); font-size:.78rem; font-weight:750; letter-spacing:.12em; text-transform:uppercase; }
+    h1 { margin:.1rem 0 .8rem; font-size:clamp(2.1rem,6vw,3.6rem); line-height:1.05; letter-spacing:-.035em; }
+    h2 { margin:3.2rem 0 1rem; font-size:1.65rem; letter-spacing:-.02em; }
+    h3 { margin:0; font-size:1.28rem; line-height:1.25; }
+    p, li { max-width:70ch; }
+    code { background:#eef0ed; padding:.1em .3em; border-radius:4px; font-size:.92em; }
+    a { color:var(--accent); text-underline-offset:3px; }
+    a:focus-visible { outline:3px solid #9bc6ae; outline-offset:3px; border-radius:3px; }
+    .metadata { display:flex; flex-wrap:wrap; gap:8px 20px; margin:0; color:var(--muted); }
+    .metadata div { display:flex; gap:6px; }
+    .metadata dt { font-weight:700; }
+    .metadata dd { margin:0; }
+    nav { position:sticky; top:0; z-index:2; display:flex; flex-wrap:wrap; gap:8px; padding:12px 0; background:rgba(247,247,244,.96); border-block:1px solid var(--border); }
+    nav a, .chip { border:1px solid var(--border); border-radius:999px; padding:5px 11px; background:var(--surface); color:var(--text); font-size:.88rem; text-decoration:none; }
+    .context { padding:20px 22px; border:1px solid var(--border); border-radius:14px; background:var(--surface); }
+    .context strong { color:var(--text); }
+    .areas { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; padding:0; list-style:none; }
+    .areas li { padding:13px; border-radius:10px; background:var(--soft); color:#173d2e; font-weight:650; font-size:.9rem; }
+    .jump-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 22px; padding-left:1.4rem; }
+    .idea { margin:18px 0; padding:24px; border:1px solid var(--border); border-radius:16px; background:var(--surface); box-shadow:var(--shadow); }
+    .idea.top { background:#f0f7f3; border-color:#b8d0c1; }
+    .idea-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:14px; }
+    .rank { flex:none; display:grid; place-items:center; width:34px; height:34px; border-radius:50%; background:var(--accent); color:#fff; font-weight:800; }
+    .title-group { flex:1; }
+    .badge { display:inline-block; margin-top:7px; padding:3px 9px; border-radius:999px; background:#d7eadf; color:#174732; font-size:.78rem; font-weight:750; }
+    .idea-meta { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 18px; }
+    .idea dl { display:grid; grid-template-columns:110px 1fr; gap:10px 18px; margin:0; }
+    .idea dt { color:var(--muted); font-weight:750; }
+    .idea dd { margin:0; max-width:70ch; }
+    .confidence { background:var(--soft); color:#173d2e; }
+    .complexity { background:var(--warn-soft); color:var(--warn); }
+    .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:12px; background:var(--surface); }
+    table { width:100%; border-collapse:collapse; min-width:650px; }
+    th, td { padding:12px 14px; border-bottom:1px solid var(--border); text-align:left; vertical-align:top; }
+    th { background:#eef1ed; font-size:.86rem; }
+    tr:last-child td { border-bottom:0; }
+    footer { margin-top:40px; padding-top:18px; border-top:1px solid var(--border); color:var(--muted); font-size:.86rem; }
+    @media (max-width:720px) { .container{width:min(100% - 24px,900px);padding-top:30px}.areas{grid-template-columns:1fr 1fr}.jump-list{grid-template-columns:1fr}.idea{padding:18px}.idea dl{grid-template-columns:1fr;gap:2px}.idea dd{margin-bottom:10px} }
+    @media print { body{background:#fff}.container{width:100%;padding:0}.idea{box-shadow:none;break-inside:avoid}nav{display:none}a{color:inherit} }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <p class="eyebrow">Ideation</p>
+      <h1>Lightweight code review</h1>
+      <dl class="metadata">
+        <div><dt>Date</dt><dd>2026-08-11</dd></div>
+        <div><dt>Topic</dt><dd>lightweight-code-review</dd></div>
+        <div><dt>Focus</dt><dd>Reduce token use without reducing code quality or review thoroughness</dd></div>
+        <div><dt>Mode</dt><dd>repo-grounded</dd></div>
+      </dl>
+    </header>
+
+    <nav aria-label="Document sections">
+      <a href="#grounding-context">Relevant Context</a>
+      <a href="#topic-areas">Topic Areas</a>
+      <a href="#ranked-ideas">Ranked Ideas</a>
+      <a href="#rejection-summary">Rejection Summary</a>
+    </nav>
+
+    <main>
+      <section id="grounding-context">
+        <h2>Relevant Context</h2>
+        <div class="context">
+          <p><strong>Codebase Context.</strong> The smallest core reviewer currently starts with about <strong>5,324 words of fixed review instructions</strong> before it sees the plan, PR context, diff, file list, or repository output: the 3,414-word reviewer template, 1,128-word schema, 379-word scope rules, and 403-word core persona. Each specialist repeats the shared portion and adds its own persona.</p>
+          <p>The same review also asks every reviewer to write a full JSON file and return an overlapping compact JSON result. Important findings then trigger a fresh validator inspection. These are useful quality safeguards, but they make fixed prompt text, repeated context, repeated output, and repeated repository exploration the main places to reduce tokens.</p>
+          <p>The current workflow has already reduced fan-out to one core reviewer plus specialists chosen from actual runtime concerns. That means another broad “use fewer reviewers” change has less safe upside than shrinking what each reviewer receives and emits. External evidence supports that focus: Anthropic reports large token multipliers for multi-agent systems and notes that coding offers less parallelism than research; its context-engineering guidance favors narrowly scoped agents that return compact results. OpenAI prompt caching can lower cost and latency for identical prefixes, but it does not reduce nominal token volume. Sources: <a href="https://www.anthropic.com/engineering/multi-agent-research-system">Anthropic multi-agent research system</a>, <a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Anthropic context engineering</a>, and <a href="https://openai.com/index/api-prompt-caching/">OpenAI prompt caching</a>.</p>
+        </div>
+      </section>
+
+      <section id="topic-areas">
+        <h2>Topic Areas</h2>
+        <ol class="areas">
+          <li>Reviewer fan-out</li>
+          <li>Prompt and context payload</li>
+          <li>Independent validation</li>
+          <li>Depth by change risk</li>
+          <li>Measurement and budgets</li>
+        </ol>
+      </section>
+
+      <section id="ranked-ideas">
+        <h2>Ranked Ideas</h2>
+        <ol class="jump-list">
+          <li><a href="#idea-1">Compile a lean reviewer protocol</a></li>
+          <li><a href="#idea-2">Start reviewers with fresh context</a></li>
+          <li><a href="#idea-3">Return a receipt, not a second report</a></li>
+          <li><a href="#idea-4">Build one expandable review index</a></li>
+          <li><a href="#idea-5">Validate small proof obligations</a></li>
+          <li><a href="#idea-6">Add a token and quality flight recorder</a></li>
+          <li><a href="#idea-7">Add a calibrated low-risk path</a></li>
+        </ol>
+
+        <article class="idea top" id="idea-1">
+          <div class="idea-header"><span class="rank">1</span><div class="title-group"><h3>Compile a lean reviewer protocol</h3><span class="badge">Top pick</span></div></div>
+          <div class="idea-meta"><span class="chip">Prompt and context payload</span><span class="chip confidence">Confidence 95%</span><span class="chip complexity">Complexity Medium</span></div>
+          <dl>
+            <dt>Description</dt><dd>Replace the long prose template and embedded full schema with a short, versioned reviewer protocol. Keep the rules that require judgment—observable impact, evidence, false-positive checks, and proposed fixes—in the prompt. Move enum checks, required-field checks, stable numbering, routing defaults, and output repair into deterministic merge code.</dd>
+            <dt>Basis</dt><dd><strong>direct:</strong> The fixed core packet is about 5,324 words before run-specific context, and much of it explains machine-checkable output rules or repeats the schema.</dd>
+            <dt>Rationale</dt><dd>This cuts the largest cost that multiplies with every reviewer while preserving the actual review rubric. Central enforcement is also more reliable than asking every model invocation to remember the same formatting rules.</dd>
+            <dt>Downsides</dt><dd>The short protocol needs contract tests. If too much judgment guidance is moved into code, reviewer quality can fall even though schema validity improves. Keep examples available on demand for repair, not in every initial prompt.</dd>
+            <dt>Confidence</dt><dd>95%</dd><dt>Complexity</dt><dd>Medium</dd>
+          </dl>
+        </article>
+
+        <article class="idea" id="idea-2">
+          <div class="idea-header"><span class="rank">2</span><div class="title-group"><h3>Start reviewers with fresh context</h3></div></div>
+          <div class="idea-meta"><span class="chip">Prompt and context payload</span><span class="chip confidence">Confidence 95%</span><span class="chip complexity">Complexity Low</span></div>
+          <dl>
+            <dt>Description</dt><dd>Dispatch reviewer and validator agents without inherited conversation history. Give each one a self-contained packet containing only the resolved intent, plan requirements, PR facts, repository profile, scope rules, and file paths it needs.</dd>
+            <dt>Basis</dt><dd><strong>direct:</strong> The review workflow already constructs an exact shared packet for every reviewer, so inherited planning and implementation history is redundant. Fresh context also reduces anchoring on the authoring agent.</dd>
+            <dt>Rationale</dt><dd>This is a rare change that should improve independence and reduce tokens at the same time. It prevents the full LFG conversation, earlier skill instructions, and unrelated tool output from being copied into every reviewer.</dd>
+            <dt>Downsides</dt><dd>The packet must include every authoritative requirement and applicable repository instruction. A missing plan or intent field would become more visible because reviewers can no longer recover it from chat history.</dd>
+            <dt>Confidence</dt><dd>95%</dd><dt>Complexity</dt><dd>Low</dd>
+          </dl>
+        </article>
+
+        <article class="idea" id="idea-3">
+          <div class="idea-header"><span class="rank">3</span><div class="title-group"><h3>Return a receipt, not a second report</h3></div></div>
+          <div class="idea-meta"><span class="chip">Prompt and context payload</span><span class="chip confidence">Confidence 95%</span><span class="chip complexity">Complexity Low</span></div>
+          <dl>
+            <dt>Description</dt><dd>Make the reviewer JSON file the normal source of truth. The agent returns only reviewer name, status, file path, digest, and counts. The current compact finding payload remains a fallback when the file cannot be written.</dd>
+            <dt>Basis</dt><dd><strong>direct:</strong> Reviewers currently generate a full JSON file and then repeat most merge fields in an inline compact return.</dd>
+            <dt>Rationale</dt><dd>One model output replaces two overlapping outputs. The parent context stays small, the merger can load files only when needed, and a digest detects mismatched or partial writes.</dd>
+            <dt>Downsides</dt><dd>The merger needs robust file and digest handling. Remote or restricted environments may make file writes less dependable, so the inline fallback remains important.</dd>
+            <dt>Confidence</dt><dd>95%</dd><dt>Complexity</dt><dd>Low</dd>
+          </dl>
+        </article>
+
+        <article class="idea" id="idea-4">
+          <div class="idea-header"><span class="rank">4</span><div class="title-group"><h3>Build one expandable review index</h3></div></div>
+          <div class="idea-meta"><span class="chip">Reviewer fan-out</span><span class="chip confidence">Confidence 85%</span><span class="chip complexity">Complexity High</span></div>
+          <dl>
+            <dt>Description</dt><dd>Create one deterministic index of changed hunks, symbols, callers, tests, applicable repository rules, persistence boundaries, public contracts, and external I/O. The core reviewer sees the whole change. Specialists start with the relevant index entries and may freely expand into the repository whenever a cross-file check requires it.</dd>
+            <dt>Basis</dt><dd><strong>direct:</strong> Large diffs are staged once, but each selected reviewer still receives the same broad change packet and independently rediscovers nearby code relationships.</dd>
+            <dt>Rationale</dt><dd>Parsing and orientation are paid once; independent judgment remains separate. On broad changes this can remove far more tool output than prompt compression alone.</dd>
+            <dt>Downsides</dt><dd>A bad index can hide the exact dependency a specialist should notice. It must be a starting map, never a scope boundary, and the core reviewer must retain full-diff coverage.</dd>
+            <dt>Confidence</dt><dd>85%</dd><dt>Complexity</dt><dd>High</dd>
+          </dl>
+        </article>
+
+        <article class="idea" id="idea-5">
+          <div class="idea-header"><span class="rank">5</span><div class="title-group"><h3>Validate small proof obligations</h3></div></div>
+          <div class="idea-meta"><span class="chip">Independent validation</span><span class="chip confidence">Confidence 90%</span><span class="chip complexity">Complexity Medium</span></div>
+          <dl>
+            <dt>Description</dt><dd>Keep the fresh validator for every consequential finding, but give it a compact proof request: the claim, cited line, changed symbol, dependent callers or guards to inspect, and stable source references. The validator opens those sources independently and widens its search when the proof is incomplete.</dd>
+            <dt>Basis</dt><dd><strong>direct:</strong> The current validator already checks whether callers, guards, middleware, framework behavior, or types prevent a finding; precise locators can direct the same checks without resending rich prose and broad diff context.</dd>
+            <dt>Rationale</dt><dd>This preserves the safeguard that catches correlated reviewer mistakes. It cuts rediscovery and reduces anchoring on the original reviewer’s explanation.</dd>
+            <dt>Downsides</dt><dd>Proof requests must name both confirming and disproving paths. A validator that treats locators as a hard boundary would be less thorough, so widening on uncertainty must be explicit.</dd>
+            <dt>Confidence</dt><dd>90%</dd><dt>Complexity</dt><dd>Medium</dd>
+          </dl>
+        </article>
+
+        <article class="idea" id="idea-6">
+          <div class="idea-header"><span class="rank">6</span><div class="title-group"><h3>Add a token and quality flight recorder</h3></div></div>
+          <div class="idea-meta"><span class="chip">Measurement and budgets</span><span class="chip confidence">Confidence 95%</span><span class="chip complexity">Complexity Medium</span></div>
+          <dl>
+            <dt>Description</dt><dd>Record input and output tokens, inherited-context size, tool-output volume, files read, unique findings, duplicates, validator reversals, and surviving severity per reviewer and risk class. Add a seeded-defect review set so prompt changes must preserve recall and false-positive rates.</dd>
+            <dt>Basis</dt><dd><strong>reasoned:</strong> Lower token totals alone cannot show whether a cheaper review preserved quality. The existing review output records confidence and validation results but not their cost or marginal reviewer value.</dd>
+            <dt>Rationale</dt><dd>This turns later reductions into measured experiments. It will show whether fixed prompt text, repository exploration, output generation, or specific personas actually dominate real runs.</dd>
+            <dt>Downsides</dt><dd>Codex may not expose every token field at the skill level. Seeded defects also need maintenance and can overfit if they are too small or too predictable.</dd>
+            <dt>Confidence</dt><dd>95%</dd><dt>Complexity</dt><dd>Medium</dd>
+          </dl>
+        </article>
+
+        <article class="idea" id="idea-7">
+          <div class="idea-header"><span class="rank">7</span><div class="title-group"><h3>Add a calibrated low-risk path</h3></div></div>
+          <div class="idea-meta"><span class="chip">Depth by change risk</span><span class="chip confidence">Confidence 75%</span><span class="chip complexity">Complexity Medium</span></div>
+          <dl>
+            <dt>Description</dt><dd>Let <code>mode:agent</code> use a structured low-risk path for changes that are clearly contained. It still runs an independent core reviewer, but skips specialist and validator work that has no trigger. Any uncertainty, consequential finding, public contract, auth, money, durable data, concurrency, external I/O, or irreversible operation escalates to the full path. Periodically run full reviews on a sample of low-risk changes and disable or tighten the lane when they find missed issues.</dd>
+            <dt>Basis</dt><dd><strong>direct:</strong> Fast review is currently unavailable in <code>mode:agent</code>, while LFG always invokes that mode. <strong>reasoned:</strong> Full-review samples are needed because risk classification can be wrong even when it fails closed.</dd>
+            <dt>Rationale</dt><dd>This targets routine pipeline volume without weakening high-risk reviews. Calibration makes the safety claim testable instead of relying on a line-count threshold.</dd>
+            <dt>Downsides</dt><dd>This has the highest recall risk of the surviving ideas. Classification must be semantic, uncertainty must choose the full path, and the low-risk lane should follow the prompt/context reductions rather than precede them.</dd>
+            <dt>Confidence</dt><dd>75%</dd><dt>Complexity</dt><dd>Medium</dd>
+          </dl>
+        </article>
+      </section>
+
+      <section id="rejection-summary">
+        <h2>Rejection Summary</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Candidate</th><th>Disposition</th><th>Reason</th></tr></thead>
+            <tbody>
+              <tr><td>Hydrate only surviving findings</td><td>Cut</td><td>Reviewers are best placed to explain observable impact and grounded fixes; rebuilding that nuance later risks inaccurate synthesis.</td></tr>
+              <tr><td>Shared-prefix prompt caching</td><td>Cut as a primary direction</td><td>Useful for billing and latency, but it does not reduce nominal tokens; apply it opportunistically after the prompt is lean.</td></tr>
+              <tr><td>Content-addressed review reuse</td><td>Cut from the first tranche</td><td>Safe invalidation must include surrounding code, repository rules, plan, PR comments, and external context; stale no-finding results are a serious risk.</td></tr>
+              <tr><td>Core-first specialist activation</td><td>Cut</td><td>Letting the broad reviewer decide whether expertise is needed is circular and can miss specialist-only concerns.</td></tr>
+              <tr><td>Run core inline for low-risk changes</td><td>Rejected</td><td>It removes the independent shipping check; the existing inline pass already provides the cheap preliminary scan.</td></tr>
+              <tr><td>Composite low-risk specialists</td><td>Cut</td><td>One agent carrying several personas saves context but dilutes focus and increases correlated misses.</td></tr>
+              <tr><td>Have LFG choose the review class</td><td>Folded in as context only</td><td>Plan risk can inform escalation, but review must assess the actual diff independently.</td></tr>
+              <tr><td>Evidence-triggered inspection budgets</td><td>Cut</td><td>A narrow initial budget can stop before the deeper inspection that would reveal the evidence; every changed path needs a meaningful baseline.</td></tr>
+              <tr><td>Skip validation on reviewer agreement</td><td>Rejected</td><td>Reviewers share rules and context, so agreement does not protect against correlated false positives.</td></tr>
+              <tr><td>Rely on prompt caching</td><td>Rejected</td><td>It reduces neither output duplication nor fan-out and does not lower nominal token volume.</td></tr>
+              <tr><td>Periodic full-review calibration</td><td>Combined with rank 7</td><td>It is necessary protection for the low-risk path, not a useful standalone change.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="composition-signal">Composed 2026-08-11 07:39 Europe/Berlin from repository evidence and external research by ce-ideate.</footer>
+  </div>
+</body>
+</html>
