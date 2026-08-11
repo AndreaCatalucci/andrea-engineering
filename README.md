@@ -15,6 +15,29 @@ This plugin targets Codex directly. Its skills assume Codex conventions and capa
 
 There are deliberately no compatibility adapters for Claude Code, Cursor, Gemini, or other coding-agent harnesses. Portability should be implemented as a separate fork rather than by adding conditional branches back into these skills.
 
+## Install this checkout for every Codex session
+
+One local Codex plugin installation is shared by Codex Desktop and Codex CLI
+for the current user. Install or refresh this checkout with:
+
+```bash
+scripts/install-codex-plugin
+```
+
+The script reuses a marketplace that already points at this checkout. If none
+exists, it registers this repository as a local marketplace. It then installs
+or refreshes the plugin, verifies that it is enabled, and prints the restart
+step. Preview the inspection and conditional install commands without launching
+or changing Codex with:
+
+```bash
+scripts/install-codex-plugin --dry-run
+```
+
+Restart Codex Desktop or start a new CLI session after installation. Existing
+tasks keep the skills they loaded when they started. Codex's IDE extension does
+not currently support plugins; use Codex Desktop or CLI instead.
+
 ## Install from Git
 
 Prerequisites: Git and a current Codex CLI installation.
