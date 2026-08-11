@@ -7,7 +7,7 @@ description: "Ship software autonomously from request to open PR: plan, implemen
 
 Run the complete software delivery pipeline without check-ins:
 
-`ce-plan → ce-work → ce-simplify-code → ce-code-review → review closure → ce-test-browser → ce-commit-push-pr → ce-babysit-pr`
+`ce-plan → ce-work → ce-simplify-code → ce-code-review → review closure → conditional ce-test-browser → ce-commit-push-pr → ce-babysit-pr`
 
 Planning, simplification, independent review, applied fixes, relevant testing, and shipping are quality stages—not optional ceremony. Keep the orchestrator thin: each child skill owns its own workflow and validation. LFG checks transition state; it does not restate or second-guess child contracts.
 
@@ -60,11 +60,25 @@ Close the review in the working tree:
 
 Do not commit, push, file tickets, or duplicate residuals in the PR body here. The shipping stage commits all intentional pipeline changes.
 
-### 5. Browser-test relevant behavior
+### 5. Browser-test interaction-only behavior
 
-Invoke `ce-test-browser mode:pipeline` only when the plan or branch diff changes browser-visible behavior or a browser-backed user flow. Run it when relevance is ambiguous for a web-facing change. Skip it for backend-only, CLI, infrastructure, docs, and other non-browser work; `ce-work` verification and independent review still apply.
+Browser testing is not a default finishing stage for UI or web-facing changes.
+Prefer focused component or integration tests when they can prove the changed
+behavior without a person driving the rendered interface.
 
-A failed required browser test blocks shipping. Record an intentional skip in the completion summary.
+Invoke `ce-test-browser mode:pipeline` only when a material claim cannot be
+covered confidently by practical integration tests and the remaining risk
+depends on fiddly real-user interaction or browser rendering. Typical examples
+are pointer or drag behavior, focus and keyboard transitions, responsive
+layout, browser-native APIs, or multi-step rendered state whose correctness is
+only apparent while using it. A changed view, route, component, or browser-backed
+flow is not sufficient by itself.
+
+When relevance is ambiguous, skip browser testing and rely on the focused
+automated verification; mention any meaningful interaction-only uncertainty in
+the completion summary. Also skip for backend-only, CLI, infrastructure, docs,
+and other non-browser work. If this narrow gate is met, a failed browser test
+blocks shipping.
 
 ### 6. Ship
 
