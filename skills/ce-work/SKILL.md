@@ -341,8 +341,9 @@ or a `ce-plan` update.
    For UI tasks without a Figma design -- where the implementation touches view, template, component, layout, or page files, creates user-visible routes, or the plan contains explicit UI/frontend/design language:
 
    - Apply the frontend guidance embedded in this skill and the active repo instructions: preserve existing design-system conventions, use real UI controls and states, keep layouts responsive, and verify text does not overflow or overlap.
-   - When browser tooling is available, inspect the changed UI at desktop and mobile widths before final validation. If no browser access is available, do a code-level responsive/layout review and record that browser verification was unavailable.
-   - Phase 4's screenshot capture still applies when the change is user-visible.
+   - Prefer focused component or integration tests for frontend behavior. Browser testing is not a default end-of-change check and a user-visible change alone does not require it.
+   - Use browser testing only when practical integration tests cannot confidently cover a material behavior and correctness depends on fiddly real-user interaction or rendering -- for example pointer or drag behavior, focus and keyboard transitions, responsive layout, browser-native APIs, or multi-step rendered state that is only meaningful while using it.
+   - When that narrow condition does not apply or its relevance is ambiguous, skip browser testing and finish with automated tests and a code-level responsive/layout review. Record any meaningful interaction-only uncertainty, but do not treat skipped browser testing or absent screenshots as missing verification.
 
 8. **Track Progress**
    - Keep the task list updated as you complete tasks

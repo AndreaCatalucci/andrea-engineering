@@ -57,7 +57,7 @@ This file contains the shipping workflow (Phase 3-4). It is loaded when all Phas
    - Linting passes
    - Code follows existing patterns
    - Figma designs match (if applicable)
-   - No console errors or warnings
+   - If browser or manual runtime validation was warranted and actually run, no new console errors or warnings were observed
    - Verify that every item in the plan's `Requirements` section is satisfied.
    - If any `Deferred to Implementation` questions were noted, confirm they were resolved during execution
 
