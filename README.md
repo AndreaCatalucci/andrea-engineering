@@ -1,95 +1,141 @@
 # Andrea Engineering
 
-Andrea Engineering is a personal, Codex-native fork of the Compound Engineering skill suite. It packages 30 workflows for strategy, ideation, planning, implementation, debugging, review, shipping, browser testing, and durable project learnings.
+Andrea Engineering is a personal fork of the Compound Engineering skill suite. It packages 30 `ae-*` workflows for strategy, ideation, planning, implementation, debugging, review, shipping, browser testing, and durable project learnings.
 
-## Codex only
+The same skill tree is packaged for **Codex**, **Claude Code**, and **Grok Build**. Each host discovers the plugin through its own marketplace and plugin manifest.
 
-This plugin targets Codex directly. Its skills assume Codex conventions and capabilities, including:
+## Install this checkout
 
-- `$skill-name` invocation;
-- `AGENTS.md` for repository instructions;
-- Codex subagents through `spawn_agent`;
-- persistent commands through `exec_command` and `write_stdin`;
-- the Codex in-app browser for browser workflows; and
-- Codex interaction, approval, sandbox, and automation behavior.
+One command installs or refreshes the plugin for every supported CLI on your `PATH`:
 
-There are deliberately no compatibility adapters for Claude Code, Cursor, Gemini, or other coding-agent harnesses. Portability should be implemented as a separate fork rather than by adding conditional branches back into these skills.
+```bash
+scripts/install
+```
 
-## Install this checkout for every Codex session
+Limit the install, or preview it without changing anything:
 
-One local Codex plugin installation is shared by Codex Desktop and Codex CLI
-for the current user. Install or refresh this checkout with:
+```bash
+scripts/install --codex --claude --grok
+scripts/install --dry-run
+```
+
+Each host also has a dedicated installer. Restart that agent, or start a new session, after installation. Existing sessions keep the skills they loaded when they started.
+
+### Codex
 
 ```bash
 scripts/install-codex-plugin
-```
-
-The script reuses a marketplace that already points at this checkout. If none
-exists, it registers this repository as a local marketplace. It then installs
-or refreshes the plugin, verifies that it is enabled, and prints the restart
-step. Preview the inspection and conditional install commands without launching
-or changing Codex with:
-
-```bash
 scripts/install-codex-plugin --dry-run
 ```
 
-Restart Codex Desktop or start a new CLI session after installation. Existing
-tasks keep the skills they loaded when they started. Codex's IDE extension does
-not currently support plugins; use Codex Desktop or CLI instead.
+From Git:
 
-## Install from Git
+```bash
+codex plugin marketplace add AndreaCatalucci/andrea-engineering --ref main
+codex plugin add andrea-engineering@andrea-engineering
+codex plugin list
+```
 
-Prerequisites: Git and a current Codex CLI installation.
-
-1. Add this repository as a Codex plugin marketplace:
-
-   ```bash
-   codex plugin marketplace add AndreaCatalucci/andrea-engineering --ref main
-   ```
-
-2. Install the plugin from that marketplace:
-
-   ```bash
-   codex plugin add andrea-engineering@andrea-engineering
-   ```
-
-3. Verify that Codex reports the plugin as installed and enabled:
-
-   ```bash
-   codex plugin list
-   ```
-
-4. Restart the Codex desktop app, or start a new Codex CLI session, so the installed skills are loaded.
-
-The marketplace follows `main`. To refresh an existing installation after new changes land:
+Refresh:
 
 ```bash
 codex plugin marketplace upgrade andrea-engineering
 codex plugin add andrea-engineering@andrea-engineering
 ```
 
-Restart the Codex desktop app, or start a new CLI session, after upgrading.
-
-To remove the plugin:
+Remove:
 
 ```bash
 codex plugin remove andrea-engineering@andrea-engineering
 ```
 
+Codex Desktop and Codex CLI share one user plugin install. The IDE extension does not currently support plugins.
+
+### Claude Code
+
+```bash
+scripts/install-claude-plugin
+scripts/install-claude-plugin --dry-run
+```
+
+From Git:
+
+```bash
+claude plugin marketplace add AndreaCatalucci/andrea-engineering
+claude plugin install andrea-engineering@andrea-engineering
+claude plugin list
+```
+
+Refresh:
+
+```bash
+claude plugin marketplace update andrea-engineering
+claude plugin update andrea-engineering@andrea-engineering
+```
+
+Remove:
+
+```bash
+claude plugin uninstall andrea-engineering@andrea-engineering
+```
+
+If the install summary asks you to reload, run `/reload-plugins`.
+
+### Grok Build
+
+```bash
+scripts/install-grok-plugin
+scripts/install-grok-plugin --dry-run
+```
+
+From Git:
+
+```bash
+grok plugin marketplace add AndreaCatalucci/andrea-engineering
+grok plugin install andrea-engineering --trust
+grok plugin list
+```
+
+Refresh:
+
+```bash
+grok plugin marketplace update andrea-engineering
+grok plugin update andrea-engineering
+```
+
+Remove:
+
+```bash
+grok plugin uninstall andrea-engineering --confirm
+```
+
+Reload plugins with `r` in the Plugins tab, or start a new session.
+
 ## Use
 
-Invoke a workflow by name in a Codex prompt, for example:
+Invoke a workflow by name. Codex uses `$skill-name`. Claude Code and Grok Build use `/skill-name`, or `/andrea-engineering:skill-name` when the plugin namespace is required.
 
 ```text
-$ce-brainstorm shape this feature idea
-$ce-plan create an implementation plan
-$ce-work execute the plan
-$ce-code-review review the current changes
+$ae-brainstorm shape this feature idea
+$ae-plan create an implementation plan
+$ae-work execute the plan
+$ae-code-review review the current changes
 $lfg ship this request end to end
 ```
 
-Each skill's `SKILL.md` defines its trigger and workflow. The plugin manifest is at [`.codex-plugin/plugin.json`](.codex-plugin/plugin.json).
+```text
+/ae-brainstorm shape this feature idea
+/ae-plan create an implementation plan
+/ae-work execute the plan
+/ae-code-review review the current changes
+/lfg ship this request end to end
+```
+
+Each skill's `SKILL.md` defines its trigger and workflow. Skill directories are named `ae-*` (plus `lfg`). Manifests live at:
+
+- [`.codex-plugin/plugin.json`](.codex-plugin/plugin.json)
+- [`.claude-plugin/plugin.json`](.claude-plugin/plugin.json) and [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json)
+- [`.grok-plugin/plugin.json`](.grok-plugin/plugin.json) and [`.grok-plugin/marketplace.json`](.grok-plugin/marketplace.json)
 
 ## Development
 
@@ -106,6 +152,13 @@ Verify that committed mirrors are current with:
 
 ```bash
 scripts/sync-shared-skill-assets --check
+```
+
+Validate host packages with:
+
+```bash
+claude plugin validate .
+grok plugin validate .
 ```
 
 ## License

@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "plugins": {
+    "andrea-engineering": {
+      "components": {
+        "skills": [
+          {
+            "name": "ae-babysit-pr",
+            "description": "Watch an open GitHub or GitHub Enterprise PR until merge-ready. Use for ongoing PR monitoring; not one-shot review-comment resolution or CI debugging."
+          },
+          {
+            "name": "ae-brainstorm",
+            "description": "Turn a vague or ambitious idea into confirmed requirements. Use while deciding what to build, before implementation planning; not for execution, debugging, code review, or choosing a project technology."
+          },
+          {
+            "name": "ae-code-review",
+            "description": "Structured code review for bugs, regressions, tests, and standards. Use before PRs or when asked for review; interactive mode can fix locally, while mode:agent reports only for pipeline callers."
+          },
+          {
+            "name": "ae-commit",
+            "description": "Commit working-tree changes with a repo-appropriate, value-focused message. Use when the user asks to save staged or unstaged changes in git."
+          },
+          {
+            "name": "ae-commit-push-pr",
+            "description": "Commit, push, and open a PR. Use when asked to ship/open a PR, or for PR-description-only flows like writing, rewriting, or describing a PR body."
+          },
+          {
+            "name": "ae-compound",
+            "description": "Document one recently solved problem or durable project learning in docs/solutions/, with optional project-vocabulary updates. Use after verified, non-trivial work is complete."
+          },
+          {
+            "name": "ae-compound-refresh",
+            "description": "Refresh docs/solutions learnings against the current codebase. Use when auditing stale, overlapping, superseded, or drifted learnings; avoid general refactor, debugging, or code review unless docs/solutions is explicit."
+          },
+          {
+            "name": "ae-debug",
+            "description": "Diagnosis loop for bugs and failing behavior. Use for errors, stack traces, regressions, failed tests, issue-tracker bugs, stuck investigations after failed fixes, or asks to debug/fix a bug."
+          },
+          {
+            "name": "ae-doc-review",
+            "description": "Review an existing requirements document, implementation plan, or specification for contradictions, weak decisions, execution gaps, and relevant design or security risks. Use when a user or another skill needs to improve a planning document before implementation."
+          },
+          {
+            "name": "ae-dogfood",
+            "description": "Run hands-off, diff-scoped browser QA with autonomous fixes and a durable report. Use when asked to dogfood or QA a branch or PR in a real browser; not for narrow scripted browser checks."
+          },
+          {
+            "name": "ae-explain",
+            "description": "Turn a concept, a diff, an idea, or a window of your own recent work into a dense, visual explainer written for you personally \u2014 with an optional check-in (predict-then-reveal for diffs, corrected exercises) that makes the material stick. For learning, not repo docs or verdicts."
+          },
+          {
+            "name": "ae-ideate",
+            "description": "Generate and evaluate grounded ideas. Use when the user asks for ideas, improvements, surprising options, or AI-generated directions before choosing one to develop; use ae-brainstorm to refine the user's own idea."
+          },
+          {
+            "name": "ae-optimize",
+            "description": "Run metric-driven optimization loops. Use when improving measurable outcomes such as search relevance, clustering quality, build performance, prompt quality, or scored behavior through experiments."
+          },
+          {
+            "name": "ae-plan",
+            "description": "Plan multi-step work with implementation guardrails. Use when asked to plan software or non-software work, break down implementation, plan from requirements, or revise an existing plan; prefer ae-brainstorm when the user is still deciding what to build."
+          },
+          {
+            "name": "ae-polish",
+            "description": "Start the dev server, inspect a feature in the browser, and iterate on polish. Use when the user wants interactive visual or UX refinement of a working feature."
+          },
+          {
+            "name": "ae-pov",
+            "description": "Verdict on whether an external technology, pattern, platform, architecture, or ecosystem change fits this project. Use for project-grounded adoption decisions or second opinions; not neutral explanation or ideation."
+          },
+          {
+            "name": "ae-product-pulse",
+            "description": "Generate time-windowed product pulse reports from configured signals. Use when the user asks for a product health, adoption, or performance pulse from connected data sources."
+          },
+          {
+            "name": "ae-promote",
+            "description": "Draft launch or promotion copy for a shipped feature. Use when the user asks for release announcements, social posts, launch copy, or channel-specific promotion."
+          },
+          {
+            "name": "ae-proof",
+            "description": "Publish, read, comment on, or edit markdown in Proof. Use for Proof links, sharing specs/plans/drafts, or publish handoffs from planning workflows; avoid proofread, math, evidence, or proof-of-concept meanings."
+          },
+          {
+            "name": "ae-resolve-pr-feedback",
+            "description": "Resolve PR review feedback. Use when addressing review comments, resolving review threads, or fixing code-review feedback."
+          },
+          {
+            "name": "ae-riffrec-feedback-analysis",
+            "description": "Analyze Riffrec feedback captures from bundles or standalone recordings. Always load for `riffrec-*.zip`, `session.json` + `events.json` + `recording.webm` + `voice.webm` bundles, `.mp4`/`.mov`/`.webm` videos, `.m4a`/`.mp3`/`.wav` audio, or capture/share requests."
+          },
+          {
+            "name": "ae-setup",
+            "description": "Check Andrea Engineering health and repo-local configuration. Use when diagnosing plugin setup, optional tool availability, or local configuration safety."
+          },
+          {
+            "name": "ae-simplify-code",
+            "description": "Simplify recently changed code for clarity, reuse, quality, and efficiency while preserving behavior. Use for tidy/refactor passes; use ae-debug for bugs."
+          },
+          {
+            "name": "ae-strategy",
+            "description": "Create or update STRATEGY.md. Use when starting a product, changing direction or roadmap, or when ae-ideate, ae-brainstorm, or ae-plan need upstream product grounding."
+          },
+          {
+            "name": "ae-sweep",
+            "description": "Sweep configured feedback sources (Slack, GitHub Issues; email experimental) for new items: acknowledge at source, analyze recordings, verify fixes merged to main, and emit an $lfg-ready plan. First run sets up sources; supports mode:headless for scheduled runs."
+          },
+          {
+            "name": "ae-test-browser",
+            "description": "Run browser tests for pages affected by the current branch or PR. Use when asked to verify changed web flows in Codex's in-app browser; not for broad autonomous dogfooding."
+          },
+          {
+            "name": "ae-test-xcode",
+            "description": "Build and test iOS apps on a simulator with XcodeBuildMCP. Use when asked to compile, launch, or verify an iOS project or affected test targets."
+          },
+          {
+            "name": "ae-work",
+            "description": "Execute a plan or concrete work prompt end-to-end. Use when implementing from docs/plans, a spec path, or a clear build request; use ae-debug for open-ended bugs."
+          },
+          {
+            "name": "ae-worktree",
+            "description": "Set up isolated git worktrees \u2014 create a new branch for fresh work, or attach a worktree to an existing branch/PR/commit to work on it in isolation. Use when starting isolated work or isolating an existing ref; detects existing isolation first."
+          },
+          {
+            "name": "lfg",
+            "description": "Ship software autonomously from request to open PR: plan, implement, simplify, independently review and fix, test, commit, push, open a PR, and drive CI to a decided state. Use only when the user explicitly invokes lfg or asks for hands-off delivery through an open PR. Not for interactive work or shipping an already-finished diff."
+          }
+        ]
+      }
+    }
+  }
+}

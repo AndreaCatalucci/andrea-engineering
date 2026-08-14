@@ -30,10 +30,10 @@ mirror() {
 }
 
 interaction_consumers=(
-  ce-babysit-pr ce-brainstorm ce-commit-push-pr ce-commit
-  ce-compound-refresh ce-debug ce-dogfood ce-explain ce-ideate
-  ce-optimize ce-plan ce-pov ce-product-pulse ce-promote ce-resolve-pr-feedback
-  ce-setup ce-strategy ce-sweep ce-test-browser ce-test-xcode ce-work ce-worktree
+  ae-babysit-pr ae-brainstorm ae-commit-push-pr ae-commit
+  ae-compound-refresh ae-debug ae-dogfood ae-explain ae-ideate
+  ae-optimize ae-plan ae-pov ae-product-pulse ae-promote ae-resolve-pr-feedback
+  ae-setup ae-strategy ae-sweep ae-test-browser ae-test-xcode ae-work ae-worktree
 )
 
 for skill in "${interaction_consumers[@]}"; do
@@ -41,9 +41,9 @@ for skill in "${interaction_consumers[@]}"; do
 done
 
 plain_language_consumers=(
-  ce-brainstorm ce-code-review ce-commit-push-pr ce-compound
-  ce-compound-refresh ce-doc-review ce-explain ce-ideate ce-plan ce-pov
-  ce-product-pulse ce-promote ce-riffrec-feedback-analysis ce-strategy ce-sweep
+  ae-brainstorm ae-code-review ae-commit-push-pr ae-compound
+  ae-compound-refresh ae-doc-review ae-explain ae-ideate ae-plan ae-pov
+  ae-product-pulse ae-promote ae-riffrec-feedback-analysis ae-strategy ae-sweep
 )
 
 for skill in "${plain_language_consumers[@]}"; do
@@ -51,25 +51,25 @@ for skill in "${plain_language_consumers[@]}"; do
 done
 
 profile_consumers=(
-  ce-brainstorm ce-code-review ce-compound ce-debug
-  ce-explain ce-ideate ce-optimize ce-pov
+  ae-brainstorm ae-code-review ae-compound ae-debug
+  ae-explain ae-ideate ae-optimize ae-pov
 )
 
 for skill in "${profile_consumers[@]}"; do
-  mirror skills/ce-plan/scripts/repo-profile-cache.py "skills/$skill/scripts/repo-profile-cache.py"
-  mirror skills/ce-plan/references/repo-profile-cache.md "skills/$skill/references/repo-profile-cache.md"
-  mirror skills/ce-plan/references/agents/repo-profiler.md "skills/$skill/references/agents/repo-profiler.md"
+  mirror skills/ae-plan/scripts/repo-profile-cache.py "skills/$skill/scripts/repo-profile-cache.py"
+  mirror skills/ae-plan/references/repo-profile-cache.md "skills/$skill/references/repo-profile-cache.md"
+  mirror skills/ae-plan/references/agents/repo-profiler.md "skills/$skill/references/agents/repo-profiler.md"
 done
 
-mirror skills/ce-compound/references/concepts-vocabulary.md skills/ce-compound-refresh/references/concepts-vocabulary.md
-mirror skills/ce-compound/references/schema.yaml skills/ce-compound-refresh/references/schema.yaml
-mirror skills/ce-compound/references/yaml-schema.md skills/ce-compound-refresh/references/yaml-schema.md
-mirror skills/ce-compound/assets/resolution-template.md skills/ce-compound-refresh/assets/resolution-template.md
-mirror skills/ce-compound/scripts/validate-frontmatter.py skills/ce-compound-refresh/scripts/validate-frontmatter.py
-mirror skills/ce-compound/scripts/validate-doc-claims.py skills/ce-compound-refresh/scripts/validate-doc-claims.py
+mirror skills/ae-compound/references/concepts-vocabulary.md skills/ae-compound-refresh/references/concepts-vocabulary.md
+mirror skills/ae-compound/references/schema.yaml skills/ae-compound-refresh/references/schema.yaml
+mirror skills/ae-compound/references/yaml-schema.md skills/ae-compound-refresh/references/yaml-schema.md
+mirror skills/ae-compound/assets/resolution-template.md skills/ae-compound-refresh/assets/resolution-template.md
+mirror skills/ae-compound/scripts/validate-frontmatter.py skills/ae-compound-refresh/scripts/validate-frontmatter.py
+mirror skills/ae-compound/scripts/validate-doc-claims.py skills/ae-compound-refresh/scripts/validate-doc-claims.py
 
-mirror skills/ce-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py skills/ce-sweep/scripts/analyze_riffrec_zip.py
-mirror skills/ce-brainstorm/references/markdown-rendering.md skills/ce-ideate/references/markdown-rendering.md
+mirror skills/ae-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py skills/ae-sweep/scripts/analyze_riffrec_zip.py
+mirror skills/ae-brainstorm/references/markdown-rendering.md skills/ae-ideate/references/markdown-rendering.md
 
 if [[ "$MODE" == "check" && "$drift" -ne 0 ]]; then
   exit 1

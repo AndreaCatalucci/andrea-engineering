@@ -1,0 +1,79 @@
+# Andrea Engineering -- local config
+# Copy to .andrea-engineering/config.local.yaml in your project root.
+# All settings are optional. Invalid values fall through to defaults.
+
+# --- Product pulse ---
+# Settings written by $ae-product-pulse first-run interview. Re-run the skill with
+# argument `setup` or `reconfigure` to edit interactively.
+
+# pulse_product_name: "Spiral"                          # used in report titles (no default)
+# pulse_lookback_default: 24h                           # 1h | 24h | 7d | 30d (default: 24h)
+# pulse_primary_event: "session_started"                # the event that means "user showed up"
+# pulse_value_event: "task_completed"                   # the event that means "user got value"
+# pulse_completion_events: "onboarded,first_purchase"   # comma-separated, 0-3 events
+# pulse_quality_scoring: false                          # true | false (default: false; AI products only)
+# pulse_quality_dimension: "answer accuracy"            # dimension scored 1-5 when pulse_quality_scoring is true
+# pulse_analytics_source: posthog                       # posthog | mixpanel | custom (no default)
+# pulse_tracing_source: sentry                          # sentry | datadog | custom (no default)
+# pulse_payments_source: stripe                         # stripe | custom (no default)
+# pulse_db_enabled: false                               # true | false (default: false; read-only DB if true)
+# pulse_metric_sources: "retention_d7=posthog,nps=delighted"  # strategy-metric -> source overrides; comma-separated 'metric=source' pairs; unlisted metrics fall back to pulse_analytics_source
+# pulse_pending_metrics: "retention_d7,nps"             # comma-separated strategy metrics awaiting instrumentation; render as 'no data'
+# pulse_excluded_metrics: "north_star"                  # comma-separated strategy metrics intentionally not in pulse
+
+# --- Output format ---
+# Persisted output defaults for skills that support them. A format request in
+# the current prompt wins. Each run writes one format, not sibling artifacts.
+
+# plan_output: html              # md | html (default: md)
+# brainstorm_output: html        # md | html (default: md)
+
+# --- PR concept teaching (ae-commit-push-pr) ---
+# When a PR introduces a concept new to the codebase, the generated PR
+# description gains a "New concepts" section teaching it. The section toggle is
+# the single gate: off disables judgment, the section, the $ae-explain offer,
+# and archival. Archival additionally writes the explainer to docs/explainers/
+# and links it from the PR (full-workflow runs only; override per run with
+# archive:on|off). Note: this file is gitignored and per-checkout -- fresh
+# worktrees don't inherit it.
+
+# pr_teaching_section: false     # true | false (default: true)
+# pr_teaching_archive: true      # true | false (default: false; full-workflow runs only)
+
+# --- ae-commit-push-pr babysit handoff ---
+# After a full-workflow PR is opened, ae-commit-push-pr auto-invokes ae-babysit-pr
+# to watch CI + incoming review and drive the PR toward merge-ready. Set false to
+# opt out standing (per-run override: the babysit:off token).
+# auto_babysit: false            # true | false (default: true)
+
+# --- ae-plan scoping confirmation ---
+# By default $ae-plan pauses before research/plan-write to show a scoping
+# summary and wait for you to confirm scope. Set this to skip that wait: ae-plan
+# composes the summary for itself, records any inferred scope under an
+# Assumptions section, announces that it's proceeding, and keeps going. It skips
+# only that confirmation; genuine blocking questions still apply. Override per
+# run with `confirm:auto` (skip) or `confirm:ask` (force the gate on).
+
+# plan_skip_scoping_confirm: true   # true | false (default: false)
+
+# --- ae-promote ---
+# Written automatically when you decline the Spiral setup offer in $ae-promote.
+# Suppresses that one-time setup nudge in this project. Remove the key to re-enable.
+
+# ce_promote_spiral_optout: true   # true | (absent) (default: absent -- offer once)
+
+# --- Sweep (ae-sweep) ---
+
+# Feedback sources swept by $ae-sweep. Generic key: other skills may read this list.
+# Each entry: type (slack | github-issues | email), id (short name), target (channel ID /
+# owner/repo / mailbox), ack_action, closeout_action, sensitive (true withholds content
+# from committed state/plan text), approved (standing approval for source-side writes).
+# feedback_sources:
+#   - { type: slack, id: slack-alpha, target: C0XXXXXXX, ack_action: eyes, closeout_action: white_check_mark, sensitive: false, approved: true }
+#   - { type: github-issues, id: gh-issues, target: owner/repo, ack_action: "feedback:ack", closeout_action: "feedback:resolved", sensitive: false, approved: true }
+
+# Sweep-owned settings.
+# sweep_state_path: docs/feedback-sweep/state.yml   # committed (multi-agent) or /tmp path (solo)
+# sweep_ack_cap: 25                                 # max acks per source per run before the circuit breaker
+# sweep_lease_ttl_minutes: 60                       # single-writer lease staleness threshold
+# sweep_shared_branch: false                        # true: push-gated lease for shared-docs-branch topology

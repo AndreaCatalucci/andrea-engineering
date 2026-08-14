@@ -1,0 +1,17 @@
+{
+  "name": "andrea-engineering",
+  "description": "Andrea Engineering skill suite: strategy, ideation, planning, implementation, debugging, review, and shipping",
+  "version": "3.19.0-fork.2",
+  "author": {
+    "name": "Andrea Catalucci"
+  },
+  "homepage": "https://github.com/AndreaCatalucci/andrea-engineering",
+  "repository": "https://github.com/AndreaCatalucci/andrea-engineering",
+  "license": "MIT",
+  "keywords": [
+    "engineering",
+    "planning",
+    "review",
+    "skills"
+  ]
+}

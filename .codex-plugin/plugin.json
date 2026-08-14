@@ -1,7 +1,7 @@
 {
   "name": "andrea-engineering",
-  "version": "3.19.0-fork.1+codex.20260718094213",
-  "description": "Personal Codex-native fork of the Compound Engineering skill suite",
+  "version": "3.19.0-fork.2",
+  "description": "Andrea Engineering skill suite: strategy, ideation, planning, implementation, debugging, review, and shipping",
   "author": {
     "name": "Andrea Catalucci"
   },
@@ -9,8 +9,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Andrea Engineering",
-    "shortDescription": "Personal engineering workflows for Codex",
-    "longDescription": "Andrea Engineering provides a personal Codex workflow for strategy, ideation, planning, implementation, debugging, review, shipping, and durable project learnings. Forked from Compound Engineering 3.19.0 under the MIT License.",
+    "shortDescription": "Personal engineering workflows",
+    "longDescription": "Andrea Engineering provides workflows for strategy, ideation, planning, implementation, debugging, review, shipping, and durable project learnings. Packaged for Codex, Claude Code, and Grok Build. Forked from Compound Engineering 3.19.0 under the MIT License.",
     "developerName": "Andrea Catalucci",
     "category": "Coding",
     "capabilities": [

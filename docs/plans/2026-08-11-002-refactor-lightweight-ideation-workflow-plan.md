@@ -4,7 +4,7 @@ date: 2026-08-11
 type: refactor
 plan_format: andrea-plan/v1
 plan_readiness: implementation-ready
-requirements_source: ce-plan-bootstrap
+requirements_source: ae-plan-bootstrap
 execution: code
 related_plan: docs/plans/2026-08-11-001-refactor-lightweight-code-review-plan.md
 ---
@@ -13,9 +13,9 @@ related_plan: docs/plans/2026-08-11-001-refactor-lightweight-code-review-plan.md
 
 ## Goal
 
-Reduce `ce-ideate` token use without reducing grounding, frame diversity, candidate volume, area coverage, independent basis verification, or final-document quality.
+Reduce `ae-ideate` token use without reducing grounding, frame diversity, candidate volume, area coverage, independent basis verification, or final-document quality.
 
-**Source:** Internal `ce-ideate` instructions and the receipt pattern selected in the related code-review plan.
+**Source:** Internal `ae-ideate` instructions and the receipt pattern selected in the related code-review plan.
 **Input:** A resolved subject, mode, focus, grounding summary, constraints, topic areas, assignments, and run directory.
 **Operation:** Load instructions only for the active phase, use a small fresh-context fleet, and exchange validated files through receipts.
 **Outcome:** `SKILL.md` is at most 2,000 words, fixed agent protocols are at most 700 words, and the default fleet falls from five generation agents to three while retaining six frames and 36-48 raw candidates.
@@ -31,7 +31,7 @@ The root becomes a short orchestration spine with optional branches in phase-spe
 ### Requirements
 
 - R1. Default to three generation agents, each handling two dissimilar frames with separate quotas. Preserve six frames, 6-8 candidates per frame, generation-before-critique, survivor count, and output fields.
-- R2. Reduce `skills/ce-ideate/SKILL.md` to at most 2,000 words by moving optional intake, mode, research-artifact, and delivery details behind phase-specific references.
+- R2. Reduce `skills/ae-ideate/SKILL.md` to at most 2,000 words by moving optional intake, mode, research-artifact, and delivery details behind phase-specific references.
 - R3. Keep generation, recovery, verifier, critic, and distillation fixed protocols at or below 700 words, excluding run-specific grounding and assignments.
 - R4. Give every agent a complete fresh-context packet preserving constraints, evidence provenance, scope, areas, assignment quotas, and evidence-read budget.
 - R5. Agents write candidate JSON once and normally return a receipt. The parent revalidates every file and digest before use.
@@ -57,7 +57,7 @@ The root becomes a short orchestration spine with optional branches in phase-spe
 ### Technical Decisions
 
 - D1. Keep `SKILL.md` as the phase map and invariant list. Load elsewhere-only, large-research, or delivery branches only when selected.
-- D2. Add an ideation-specific schema and helper under `skills/ce-ideate/`. Reuse receipt vocabulary and failure behavior, not a generic review/ideation framework.
+- D2. Add an ideation-specific schema and helper under `skills/ae-ideate/`. Reuse receipt vocabulary and failure behavior, not a generic review/ideation framework.
 - D3. Keep ambition, scope, basis types, area spread, quotas, and direct-evidence rules in the agent protocol. Code handles structure, digesting, and projection only.
 - D4. Give each original a stable source key: kind, assignment ID, checked-file digest, and index. Every consolidated candidate gets a `candidate_id` and parent source keys. Deduplication retains all parents; combinations and root synthesis list their inputs; recovery candidates identify their recovery assignment. The verifier reports by `candidate_id`.
 - D5. Inline fallback is not trusted prose: the parent persists it as candidate JSON, runs the same validation, and only then consolidates it.
@@ -66,19 +66,19 @@ The root becomes a short orchestration spine with optional branches in phase-spe
 
 ### W1. Make the root workflow progressively loaded
 
-**Affected area:** `skills/ce-ideate/SKILL.md`, `skills/ce-ideate/references/`.
+**Affected area:** `skills/ae-ideate/SKILL.md`, `skills/ae-ideate/references/`.
 
 Move branch detail behind phase routes while preserving phase order. Verify word budgets and map every existing rule to the spine or one reachable reference. Cover repo, elsewhere-software, non-software depths, issue, surprise, resume, research-document, and output-format branches.
 
 ### W2. Add fresh-context candidate files and receipts
 
-**Affected area:** `skills/ce-ideate/references/divergent-ideation.md`, `skills/ce-ideate/references/universal-ideation.md`, `skills/ce-ideate/scripts/`.
+**Affected area:** `skills/ae-ideate/references/divergent-ideation.md`, `skills/ae-ideate/references/universal-ideation.md`, `skills/ae-ideate/scripts/`.
 
 Implement standard-library validation for required fields, basis tags, area rules, quotas, digests, source keys, candidate lineage, and deterministic projections. Test every dispatch-table row, single and paired assignments, inline fallback, write failure, one repair, recovery, and degraded coverage.
 
 ### W3. Keep verification and delivery complete
 
-**Affected area:** `skills/ce-ideate/references/post-ideation-workflow.md`, `skills/ce-ideate/references/ideation-sections.md`.
+**Affected area:** `skills/ae-ideate/references/post-ideation-workflow.md`, `skills/ae-ideate/references/ideation-sections.md`.
 
 Make the verifier consume consolidated candidates by path and emit one verdict file by `candidate_id`. Sealed grounding fixtures compare old and new protocols for raw count, frame/theme and area coverage, valid bases, disposition coverage, rejection accounting, survivor fields, and degraded-path reporting. Run one representative end-to-end ideation and render audit.
 

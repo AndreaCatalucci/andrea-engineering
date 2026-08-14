@@ -7,8 +7,8 @@ from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "skills" / "ce-code-review" / "scripts" / "review-artifact.py"
-SCHEMA = ROOT / "skills" / "ce-code-review" / "references" / "findings-schema.json"
+SCRIPT = ROOT / "skills" / "ae-code-review" / "scripts" / "review-artifact.py"
+SCHEMA = ROOT / "skills" / "ae-code-review" / "references" / "findings-schema.json"
 SPEC = importlib.util.spec_from_file_location("review_artifact", SCRIPT)
 MODULE = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader is not None
@@ -19,7 +19,7 @@ def finding(**overrides):
     value = {
         "title": "Rejects valid empty review",
         "severity": "P1",
-        "file": "skills/ce-code-review/scripts/review-artifact.py",
+        "file": "skills/ae-code-review/scripts/review-artifact.py",
         "line": 42,
         "why_it_matters": "A valid reviewer result is discarded, so the final report silently loses review coverage.",
         "autofix_class": "gated_auto",
@@ -28,7 +28,7 @@ def finding(**overrides):
         "suggested_fix": "Accept an empty findings array while preserving reviewer coverage.",
         "confidence": 75,
         "evidence": [
-            "skills/ce-code-review/scripts/review-artifact.py:42 -- findings = document['findings']"
+            "skills/ae-code-review/scripts/review-artifact.py:42 -- findings = document['findings']"
         ],
         "pre_existing": False,
     }
@@ -106,7 +106,7 @@ class ReviewArtifactTest(unittest.TestCase):
                 finding(
                     line=4,
                     evidence=[
-                        "skills/ce-code-review/scripts/review-artifact.py:42 -- wrong line"
+                        "skills/ae-code-review/scripts/review-artifact.py:42 -- wrong line"
                     ],
                 )
             ]
@@ -229,7 +229,7 @@ class ReviewArtifactTest(unittest.TestCase):
             )
             api_finding = finding(
                 evidence=[
-                    "skills/ce-code-review/scripts/review-artifact.py:42 -- findings = document['findings']",
+                    "skills/ae-code-review/scripts/review-artifact.py:42 -- findings = document['findings']",
                     "tests/test_review_artifact.py:1 -- regression coverage",
                 ]
             )
@@ -305,7 +305,7 @@ class ReviewArtifactTest(unittest.TestCase):
 
     def test_instruction_packet_is_complete_and_within_budget(self):
         template = (
-            ROOT / "skills" / "ce-code-review" / "references" / "subagent-template.md"
+            ROOT / "skills" / "ae-code-review" / "references" / "subagent-template.md"
         ).read_text(encoding="utf-8")
         for field in (
             "protocol_path",
@@ -330,19 +330,19 @@ class ReviewArtifactTest(unittest.TestCase):
         self.assertIn('fork_turns="none"', template)
         self.assertIn("receipt handoff always win", template)
         scope_rules = (
-            ROOT / "skills" / "ce-code-review" / "references" / "diff-scope.md"
+            ROOT / "skills" / "ae-code-review" / "references" / "diff-scope.md"
         ).read_text(encoding="utf-8")
         self.assertLessEqual(len(template.split()) + len(scope_rules.split()), 1500)
 
     def test_merge_validator_and_agent_output_keep_existing_guards(self):
         merge = (
-            ROOT / "skills" / "ce-code-review" / "references" / "merge-apply-contract.md"
+            ROOT / "skills" / "ae-code-review" / "references" / "merge-apply-contract.md"
         ).read_text(encoding="utf-8")
         validator = (
-            ROOT / "skills" / "ce-code-review" / "references" / "validator-template.md"
+            ROOT / "skills" / "ae-code-review" / "references" / "validator-template.md"
         ).read_text(encoding="utf-8")
         output = (
-            ROOT / "skills" / "ce-code-review" / "references" / "review-output-template.md"
+            ROOT / "skills" / "ae-code-review" / "references" / "review-output-template.md"
         ).read_text(encoding="utf-8")
 
         for phrase in (

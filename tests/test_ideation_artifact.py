@@ -7,7 +7,7 @@ from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "skills" / "ce-ideate" / "scripts" / "ideation-artifact.py"
+SCRIPT = ROOT / "skills" / "ae-ideate" / "scripts" / "ideation-artifact.py"
 SPEC = importlib.util.spec_from_file_location("ideation_artifact", SCRIPT)
 MODULE = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader is not None
@@ -422,14 +422,14 @@ class IdeationArtifactTest(unittest.TestCase):
                 )
 
     def test_instruction_word_budgets(self):
-        skill_words = (ROOT / "skills" / "ce-ideate" / "SKILL.md").read_text(encoding="utf-8").split()
+        skill_words = (ROOT / "skills" / "ae-ideate" / "SKILL.md").read_text(encoding="utf-8").split()
         self.assertLessEqual(len(skill_words), 2000)
         for name in ("ideation-generator.md", "ideation-verifier.md", "research-distiller.md"):
-            path = ROOT / "skills" / "ce-ideate" / "references" / "agents" / name
+            path = ROOT / "skills" / "ae-ideate" / "references" / "agents" / name
             self.assertLessEqual(len(path.read_text(encoding="utf-8").split()), 700, name)
 
     def test_root_routes_optional_context_instead_of_embedding_it(self):
-        skill = (ROOT / "skills" / "ce-ideate" / "SKILL.md").read_text(encoding="utf-8")
+        skill = (ROOT / "skills" / "ae-ideate" / "SKILL.md").read_text(encoding="utf-8")
         for reference in (
             "intake-and-routing.md",
             "repo-grounding.md",

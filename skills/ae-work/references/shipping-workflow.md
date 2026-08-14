@@ -1,0 +1,128 @@
+# Shipping Workflow
+
+This file contains the shipping workflow (Phase 3-4). It is loaded when all Phase 2 tasks are complete and execution transitions to quality check.
+
+## Phase 3: Quality Check
+
+1. **Run Core Quality Checks**
+
+   Always run before submitting:
+
+   ```bash
+   # Run full test suite (use project's test command)
+   # Examples: bin/rails test, npm test, pytest, go test, etc.
+
+   # Run linting with the project's configured command / active instructions
+   ```
+
+2. **Confirm simplification coverage**
+
+   Follow the cadence in `ae-work`'s **Simplify as You Go** step. Do not repeat a completed three-reviewer pass unless production code changed materially afterward.
+
+3. **Code Review**
+
+   Review the diff with **`ae-code-review`** as the single path. It self-right-sizes: a lite roster for small, low-risk, code-only diffs and the full roster otherwise.
+
+   **Skip dedicated review only for a purely mechanical diff** — formatting, dependency-version bumps, lint-only fixes, generated artifacts (the same class step 2 skips for simplify). Note in the shipping summary: `Code review: skipped (mechanical diff)`. Everything else gets reviewed.
+
+   **Review is not fix — two steps:**
+
+   **3a. Review (read-only).** Invoke `ae-code-review` with `mode:agent` (add `plan:<path>` when known; `base:<ref>` when the diff base is resolved). Pass **`depth:full`** when the plan, the task, or the user explicitly asked for a full / deep / thorough review — that is the one escalation signal `ae-code-review` cannot infer from the diff alone. Do not pass `mode:autofix`. Parse the JSON.
+
+   **3b. Apply fixes (caller-owned).** Load `references/review-findings-followup.md`: filter on JSON, batch by file, dispatch fix subagents. Orchestrator merges, tests, commits. Then proceed to the Residual Work Gate.
+
+   **If `ae-code-review` cannot run at all** and returns `status: failed` or degraded with no coverage, note `Code review: dedicated review unavailable` and perform an explicit manual diff scan during Final Validation. Never silently ship a non-mechanical change with no review.
+
+4. **Residual Work Gate** (REQUIRED when `ae-code-review` ran and left actionable residuals)
+
+   After code review and review-findings followup, inspect the **Actionable Findings** summary (or read the run artifact at `/tmp/andrea-engineering/ae-code-review/<run-id>/` if the summary was truncated). If one or more actionable `downstream-resolver` findings were not applied in followup, do not proceed to Final Validation until they are resolved or durably recorded.
+
+   **Non-interactive / autonomous sessions (no human can answer — e.g. an `lfg`-style pipeline or a headless run):** do **not** call the blocking tool — that would hang the pipeline. After step 3b auto-applied every mechanically-eligible finding, take the `Accept and proceed` path automatically: record the remaining actionable residuals verbatim to the durable Known Residuals sink (the PR description's Known Residuals section, or `docs/residual-review-findings/<branch-or-head-sha>.md` on the no-PR path) and continue to Final Validation. Residuals are recorded, never dropped — this keeps autonomous shipping unblocked without losing findings.
+
+   **Interactive sessions:** Ask through the [shared codex-interaction contract](codex-interaction.md). Never silently skip the gate.
+
+   Stem: `Code review left N actionable finding(s) not yet fixed. How should the agent proceed?`
+
+   Options (four or fewer, self-contained labels):
+   - `Apply/fix now` — load `references/review-findings-followup.md`, dispatch batched fix subagents for remaining eligible findings, run tests, commit if needed; optionally re-run `ae-code-review` only after the diff changed materially.
+   - `File tickets via project tracker` — load `references/tracker-defer.md` in Interactive mode; the agent files tickets in the project's detected tracker (or `gh` fallback, or leaves them in the report if no sink exists) and proceeds to Final Validation.
+   - `Accept and proceed` — record the residual findings verbatim in a durable "Known Residuals" sink before shipping. If a PR will be created or updated in Phase 4, include them in the PR description's "Known Residuals" section (the agent owns this when calling `ae-commit-push-pr`). If the user later chooses the no-PR `ae-commit` path, create `docs/residual-review-findings/<branch-or-head-sha>.md`, include the accepted findings and source review-run context, stage it with the implementation commit, and mention the file path in the final summary. The user has acknowledged the risk, but the findings must not live only in the transient session.
+   - `Stop — do not ship` — abort the shipping workflow. The user will handle findings manually before re-invoking.
+
+   Skip this gate entirely when the review reported `Actionable findings: none.` (and followup applied everything mechanical), or when dedicated review was skipped (mechanical diff or `ae-code-review` unavailable). Do not proceed past this gate on an `Accept and proceed` decision (including the autonomous auto-accept above) until the agent has recorded whether the durable sink is `PR Known Residuals` or `docs/residual-review-findings/<branch-or-head-sha>.md`.
+
+5. **Final Validation**
+   - All tasks marked completed
+   - Testing addressed -- tests pass and new/changed behavior has corresponding test coverage (or an explicit justification for why tests are not needed)
+   - Linting passes
+   - Code follows existing patterns
+   - Figma designs match (if applicable)
+   - If browser or manual runtime validation was warranted and actually run, no new console errors or warnings were observed
+   - Verify that every item in the plan's `Requirements` section is satisfied.
+   - If any `Deferred to Implementation` questions were noted, confirm they were resolved during execution
+
+6. **Prepare Operational Validation Plan** (REQUIRED)
+   - Add a `## Post-Deploy Monitoring & Validation` section to the PR description for every change.
+   - Include concrete:
+     - Log queries/search terms
+     - Metrics or dashboards to watch
+     - Expected healthy signals
+     - Failure signals and rollback/mitigation trigger
+     - Validation window and owner
+   - If there is truly no production/runtime impact, still include the section with: `No additional operational monitoring required` and a one-line reason.
+
+## Phase 4: Ship It
+
+1. **Prepare Validation Context**
+
+   Do not launch a dedicated CE evidence-capture workflow. Use Codex browser, screenshot, terminal, and artifact tools directly when the user asks or when the artifact already exists.
+
+   Note whether the completed work has observable behavior (UI rendering, CLI output, API/library behavior with a runnable example, generated artifacts, or workflow output), and summarize any manual validation performed. If the user supplied evidence (URL, markdown embed, local artifact path), pass it to `ae-commit-push-pr` as PR-description context.
+
+2. **Commit and Create Pull Request**
+
+   Load the `ae-commit-push-pr` skill to handle committing, pushing, and PR creation. The skill handles convention detection, branch safety, logical commit splitting, adaptive PR descriptions, and attribution badges.
+
+   When providing context for the PR description, include:
+   - The plan's summary and key decisions
+   - Testing notes (tests added/modified, manual testing performed)
+   - Evidence context from step 1, so `ae-commit-push-pr` can decide whether to ask about capturing evidence
+   - Figma design link (if applicable)
+   - The Post-Deploy Monitoring & Validation section (see Phase 3 Step 6)
+   - Any "Known Residuals" accepted in the Phase 3 Residual Work Gate, rendered as a dedicated section in the PR body with severity, file:line, and title per finding
+
+   If the user prefers to commit without creating a PR, load the `ae-commit` skill instead.
+
+3. **Notify User**
+   - Summarize what was completed
+   - Link to PR (if one was created)
+   - Note any follow-up work needed
+   - Suggest next steps if applicable
+
+## Quality Checklist
+
+Before creating PR, verify:
+
+- [ ] All clarifying questions asked and answered
+- [ ] All tasks marked completed
+- [ ] Testing addressed -- tests pass AND new/changed behavior has corresponding test coverage (or an explicit justification for why tests are not needed)
+- [ ] Linting passes with the project's configured command
+- [ ] Code follows existing patterns
+- [ ] Figma designs match implementation (if applicable)
+- [ ] Validation/evidence context passed to `ae-commit-push-pr` when the change has observable behavior
+- [ ] Commit messages follow conventional format
+- [ ] PR description includes Post-Deploy Monitoring & Validation section (or explicit no-impact rationale)
+- [ ] Simplification cadence satisfied; the latest pass covered reuse, quality, and efficiency
+- [ ] Code review: `ae-code-review` ran (self-sized), or skipped (mechanical diff / unavailable — noted in summary); residuals handled via the Residual Work Gate
+- [ ] PR description includes summary, testing notes, and evidence when captured
+- [ ] PR description includes the Andrea Engineering and Codex badges
+
+## Code Review
+
+**`ae-code-review`** self-sizes to a lite roster for small low-risk code-only diffs and the full roster otherwise.
+
+**Skip** only for a purely mechanical diff (formatting, dep-bumps, lint-only, generated). Everything else is reviewed.
+
+**Two steps — review is not fix.** (3a) Review-only via `mode:agent`; add `depth:full` when the plan/task/user explicitly asked for a deep review. (3b) Batched fix subagents per `references/review-findings-followup.md`; residuals → Residual Work Gate.
+
+**If `ae-code-review` cannot run**, record the failure and perform a manual diff scan during Final Validation. Never silently ship a non-mechanical change unreviewed.

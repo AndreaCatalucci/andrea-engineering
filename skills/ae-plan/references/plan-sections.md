@@ -1,0 +1,441 @@
+# Plan Sections
+
+This reference describes what makes a great implementation plan. It does NOT
+prescribe how the plan looks on the page — rendering is handled by the
+format-specific references (`markdown-rendering.md`, `html-rendering.md`).
+
+## The outcome
+
+A great plan enables three audiences to act:
+
+- **The implementing agent** (`ae-work` or a human) starts from an informed
+  baseline — important decisions are named, research breadcrumbs orient
+  their own investigation, step boundaries are clear. The plan gives the
+  implementer a starting point, not a substitute for their own investigation.
+- **The reviewer** identifies the important decisions and the boundaries
+  of what's being changed in one pass.
+- **The future reader** (anyone returning months later) traces why the work
+  was done, what shaped it, and where the artifacts live.
+
+Sections earn their place by serving one of these audiences. Omit padding.
+
+## Unified Plan Format
+
+`ae-plan` writes the canonical andrea-engineering plan artifact. The same
+artifact may begin as a requirements-only skeleton from `ae-brainstorm` and
+later be enriched by `ae-plan`; it is still one plan file moving through
+readiness states, not a requirements doc plus a separate implementation doc.
+
+For plans that implementation agents will consume, use:
+
+- **`plan_format: andrea-plan/v1`** — identifies the plan format.
+- **`plan_readiness`** — document completeness, not work progress. Valid
+  values are:
+  - `requirements-only` — What We're Building exists; planning sections are not
+    complete and the artifact is not executable.
+  - `implementation-ready` — What We're Building, How We'll Build It,
+    Work Steps, How We'll Check It, and Done When are
+    complete enough for `ae-work`, `/goal`, or an equivalent executor, **and no
+    launch-blocking open question remains**. A plan that is otherwise complete
+    but still has a blocking product/architecture question stays
+    `requirements-only`, so the next step it routes to is blocker resolution /
+    planning, not implementation. Deferred (non-blocking) questions
+    do not hold readiness back — mark each open question as blocking or deferred
+    so this distinction is explicit.
+- **`requirements_source`** — where the requirements came from:
+  `ae-brainstorm`, `ae-plan-bootstrap`, or another
+  explicit source string when a repo has a specialized producer.
+- **`execution`** — `code` for implementation plans or `knowledge-work` for
+  non-code deliverables. This field is required.
+
+Do **not** use progress-like readiness values such as `active`,
+`in_progress`, `completed`, or `done`. Readiness answers "can the artifact be
+executed?", not "has execution happened?" Plans still carry no `status` field
+and no mutable execution lifecycle.
+
+Do **not** use `plan_readiness: approach-plan`. Approach-plans,
+answer-seeking outputs, and universal-planning outputs are outside this
+software plan format unless they include the full What
+We're Building, How We'll Build It, Work Steps, How We'll Check It, and
+Done When required for software execution. Route those artifacts by
+their own shape or by `execution: knowledge-work`, not by adding a third
+unified readiness value.
+
+## Section ID Registry
+
+Andrea plans use these stable sections. Markdown uses the
+heading text; HTML uses matching visible headings and anchor IDs. Downstream
+skills grep or anchor-scan for these names before reading large bodies.
+
+| Logical section | Markdown heading | HTML id | Reader use |
+|---|---|---|---|
+| Goal | `## Goal` | `goal` | Objective, authority hierarchy, and stop conditions |
+| What We're Building | `## What We're Building` | `what-were-building` | Requirements, actors, flows, acceptance examples, product scope |
+| Product Requirements | `### Requirements` under What We're Building | `product-requirements` | Requirement extraction for review and implementation trace |
+| How We'll Build It | `## How We'll Build It` | `how-well-build-it` | technical decisions, technical design, assumptions, sequencing |
+| Work Steps | `## Work Steps` | `work-steps` | W-ID work packets for execution |
+| How We'll Check It | `## How We'll Check It` | `how-well-check-it` | Repo-specific test commands and quality gates |
+| Done When | `## Done When` | `done-when` | Global and per-step completion criteria |
+| Appendix | `## Appendix` | `appendix` | Long research, raw notes, or supporting detail |
+
+Requirements-only plans are kept light: Goal and What We're Building.
+They must not point implementers at absent How We'll Build It,
+Work Steps, How We'll Check It, or Done When sections.
+`ae-plan` adds those implementation sections when it enriches to
+implementation-ready. Implementation-ready artifacts include the full registry
+above, except Appendix remains optional. Keep the required sections short; the
+registry is navigation, not a demand to fill every possible subsection.
+
+### Wayfinding: map before reading (size-aware)
+
+The document does not carry a reading guide; consuming skills own the reading
+algorithm. A **short** plan — a lightweight or requirements-only artifact that
+fits in a screen or two — can just be read in full; that is cheaper and simpler
+than scanning and ranging. But an implementation-ready plan is often
+long, and HTML output (also supported) is more verbose still, so for anything
+beyond short, do **not** load the entire artifact to find your way around.
+Build a section map first, then read only the ranges the task needs:
+
+- **Markdown:** scan headings to get the section and step map — e.g.
+  `rg -n '^#{1,3} ' <plan>` (top-level sections plus `### W<N>.` steps).
+- **HTML:** scan the heading elements (`<h1>`–`<h3>`) and their anchor ids;
+  match on the section name and ignore the wrapper tags.
+
+In both formats the section **names and anchor ids are the stable contract**
+from the Section ID Registry above (`Goal`/`goal`,
+`How We'll Check It`/`how-well-check-it`, `### W<N>.` steps, …). Wayfind
+against those registry names, not a brittle tag/format pattern, so the
+instruction survives rendering changes. After mapping, read metadata, then only
+the sections the task needs — e.g. Goal, the active W-ID plus its cited
+R/F/AE/D, How We'll Check It, and Done When. Read the Appendix or
+unrelated steps only when a section you are already reading cites them.
+
+## Decide whether a plan doc is warranted at all
+
+Not every invocation of `ae-plan` should produce a plan document. For
+genuinely atomic work, the doc is ceremony — the implementer (whether
+`ae-work` or a human) can act directly without IDed steps, technical decisions, or
+Requirements as a checklist.
+
+**Bias toward producing a plan.** The risk asymmetry favors writing one:
+a thin plan doc for small work is mild ceremony, but skipping a plan when
+one was warranted costs the implementer real time (reinvented decisions,
+lost step boundaries, no IDed requirements to verify against). When unsure,
+write the plan.
+
+**Skip implementation-ready plan creation only when ALL of these hold:**
+
+- The work is **atomic** — fits in one commit, no meaningful step boundaries
+  to break out independently.
+- There are **no design choices that constrain implementation** — no
+  Technical Decisions worth recording. If the work needs the implementer
+  to make a choice between two approaches, those approaches are technical decisions and
+  a plan is warranted.
+- There are **no scope boundaries worth pinning** in writing — the work
+  scope is self-evident from the user's request.
+- **No upstream artifact** (a brainstorm with R-IDs, an incident report,
+  a deferred-follow-up item from a prior plan) needs traceability through
+  this plan.
+
+**Stress test the "looks atomic" case.** Many requests look atomic at first
+glance but hide design decisions:
+
+- *"Add caching to this endpoint"* — sounds atomic, but TTL, invalidation,
+  cache key shape, and backend selection are all technical decisions. Write the plan.
+- *"Migrate from package A to package B"* — sounds mechanical, but
+  semantic differences between the packages create migration technical decisions. Write
+  the plan.
+- *"Add rate limiting"* — sounds small, but algorithm, scope, and
+  configurability are all technical decisions. Write the plan.
+
+vs. genuine skip cases:
+
+- *"Fix typo in README line 47"* — atomic, no technical decisions, skip the plan.
+- *"Rename `oldFn` to `newFn` across the repo"* — mechanical, no design
+  choices, skip the plan.
+- *"Bump dependency X to v2.3.1"* — mechanical, skip the plan (unless the
+  bump introduces breaking changes that warrant step-by-step migration).
+
+When skipping the plan doc, the work proceeds directly to `ae-work` or to
+implementation, and any decisions made along the way land in the commit
+message or `docs/solutions/` if they're worth carrying forward.
+
+## Implementation-ready hard floor
+
+When an implementation-ready software plan is warranted, these sections are
+present. They carry the contracts downstream consumers depend on.
+
+- **Goal** — objective, authority hierarchy, stop conditions, execution
+  profile, and tail ownership. This is the fastest way for an executor to
+  avoid drifting from the plan.
+- **Source-to-Outcome summary** — within the first 25 lines, state Source,
+  Input, Operation, and Outcome. For external-data work, name the exact
+  authority, artifact or endpoint, operator-facing processing surface, and
+  observable success condition. A compact
+  `Source -> Import -> Transform -> Apply -> Publish -> Verify` flow may replace
+  longer lifecycle prose.
+- **What We're Building** — product scope and behavior. Contains Summary,
+  Problem, Requirements with stable R-IDs, and any material Actors, Flows,
+  Examples, Success Measures, Scope, Dependencies,
+  Outstanding Questions, and Sources. This replaces the separate requirements
+  artifact in new brainstorm-to-plan flows.
+- **How We'll Build It** — the implementation-facing decisions: Technical
+  Decisions, high-level design, assumptions, implementation constraints,
+  sequencing, and research that shapes the implementation.
+- **Work Steps** (with stable W-IDs) — outcome-sized guardrails that an
+  implementer can act on after doing local discovery. Group supporting codecs,
+  receipts, lifecycle handling, orchestration, readiness, rollback, and docs
+  into the outcome they serve unless one is independently valuable. Each step
+  includes:
+  - **Goal** — the observable outcome and covered requirement IDs.
+  - **Affected area** — the component, boundary, or one or two useful
+    repo-relative starting anchors. This is not an exhaustive file manifest.
+  - **Verification** — observable evidence that the outcome works.
+
+  Add Constraints, exact Files, Patterns, Approach, Dependencies, Execution
+  notes, or Test Scenarios only when that detail preserves an important
+  decision, controls a material risk, or makes a non-obvious order clear.
+  Details the implementer can safely resolve while coding stay out of the plan.
+  `ae-work` and goal-mode executors consume these steps as starting points, not
+  scripts.
+  - **Work Step Index (large plans only, ~10+ steps).** When the plan has roughly
+    ten or more steps, open the section with a compact navigation table — one
+    row per step: **W-ID · one-line title · affected area · depends-on**. It
+    lets an executor map steps to components and resolve dependency order without
+    scanning every step body. It is a **navigation aid only**: the step bodies
+    stay authoritative, it carries nothing beyond those four fields (no
+    approach, tests, or rationale). **Omit it below ~10 steps** — there the step
+    bodies already suffice, and an index would be ceremony.
+- **How We'll Check It** — repo-specific commands and quality gates,
+  including which tests prove the plan, when `release:validate` applies, and
+  what behavioral skill evaluation is required. Avoid generic "run tests"
+  language when the repo has concrete commands. When the goal is
+  optimization-shaped (build time, latency, coverage, bundle size), express a
+  measurable threshold as the exit criterion (e.g., "p95 latency < 200ms",
+  "build time reduced 30%") and consider routing to `ae-optimize` — a metric
+  target is a sharper done signal for a long-running goal than a boolean check.
+- **Done When** — a concise completion summary, not a restatement of
+  requirements, steps, and verification. Include only global boundaries not
+  already obvious from Verification, plus cleanup of abandoned experimental
+  code when relevant.
+
+## Include when material
+
+These sections are present when they carry information that isn't covered
+elsewhere. The test is not "is this a substantial plan?" — it is
+*"does this specific plan have content this section would surface?"* Filling
+a section with placeholder prose is worse than omitting it.
+
+- **High-Level Technical Design** — include when the technical approach has
+  shape that prose alone doesn't carry well: architecture across components,
+  sequencing across processes, state machines, or branching gates. Prefer a
+  paragraph or numbered flow when it is equally clear. Component/stage count
+  alone never requires a diagram. Compact plans normally use zero or one small
+  visual; every additional diagram must resolve a distinct important
+  ambiguity.
+
+- **Scope** — include when scope is contested, when there are
+  tempting non-goals worth naming explicitly, or when "deferred for later"
+  needs distinguishing from "outside the product's identity." Skip when scope
+  is obvious from Requirements alone.
+
+- **Open Questions** — include when there are genuinely unresolved items that
+  block planning or implementation. Skip when the plan is complete; an empty
+  "Open Questions: none" section signals false uncertainty.
+
+- **System-Wide Impact** — include when the change affects cross-cutting
+  concerns (data lifecycles, auth boundaries, performance posture, cardinal
+  rules, shared infrastructure, agent/tool parity, prompt context, shared
+  workspaces). Skip for changes localized to one component where the impact is
+  self-evident.
+
+- **Risks & Dependencies** — include when there are real risks worth flagging
+  (external service changes, version pins under churn, behavioral assumptions
+  worth highlighting) or material upstream dependencies. Skip for low-risk
+  localized work.
+
+- **Examples** — include when any requirement has a state-dependent
+  or conditional shape ("When X, Y") where the prose alone leaves ambiguity
+  about edge cases. Skip when all requirements are unconditional and
+  unambiguous.
+
+- **Documentation / Operational Notes** — include when documentation,
+  monitoring, runbooks, or rollout steps need explicit notes. Skip when the
+  work is purely internal and uses existing operational scaffolding without
+  modification.
+
+- **Sources / Research** — surface the research that orients the implementer
+  or justifies important choices. The test: *"if I were the implementer
+  reading this cold, would this breadcrumb help me make better choices?"*
+  Yes → surface (code locations like `services/convex/reports.ts:174-176`,
+  external docs, RFCs, constraints, prior plans — the category is inclusive,
+  not enumerated). Process exhaust (reading the user's prompt, glancing at
+  obvious entry points, restating prose) → omit. Surface inline next to the
+  D or step it justifies, or as a dedicated section — both shapes work.
+
+## Agent agency
+
+The catalog is a floor, not a ceiling. When the plan's content doesn't fit
+any catalog section, introduce a new one — don't force the content into a
+section it doesn't belong in. Content drives section choices, not vice
+versa.
+
+The agent also picks per artifact:
+
+- Whether Problem merges into Summary
+- Sub-groupings (Requirements by capability, technical decisions by component, Units phased
+  into milestones)
+- How much detail each section carries
+- Whether HTD has one diagram, several, or none — and whether visualizations
+  live in HTD or embedded in other sections
+
+## Prose economy
+
+"Include when material" sizes *which* sections appear; this sizes *how the kept
+prose reads*. A section can be material and still be written loosely — the
+failure mode is a material section padded into a wall of text where
+contradictions hide and the implementing agent loses the thread. A deep plan
+earns length through coverage (more steps, more traced requirements, real
+risks), never through wordiness around that coverage.
+
+Hold every kept section to these:
+
+- **One fact, one home.** Requirements own behavior; technical decisions own important
+  rationale; steps own where and how work lands; Verification owns proof; Done
+  owns only the final completion boundary. Reference an ID instead of
+  restating its content elsewhere.
+- **Focused means capped.** A feature with at most four outcome steps stays at
+  or below 1,000 words unless the review records the P0/P1 correctness reason
+  for exceeding it. External-data and high-risk labels do not waive the cap.
+
+- **Lead with the decision or outcome.** Put the conclusion first, then the
+  reason, then background; keep one claim plus its support per paragraph. Don't
+  bury a Key Technical Decision, the chosen scope, an open blocker, or a step
+  goal beneath its rationale. This does not override section roles — Summary
+  stays proposal-only, Problem stays motivation-only and never restates
+  the remedy.
+- **One idea per sentence.** A Summary is a handful of sentences, not one
+  sentence with five semicolons and four parentheticals. A D's rationale is
+  the important reason, not every reason.
+- **A requirement or step is one sentence of intent plus at most one
+  qualifier.** When it would specify two outcomes ("either A or B, the
+  implementer decides"), state the intent and send the fork to Open Questions —
+  don't write both arms in full inside the item.
+- **Cut hedges and intensifiers.** "Critically", "deliberately", "explicitly",
+  "genuinely", "actually", "simply" carry nothing the implementer acts on.
+- **Prefer the verb to the nominalization.** "Demote the grid", not "the
+  demotion of the grid is the deliberate change in this plan".
+
+Precision is not padding: keep file paths, IDs, dates, domain terms,
+conditionals, and exact thresholds verbatim; when a concrete anchor is knowable
+from the work already done, use it instead of a vague abstraction. Economy
+targets the connective tissue around precision, never the precision itself.
+
+**Guardrail test:** could a competent implementer choose a different local
+implementation and still satisfy the plan? If not, every constrained choice
+must name the material risk or rework it prevents. Delete unsupported coding
+instructions.
+
+**Resolve in place; don't stratify.** When deepening, a doc-review pass, or a
+later decision supersedes earlier text, rewrite or remove the original — don't
+leave it standing as strikethrough or stack a separate "resolutions" layer on
+top of it. Version control holds the history. Stacked strata double the reading
+surface and hide which text is live.
+
+**Named test, run before the plan is declared written:** could the implementer
+find a contradiction in each section in one pass? A sentence carrying more than
+one parenthetical, or an item specifying two outcomes, fails the test — split it
+or defer it.
+
+## Plan metadata fields
+
+Every plan carries a small set of stable metadata fields that downstream
+tooling depends on. The contract is format-independent: in markdown these
+fields appear as YAML frontmatter at the top of the file; in HTML they
+appear as visible header text (typically a `<dl>` of `<dt>`/`<dd>` pairs or
+a stats strip). Field names and semantics are the same across both formats
+so consumers can locate them without knowing which format produced the
+plan.
+
+### Required
+
+- **`title`** — the plan's descriptive name with a ` - Plan` suffix
+  (e.g., `Highlighter Tool - Plan`), matching the H1 (markdown) or document
+  `<h1>` (HTML) so file metadata and visible heading don't drift. Stable
+  across readiness states (it is a plan at every stage). Do not put a
+  conventional-commit prefix (`feat:`/`fix:`) in the title — the `type` field
+  carries that classification.
+- **`type`** — conventional-commit-prefix-aligned classification (`feat`,
+  `fix`, `refactor`, `chore`, `docs`, `perf`, `test`, etc.). Carries the
+  intent the eventual commit message should reflect.
+- **`date`** — creation date in ISO 8601 (`YYYY-MM-DD`), ASCII digits only.
+
+Plans carry **no `status` field** — a plan is a decision artifact, not a
+tracked work item. `ae-work` does not mutate the plan at ship time;
+whether a plan shipped is derived from git, not stored in the doc. Do not
+add a `status` field or an `active → completed` lifecycle.
+
+### Optional but well-known
+
+These fields are not required, but when set they have fixed names and
+semantics so downstream tooling can rely on them:
+
+- **`origin`** — repo-relative path to an upstream brainstorm requirements
+  doc (e.g., `docs/brainstorms/2026-05-12-pagination-requirements.md`).
+  Set when planning from an upstream brainstorm; carried for traceability
+  and re-resolved when `ae-plan` re-deepens.
+- **`deepened`** — ISO 8601 date marking the first time the confidence
+  check substantively strengthened the plan. Presence affects Phase 0.1
+  resume fast-path logic (see `references/deepening-workflow.md`).
+- **`execution`** — execution domain for downstream routing: `code`
+  (the default when absent) or `knowledge-work`. `ae-work`'s input triage
+  reads this: a plan marked `execution: knowledge-work` routes to the
+  non-code carve-out (read sources, synthesize, produce a deliverable —
+  skipping the branch/test/commit/CI lifecycle); absent or `code` routes
+  to the normal code path. Written by `ae-plan`'s approach-altitude flow
+  (`references/approach-altitude.md`) when a non-code deliverable is
+  persisted for execution.
+
+Field names are stable across plan revisions — never rename a field or
+repurpose its semantics. Agents composing new plans MUST use these exact
+names; adding new fields is fine, but renaming `origin` to `source` or
+`date` to `created` breaks the downstream consumers above.
+
+## ID and content rules
+
+These apply regardless of rendering format.
+
+- **Stable IDs.** R-IDs (Requirements), W-IDs (Work Steps), A-IDs
+  (if Actors fire), F-IDs (if Flows fire), AE-IDs (if Examples
+  fire). IDs are stable across plan revisions — never renumber to "clean
+  up gaps."
+- **Plain prefix.** `R1.`, `W1.` as bullet prefixes. Do not bold; the prefix
+  is visually distinctive on its own.
+- **Repo-relative paths.** Always. Never absolute paths in plan content;
+  they break portability across machines, worktrees, teammates.
+- **No process exhaust.** No "captured at Phase X" notes, no `## Next Steps`
+  pointing to the next skill, no italic provenance lines. Engineering process
+  metadata belongs in commit messages and tool output, not the artifact.
+- **Group Requirements by concern when they span distinct logical areas.**
+  The trigger is distinct concerns, not item count — even four requirements
+  benefit from grouping if they cover three different topics. Skip grouping
+  only when all requirements are genuinely about the same thing; a long flat
+  list is a smell that subgroups were missed. Group by capability (e.g.,
+  "Packaging", "Migration and compatibility", "Contributor workflow"), not by
+  the order requirements were discussed. R-IDs stay continuous across groups
+  (R1, R2 in the first group; R3, R4 in the second; never restart at R1 per
+  group).
+
+## Rendering
+
+The format-specific references describe how to render these sections in each
+output format:
+
+- **Markdown rendering:** `references/markdown-rendering.md`
+- **HTML rendering:** `references/html-rendering.md`
+
+This reference (`plan-sections.md`) is about WHAT the plan contains;
+rendering references are about HOW each format presents it. The plan is
+written in one format — markdown OR HTML, never both — based on the
+resolved output mode. The section catalog is the same regardless of
+format.

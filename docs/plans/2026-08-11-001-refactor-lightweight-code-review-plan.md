@@ -4,7 +4,7 @@ date: 2026-08-11
 type: refactor
 plan_format: andrea-plan/v1
 plan_readiness: implementation-ready
-requirements_source: ce-plan-bootstrap
+requirements_source: ae-plan-bootstrap
 execution: code
 source_ideation: docs/ideation/2026-08-11-lightweight-code-review-ideation.html
 ---
@@ -13,14 +13,14 @@ source_ideation: docs/ideation/2026-08-11-lightweight-code-review-ideation.html
 
 ## Goal
 
-Reduce the fixed and duplicated tokens used by `ce-code-review` without changing which reviewers run, what they inspect, the evidence bar, or independent validation.
+Reduce the fixed and duplicated tokens used by `ae-code-review` without changing which reviewers run, what they inspect, the evidence bar, or independent validation.
 
-**Source:** Internal `ce-code-review` instructions and the selected directions in the linked ideation document.
+**Source:** Internal `ae-code-review` instructions and the selected directions in the linked ideation document.
 **Input:** A resolved review scope, intent, plan requirements, PR context, project profile, diff paths, reviewer persona, and run ID.
 **Operation:** Dispatch each reviewer with a lean self-contained packet, validate its full JSON file deterministically, and return a small receipt plus merge view.
 **Outcome:** The smallest core review carries no more than 1,500 words of shared non-persona instructions before run-specific context, while valid findings, fallback behavior, and final review output remain equivalent.
 
-Authority order: this plan, existing `ce-code-review` scope and merge rules, then local implementation choices. Stop rather than weakening evidence, confidence, remote-scope safety, or validation to meet the target.
+Authority order: this plan, existing `ae-code-review` scope and merge rules, then local implementation choices. Stop rather than weakening evidence, confidence, remote-scope safety, or validation to meet the target.
 
 ## What We're Building
 
@@ -47,7 +47,7 @@ This change does not combine reviewers, alter risk classification, introduce a f
 ### Technical Decisions
 
 - D1. Keep persona files separate. The concise protocol retains the complete artifact field list and all semantic rules for impact, evidence, suppression, confidence, and fixes. Only machine-checkable schema syntax, enums, and bounds move to the helper.
-- D2. Add one deep helper under `skills/ce-code-review/scripts/` rather than spreading validation and projection rules through the skill. It supports exactly the JSON Schema features used by `findings-schema.json` and rejects schema features it cannot enforce.
+- D2. Add one deep helper under `skills/ae-code-review/scripts/` rather than spreading validation and projection rules through the skill. It supports exactly the JSON Schema features used by `findings-schema.json` and rejects schema features it cannot enforce.
 - D3. Use explicit fresh-context subagent dispatch. The packet, not prior conversation, is the complete source for intent, requirements, scope, repository orientation, and output rules.
 - D4. Treat the full JSON as authoritative. Synthesis preserves each compact finding's source key and reloads full records before validation and final output. Inline findings exist only as the documented fallback.
 
@@ -57,7 +57,7 @@ This change does not combine reviewers, alter risk classification, introduce a f
 
 **Goal:** Provide the checked handoff required by R4-R6 before changing reviewer output.
 
-**Affected area:** `skills/ce-code-review/scripts/`, `skills/ce-code-review/references/findings-schema.json`.
+**Affected area:** `skills/ae-code-review/scripts/`, `skills/ae-code-review/references/findings-schema.json`.
 
 **Constraints:** No package installation. Validate required fields, types, enums, bounds, evidence, digest, source keys, and compact projection. Unsupported schema keywords fail clearly.
 
@@ -67,7 +67,7 @@ This change does not combine reviewers, alter risk classification, introduce a f
 
 **Goal:** Meet R1-R4 by replacing repeated prose and duplicate model output while keeping the same review decisions.
 
-**Affected area:** `skills/ce-code-review/SKILL.md`, `skills/ce-code-review/references/subagent-template.md`.
+**Affected area:** `skills/ae-code-review/SKILL.md`, `skills/ae-code-review/references/subagent-template.md`.
 
 **Approach:** Assemble a fresh-context packet from resolved inputs, including governing instruction text and up to three selected Known Pattern notes. The reviewer writes one full file, runs the helper, and returns its receipt or documented inline fallback. The parent validates receipts independently and allows one repair attempt.
 
@@ -77,7 +77,7 @@ This change does not combine reviewers, alter risk classification, introduce a f
 
 **Goal:** Prove R1, R6, and R7 across the rest of the review pipeline.
 
-**Affected area:** `skills/ce-code-review/references/merge-apply-contract.md`, `skills/ce-code-review/references/validator-template.md`.
+**Affected area:** `skills/ae-code-review/references/merge-apply-contract.md`, `skills/ae-code-review/references/validator-template.md`.
 
 **Constraints:** Preserve source keys through filtering, corroboration, and deduplication, then load full records before validation and output. Do not change confidence, severity, routing, numbering, validation selection, or protected-artifact behavior. Validators use fresh context and inspect independently.
 

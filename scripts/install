@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+DRY_RUN=0
+REQUESTED=()
+
+usage() {
+  cat <<'EOF'
+usage: scripts/install [--dry-run] [--codex] [--claude] [--grok]
+
+Install or refresh this checkout for coding agents.
+
+With no agent flags, install for every agent whose CLI is on PATH.
+Pass one or more of --codex, --claude, or --grok to limit the set.
+
+options:
+  --dry-run  Show install commands without changing any agent.
+  --codex    Install the Codex plugin.
+  --claude   Install the Claude Code plugin.
+  --grok     Install the Grok Build plugin.
+  -h, --help Show this help.
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run)
+      DRY_RUN=1
+      ;;
+    --codex|--claude|--grok)
+      REQUESTED+=("${1#--}")
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "unknown argument: $1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+has_cli() {
+  case "$1" in
+    codex) command -v "${CODEX_PLUGIN_CLI:-codex}" >/dev/null 2>&1 ;;
+    claude) command -v "${CLAUDE_PLUGIN_CLI:-claude}" >/dev/null 2>&1 ;;
+    grok) command -v "${GROK_PLUGIN_CLI:-grok}" >/dev/null 2>&1 ;;
+  esac
+}
+
+if [[ ${#REQUESTED[@]} -eq 0 ]]; then
+  for agent in codex claude grok; do
+    if has_cli "$agent"; then
+      REQUESTED+=("$agent")
+    fi
+  done
+fi
+
+if [[ ${#REQUESTED[@]} -eq 0 ]]; then
+  echo "No supported coding-agent CLI found (codex, claude, grok)." >&2
+  exit 1
+fi
+
+status=0
+for agent in "${REQUESTED[@]}"; do
+  echo "==> $agent"
+  args=()
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    args+=(--dry-run)
+  fi
+  if ! "$ROOT_DIR/scripts/install-${agent}-plugin" "${args[@]+"${args[@]}"}"; then
+    status=1
+  fi
+  echo
+done
+
+exit "$status"
