@@ -1,14 +1,14 @@
 # HTML Rendering
 
 This is a format-rendering reference — it describes how to render any
-artifact in HTML, independent of which skill is producing it.
+document in HTML, independent of which skill is producing it.
 
 It is paired with a section contract (`plan-sections.md`,
-`brainstorm-sections.md`, etc.) that describes *what* the artifact contains.
+`brainstorm-sections.md`, etc.) that describes *what* the document contains.
 This reference describes *how* HTML specifically presents it. The same
 content rendered by different skills shares the same HTML principles.
 
-The HTML artifact is the *only* artifact the skill produces for that run —
+The HTML document is the *only* document the skill produces for that run —
 output mode is exclusive (markdown OR HTML, never both). Downstream
 consumers that read HTML today (`ae-work`, human readers) do so directly;
 the agent-consumability rules below make that work. `ae-doc-review` is
@@ -18,7 +18,7 @@ runs and skips it for HTML.
 
 ## Hard invariants
 
-These hold regardless of which skill produced the artifact.
+These hold regardless of which skill produced the document.
 
 - **Single self-contained HTML5 file.** No companion `.css`, `.js`, or
   `.svg` files. CSS lives in `<style>`. SVG lives inline. Images are
@@ -27,7 +27,7 @@ These hold regardless of which skill produced the artifact.
   Bunny Fonts, etc.), paired with an offline-readable fallback font stack
   so the doc remains readable if the CDN is unreachable.
 - **All metadata appears as visible text — single source of truth.**
-  The artifact's metadata (title, type, date, etc. — exact
+  The document's metadata (title, type, date, etc. — exact
   fields per-skill, defined in the section contract) renders as visible
   HTML elements that downstream agents and humans read. No hidden
   machine-readable copy in any form: no `<script type="application/json">`
@@ -50,19 +50,19 @@ These hold regardless of which skill produced the artifact.
   exists, or just the composing skill name when there's no external
   source). Example shape:
   `<footer class="composition-signal">Composed 2026-05-17T14:23Z by ae-plan from <code>docs/brainstorms/...-requirements.md</code></footer>`.
-  Under exclusive output mode this signal is the artifact's own
+  Under exclusive output mode this signal is the document's own
   provenance — there's no markdown sibling to reference. Omitting it
   leaves readers unable to tell how stale the rendering is.
 - **ASCII identifiers.** Class names, element IDs, data attribute names
   are ASCII-only.
-- **Plan navigation.** Plan artifacts include a visible
+- **Plan navigation.** Plan documents include a visible
   navigation region near the top of the document. It links to stable section
   anchors for `goal`,
   `what-were-building`, `how-well-build-it`, `work-steps`,
   `how-well-check-it`, `done-when`, and `appendix` when those
-  sections exist. Requirements-only artifacts omit links to absent
+  sections exist. Requirements-only documents omit links to absent
   implementation sections.
-- **Visible readiness metadata.** If the artifact has `plan_format`,
+- **Visible readiness metadata.** If the document has `plan_format`,
   `plan_readiness`, `requirements_source`, or `execution`, render
   those values in the visible header metadata. Do not hide a duplicate copy in
   JSON, `data-*`, or `<meta>` tags.
@@ -177,7 +177,7 @@ Specific cases:
 ## Format principles
 
 These shape what "good" HTML looks like; the agent applies them per
-artifact based on content.
+document based on content.
 
 ### Readable measure, not full bleed
 
@@ -316,7 +316,7 @@ keep every chip in the row a visual set.
 A small inline `<script>` for active-section TOC tracking or anchor-
 permalink behavior is acceptable. React, Vue, Svelte, or any framework
 runtime is not. The single-file invariant doesn't permit framework
-bundles, and the artifact's longevity doesn't warrant a build dependency.
+bundles, and the document's longevity doesn't warrant a build dependency.
 
 ## Section anatomy
 
@@ -368,7 +368,7 @@ contracts — the agent picks shapes that fit the content.
   the distinction is meaningful — not a one-edge colored stripe.
 
 The agent picks more elaborate or simpler shapes based on what each
-specific artifact's content needs.
+specific document's content needs.
 
 ## Diagrams
 
@@ -503,7 +503,7 @@ spec, which the affordance is explicitly designed to avoid.
 
 Common HTML affordances the agent can reach for when content benefits.
 These are examples, not requirements — the agent picks what each
-artifact's content warrants. Other affordances not listed here are
+document's content warrants. Other affordances not listed here are
 fine when the content suggests them.
 
 - **Sticky TOC sidebar with active-section indicator** — available when
@@ -527,7 +527,7 @@ fine when the content suggests them.
 - **Eyebrow labels** (small-caps tag above section titles) for
   editorial polish, especially when section titles are narrative
   rather than literal.
-- **Stats strip** at the top of the doc when the artifact has 3+
+- **Stats strip** at the top of the doc when the document has 3+
   quantifiable signals worth surfacing at a glance.
 - **`<details>` + `<summary>`** for collapsible secondary content
   inside repeating cards. All collapsibles start closed — `open`
@@ -544,7 +544,7 @@ fine when the content suggests them.
 ## Agent-consumability rules
 
 Downstream agents that read HTML today (`ae-work`, a skill re-reading its
-own prior artifact on a resume run, future consumers) reason over the HTML
+own prior document on a resume run, future consumers) reason over the HTML
 as text — the way they reason over markdown, not via DOM extraction or a
 script-style parse. `ae-doc-review` is not a current HTML consumer (see
 opening note).
@@ -588,7 +588,7 @@ looks identical. Compose so semantic understanding is reachable in source:
 
 ## Post-compose audit
 
-Before returning the artifact, scan it for common slips:
+Before returning the document, scan it for common slips:
 
 - **Single self-contained file.** No companion `.css` / `.js` / `.svg`.
 - **No hidden machine-readable metadata copy.** No
@@ -628,4 +628,4 @@ Before returning the artifact, scan it for common slips:
   inline bold.
 - **No template placeholders** (`{skill}`, `<value>`, `[plan title]`)
   leaked into output.
-- **No process exhaust** callouts in the artifact.
+- **No process exhaust** callouts in the document.

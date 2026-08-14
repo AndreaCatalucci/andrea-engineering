@@ -1,19 +1,19 @@
 # Brainstorm Sections
 
 This reference describes what makes a great requirements-only plan
-artifact produced by `ae-brainstorm`.
+produced by `ae-brainstorm`.
 It does NOT prescribe how the doc looks on the page — rendering is handled by
 the format-specific references (`markdown-rendering.md`, `html-rendering.md`).
 
 ## The outcome
 
-A great brainstorm produces the first version of the same plan artifact that
+A great brainstorm produces the first version of the same plan that
 `ae-plan` later enriches. It enables three audiences to act:
 
 - **The planning agent** (`ae-plan` or a human) produces an implementation
   plan without inventing user behavior, scope boundaries, or success
   criteria — the brainstorm answered those.
-- **The reviewer** sees the framing choices, distinguishes pinned from open,
+- **The reviewer** sees the scope choices, distinguishes pinned from open,
   and catches scope gaps before planning.
 - **The future reader** traces why the proposed thing matters, who it's for,
   and what success looks like.
@@ -32,7 +32,7 @@ plan format:
 - **`execution`** only when the brainstorm has enough signal to classify the
   eventual execution domain. For software features, use `execution: code`.
   For non-code deliverables, follow the universal-brainstorming route instead
-  of pretending the artifact is executable code.
+  of pretending the plan is executable code.
 
 A requirements-only plan is kept **light and standalone-readable**. It
 includes:
@@ -55,9 +55,9 @@ Brainstorm dialogue does not always need to produce a durable document.
 Skip document creation when **both** hold:
 
 - The user only needs brief alignment — no exploration produced novel scope,
-  framing, or decisions worth preserving in IDed shape.
+  interpretation, or decisions worth preserving in IDed shape.
 - Any durable decisions made during the dialogue can flow naturally to
-  downstream artifacts (`ae-plan`, the commit message, `docs/solutions/`)
+  later documents (`ae-plan`, the commit message, `docs/solutions/`)
   without a brainstorm doc as an intermediary.
 
 The trigger for creating a doc is when the dialogue surfaced enough
@@ -70,7 +70,7 @@ this with a null check or with upstream validation?" and the agent confirms
 "upstream validation, here's why" doesn't need a brainstorm doc. The
 decision flows to `ae-plan` (or directly to commit message, or to
 `docs/solutions/` if it's a pattern worth carrying) without a brainstorm
-artifact in the middle.
+document in the middle.
 
 Conversely, a brainstorm about a multi-actor feature with contested scope
 and several behavioral conditions probably does need a doc — the planning
@@ -160,10 +160,10 @@ worse than omitting it.
   situational. Does NOT restate the proposal; the remedy lives in Summary.
 
 - **Key Decisions** — include when the brainstorm produced opinionated
-  framing choices (defaults, scope narrowings, foundational technical picks)
+  scope choices (defaults, scope narrowings, foundational technical picks)
   that constrain Requirements / Flows / Scope below. Each entry names the
   decision in bold with prose rationale. Sits high in the rendered doc so
-  readers encounter the framing choices before descending into detail.
+  readers encounter those choices before descending into detail.
 
 - **Actors** — include when the proposed thing has multi-party behavior
   (multiple humans, agents, or systems meaningfully involved). Skip for
@@ -172,7 +172,7 @@ worse than omitting it.
 
 - **Main Flows** — include when the proposed thing has multi-step behavior.
   Expected by default for behavioral brainstorms unless the proposed thing
-  is genuinely non-flow-shaped (pure API surface, policy, artifact output)
+  is genuinely non-flow-shaped (pure API, policy, document output)
   and Actors / Requirements / Scope / Examples
   together prevent downstream invention of paths. When omitting from a
   behavioral brainstorm, note the reason in the doc.
@@ -204,7 +204,7 @@ worse than omitting it.
   on-ramp to the prose it illustrates, not a substitute. The IDed prose
   (Requirements, Key Decisions, Examples) stays complete and
   standalone — a reader who ignores every diagram still gets the full
-  content in text, and a downstream agent that reads the artifact as linear
+  content in text, and a downstream agent that reads the plan as linear
   text is never left with a relationship that exists only in an SVG. Adding
   a before/after diagram is not license to thin the requirement or decision
   prose it depicts.
@@ -237,7 +237,7 @@ worse than omitting it.
   Planning" (answered during planning or codebase exploration).
 
 - **Sources / Research** — surface research that orients the planner or
-  justifies framing choices. The test: *"if I were the planner reading this
+  justifies scope choices. The test: *"if I were the planner reading this
   cold, would this breadcrumb help me make better choices?"* Yes → surface
   (code locations, external docs, RFCs, constraints, prior plans — the
   category is inclusive, not enumerated). Process exhaust (reading the
@@ -250,7 +250,7 @@ fit any catalog section, introduce a new one — don't force the content into
 a section it doesn't belong in. Content drives section choices, not vice
 versa.
 
-The agent also picks per artifact:
+The agent also picks per plan:
 
 - Whether Examples render as a separate section or embed in each
   requirement
@@ -268,11 +268,11 @@ markdown these fields appear as YAML frontmatter at the top of the file; in
 HTML they appear as visible header text (typically a `<dl>` of `<dt>`/`<dd>`
 pairs or a stats strip). Field names and semantics are the same across both
 formats so consumers can locate them without knowing which format produced the
-artifact.
+plan.
 
 ### Required
 
-- **`title`** — the artifact's descriptive name with a ` - Plan` suffix
+- **`title`** — the plan's descriptive name with a ` - Plan` suffix
   (e.g., `Highlighter Tool - Plan`), matching the H1 (markdown) or document
   `<h1>` (HTML). It is a plan at every readiness state, so the title
   stays stable when `ae-plan` enriches it. Do not put a conventional-commit
@@ -284,7 +284,7 @@ artifact.
 - **`topic`** — kebab-case slug identifying the brainstorm subject (e.g.,
   `surface-scope-earlier`, `demo-reel-local-save`). Used in the filename and
   as the resume-detection key when `ae-brainstorm` scans for an existing
-  artifact to continue.
+  plan to continue.
 - **`plan_format`** — always `andrea-plan/v1` for new outputs.
 - **`plan_readiness`** — always `requirements-only` for new
   `ae-brainstorm` outputs. Do not use `active`, `in_progress`, `completed`,
@@ -293,9 +293,9 @@ artifact.
 
 ### No status field
 
-Plan artifacts have no `status` field and no `active → completed`
+Plans have no `status` field and no `active → completed`
 lifecycle. `plan_readiness` is document completeness, not execution
-progress. No CE artifact carries mutable progress state; whether work shipped
+progress. No Andrea Engineering document carries mutable progress state; whether work shipped
 is derived from git, not stored in the doc. Do not introduce one.
 
 ### Field-name stability
@@ -319,7 +319,7 @@ Same shape as plan rules.
 - **Repo-relative paths.** Always. Never absolute paths.
 - **No process exhaust.** No "captured at Phase X" notes, no `## Next Steps`
   pointing to ae-plan, no italic provenance lines. Engineering process
-  metadata belongs in commit messages and tool output, not the artifact.
+  metadata belongs in commit messages and tool output, not the plan.
 - **No implementation details by default.** Libraries, schemas, endpoints,
   file layouts, code structure stay out unless the brainstorm itself is
   inherently about a technical or architectural change and those details are

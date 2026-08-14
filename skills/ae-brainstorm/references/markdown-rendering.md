@@ -1,19 +1,19 @@
 # Markdown Rendering
 
 This is a format-rendering reference — it describes how to render any
-artifact in markdown, independent of which skill is producing it.
+document in markdown, independent of which skill is producing it.
 
 It is paired with a section contract (`plan-sections.md`,
-`brainstorm-sections.md`, etc.) that describes *what* the artifact contains.
+`brainstorm-sections.md`, etc.) that describes *what* the document contains.
 This reference describes *how* markdown specifically presents it. The same
 content rendered by different skills shares the same markdown principles.
 
 ## Hard invariants
 
-These hold regardless of which skill produced the artifact.
+These hold regardless of which skill produced the document.
 
 - **YAML frontmatter at the top of the file.** Standard `---` delimited block
-  containing the artifact's stable metadata (title, date, type, etc.
+  containing the document's stable metadata (title, date, type, etc.
   — exact fields are per-skill, defined in the section contract).
 - **ASCII identifiers in anchors.** Markdown headings auto-generate anchors
   from the heading text. Keep headings ASCII so anchors are predictable
@@ -25,16 +25,16 @@ These hold regardless of which skill produced the artifact.
   HTML rendering. Markdown stays markdown.
 - **No fixed-width line wrapping.** Do not hard-wrap prose to a column (e.g.
   80 chars). Write one sentence per line, or let each paragraph flow as a
-  single line. The artifact is read rendered and shared, where fixed wraps add
+  single line. The document is read rendered and shared, where fixed wraps add
   nothing and only produce noisy mid-sentence diffs; markdown joins soft line
   breaks within a paragraph, so wrapping never changes the rendered output.
-- **Plan sections use stable headings.** For plan artifacts,
+- **Plan sections use stable headings.** For plan documents,
   render the required sections with exact ASCII headings so agents can find
   them by heading scan: `## Goal`, `## What We're Building`,
   `## How We'll Build It`, `## Work Steps`, `## How We'll Check It`,
   `## Done When`, and optional `## Appendix`. Requirements-only
-  artifacts omit the plan-only sections rather than emitting empty placeholders.
-  These stable headings are the wayfinding contract: consumers scan them
+  documents omit the plan-only sections rather than emitting empty placeholders.
+  These stable headings are the wayfinding rules: consumers scan them
   (markdown headings, or `<h1>`–`<h3>` / anchor ids in HTML) instead of reading
   the whole document.
 - **Goal is top-loaded.** It appears before What We're Building and long
@@ -43,7 +43,7 @@ These hold regardless of which skill produced the artifact.
 ## Format principles
 
 These shape what "good" markdown looks like; the agent applies them per
-artifact based on content shape.
+document based on content shape.
 
 ### ID prefix format
 
@@ -64,7 +64,7 @@ The same content can be rendered three ways; the agent picks per content
 shape, not by template default.
 
 - **Prose** when the content has narrative flow (motivation, decision
-  rationale, problem framing). Bullets fragment narrative into
+  rationale, problem description). Bullets fragment narrative into
   disconnected pieces.
 - **Bullets** when items share a parallel shape but each carries enough
   prose to not fit a table cell.
@@ -98,7 +98,7 @@ clutter the doc and break TOC generation.
 
 ### Section separators
 
-For substantial artifacts, use horizontal rules (`---`) between top-level
+For substantial documents, use horizontal rules (`---`) between top-level
 H2 sections. Omit for short docs where separators would dominate.
 
 ### Tables for genuinely comparative info only
@@ -144,7 +144,7 @@ contracts — the agent picks the shape that fits the content.
   positioning distinction matters.
 
 The agent picks more elaborate or simpler shapes based on what each
-specific artifact's content needs.
+specific document's content needs.
 
 ## Diagrams
 
@@ -194,7 +194,7 @@ browser-use --cdp-url http://localhost:9222
 
 ## No process exhaust
 
-Engineering process metadata stays out of the artifact:
+Engineering process metadata stays out of the document:
 
 - No "captured at Phase X" notes
 - No `## Next Steps` pointing to the next skill
@@ -203,7 +203,7 @@ Engineering process metadata stays out of the artifact:
   command:")
 
 This information belongs in commit messages, tool output, and agent
-transcripts — not in the artifact a reader returns to weeks later.
+transcripts — not in the document a reader returns to weeks later.
 
 ## Frontmatter shape
 
@@ -219,7 +219,7 @@ brainstorm frontmatter). Common rules:
   (decision or discovery), not tracked work items. Do not introduce a
   mutable `status` field or an `active → completed` lifecycle — whether
   the work shipped is derived from git, not stored in the doc.
-- Stable across artifact revisions — never rename or repurpose a field.
+- Stable across document revisions — never rename or repurpose a field.
 
 ## Post-write audit
 
@@ -229,7 +229,7 @@ slips:
 - All stable IDs are plain-prefix format, not bolded.
 - No HTML elements mixed in.
 - All file paths are repo-relative.
-- Horizontal rule separators between H2s (for Standard / Deep artifacts).
+- Horizontal rule separators between H2s (for Standard / Deep documents).
 - No process exhaust (Phase X notes, Next Steps pointers, provenance
   lines).
 - Tables only where 5+ uniform-shape items justify them.

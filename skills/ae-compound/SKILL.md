@@ -5,8 +5,10 @@ description: Document one recently solved problem or durable project learning in
 
 # $ae-compound
 
-Immediately before writing user-facing text, read and follow
-[`references/plain-language.md`](references/plain-language.md).
+When writing text the user will read, reuse their words and the repository's
+existing names. Keep workflow labels, routing terms, and prompt terminology
+out of the result. Leave metadata keys, stable IDs, code, commands, and
+existing project terms unchanged.
 
 Capture one verified learning while its evidence is fresh. The root agent owns research, synthesis, writing, and validation so the final document preserves the full problem-solving narrative without subagent handoffs.
 
@@ -20,13 +22,13 @@ $ae-compound mode:headless [optional flags and context]
 ```
 
 - `history:true` searches prior sessions for relevant failed approaches or recurring evidence. Do not search session history otherwise.
-- `deep:true` adds one independent, read-only semantic grounding review after the root agent's validation. Use only when explicitly requested.
+- `deep:true` adds one independent, read-only review of the document's claims after the root agent's validation. Use only when explicitly requested.
 - `mode:headless` suppresses questions and emits a structured terminal report. It does not imply `history:true` or `deep:true`.
 - Strip recognized flags before treating the remaining arguments as context.
 
 ## Scope
 
-Document exactly one learning per run. If several independent lessons emerged, process them sequentially so each is grounded against the current tree and related documentation.
+Document exactly one learning per run. If several independent lessons emerged, process them sequentially so each is checked against the current tree and related documentation.
 
 The learning must be:
 
@@ -38,7 +40,7 @@ If these conditions are not met, explain why documentation was skipped. In headl
 
 If asked only to bootstrap `CONCEPTS.md`, redirect to `ae-compound-refresh`; this skill updates vocabulary only as a side effect of documenting a real learning.
 
-## Durable contract
+## Supporting files
 
 Read supporting files only when their step needs them:
 
@@ -137,7 +139,7 @@ Fix and rerun until it exits successfully. If the script cannot be resolved, man
 
 Report a manual fallback rather than silently skipping validation.
 
-### 7. Ground all durable claims
+### 7. Check every durable claim against current evidence
 
 Read `references/grounding-validation.md`.
 
@@ -212,7 +214,7 @@ A successful capture:
 - Produces or meaningfully updates one solution document
 - Explains the causal mechanism, not only the patch
 - Records useful failed approaches when evidence exists
-- Grounds durable claims in current source or labels historical/degraded evidence
+- Ties durable claims to current source or labels historical/degraded evidence
 - Avoids duplicating an existing solution
 - Uses valid, searchable frontmatter
 - Updates only qualifying vocabulary

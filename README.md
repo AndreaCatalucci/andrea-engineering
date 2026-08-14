@@ -140,9 +140,8 @@ Each skill's `SKILL.md` defines its trigger and workflow. Skill directories are 
 ## Development
 
 Shared skill assets have one canonical source and generated mirrors. This
-includes the Codex interaction rules and the plain-language rules used by
-document-producing skills. After changing a shared asset, regenerate the
-mirrors:
+includes the Codex interaction rules used by document-producing skills.
+After changing a shared asset, regenerate the mirrors:
 
 ```bash
 scripts/sync-shared-skill-assets

@@ -5,8 +5,10 @@ description: "Plan multi-step work with implementation guardrails. Use when aske
 
 # Create Technical Plan
 
-Immediately before writing user-facing text, read and follow
-[`references/plain-language.md`](references/plain-language.md).
+When writing text the user will read, reuse their words and the repository's
+existing names. Keep workflow labels, routing terms, and prompt terminology
+out of the result. Leave metadata keys, stable IDs, code, commands, and
+existing project terms unchanged.
 
 Turn requirements, a feature request, a bug report, or a rough description into
 the shortest plan that lets implementation begin without reopening important
@@ -26,7 +28,7 @@ A software planning run completes only when:
 
 - one canonical plan exists in `docs/plans/`;
 - external sources that shape implementation are established or recorded as blockers;
-- each implementation-ready step passes the guardrail contract in
+- each implementation-ready step passes the guardrail rules in
   `references/plan-sections.md`;
 - confidence checking and required document review completed or took a documented format/interactive skip;
 - the final compactness and concreteness audits pass;
@@ -62,7 +64,7 @@ that could not be expressed compactly.
 - When a blocking decision is genuinely necessary, read and follow [`references/codex-interaction.md`](references/codex-interaction.md).
 - In pipeline or headless contexts, do not block. Make reversible choices, expose assumptions, and force Markdown output.
 - Use repo-relative paths inside plans. Absolute paths are permitted only in the chat handoff so the document is clickable.
-- Honor user-named files, URLs, CLIs, tools, and prior artifacts. Discover them before substituting.
+- Honor user-named files, URLs, CLIs, tools, and prior documents. Discover them before substituting.
 - A direct invocation always stays in a planning workflow. If the prompt lacks a feature description, ask what to plan.
 
 ## Route the Request
@@ -103,7 +105,7 @@ Classify remaining questions:
 - **Planning blocker:** an important product, source, architecture, security, or
   data decision; resolve it now or mark the plan as not ready to implement.
 - **Planning assumption:** a reversible choice that can proceed when stated explicitly.
-- **Implementation discovery:** a bounded detail the implementer can resolve without changing product or architecture; defer to its step.
+- **Detail to verify while coding:** a bounded detail the implementer can resolve without changing product or architecture; defer to its step.
 
 ### 2. Establish External Sources Before Architecture
 
@@ -127,18 +129,18 @@ files.”
 If a source detail materially affects implementation and cannot be established after reasonable research:
 
 - do not design a generic importer around the unknown;
-- record the missing authority/acquisition contract as a blocking open question;
+- record the missing authority and how to get the source as a blocking open question;
 - leave `plan_readiness` as `requirements-only` or otherwise explicitly non-implementation-ready;
 - stop before work steps that would pretend the source is known.
 
 Write a compact requirements-only blocker document containing the goal, known
-source facts and research attempts, the exact missing contract, and the
+source facts and research attempts, the exact missing source details, and the
 blocking open question. Omit architecture, technical decisions, work steps, and
 deepening, then run only the applicable final document checks and handoff.
 
-The gate completes only when the exact source contract is cited or the document clearly names the blocker and is not implementation-ready.
+The gate completes only when the exact source details are cited or the document clearly names the blocker and is not implementation-ready.
 
-### 3. Ground the Plan in the Repository
+### 3. Check the plan against the repository
 
 Inspect the repository before structuring the plan:
 
@@ -215,7 +217,7 @@ Three components or stages alone do not require a diagram. A compact plan uses
 at most one small flow unless another diagram clears up a different important
 ambiguity. Never add diagrams merely because a category suggests one.
 
-Load the format-specific rendering reference selected in Route the Request. Its presentation rules do not expand the content contract.
+Load the format-specific rendering reference selected in Route the Request. Its presentation rules do not expand the content rules.
 
 ### 7. Write the Plan
 

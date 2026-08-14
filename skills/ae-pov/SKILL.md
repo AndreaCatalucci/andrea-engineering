@@ -5,8 +5,10 @@ description: "Verdict on whether an external technology, pattern, platform, arch
 
 # Form a Point of View
 
-Immediately before writing user-facing text, read and follow
-[`references/plain-language.md`](references/plain-language.md).
+When writing text the user will read, reuse their words and the repository's
+existing names. Keep workflow labels, routing terms, and prompt terminology
+out of the result. Leave metadata keys, stable IDs, code, commands, and
+existing project terms unchanged.
 
 Return a clear recommendation about an external technology, pattern, or
 platform based on how well it fits this project.
@@ -61,7 +63,7 @@ Dispatch scouts with `spawn_agent` and let them inherit the parent Codex model. 
    - **Tier 3 — hard to undo or high risk:** security, legal, privacy, a public
      API, or an irreversible data migration.
 
-   State the tier in the verdict and let the user override. The tier sizes the rest of the run (Phase 1 scout count, Phase 2 depth, Phase 3 reversal trigger): Tier 1 stays a one-screen verdict off a single combined grounding pass; Tier 2 adds the full scout fleet and an alternatives pass; Tier 3 adds deep external research, a precedent search, and a durable-record offer. Do not run a Tier-3 workup on a trivially reversible `npm i`, or hand a security-surface decision the moderate Tier-2 treatment.
+   State the tier in the verdict and let the user override. The tier sizes the rest of the run (Phase 1 scout count, Phase 2 depth, Phase 3 reversal trigger): Tier 1 stays a one-screen verdict off a single combined evidence pass; Tier 2 adds the full scout fleet and an alternatives pass; Tier 3 adds deep external research, a precedent search, and a durable-record offer. Do not run a Tier-3 workup on a trivially reversible `npm i`, or treat a security decision as a moderate Tier-2 choice.
 
 ### Phase 1: Gather Evidence
 
@@ -92,7 +94,7 @@ conversation. Pass the exact question, the current tool or approach, the tier,
 the resolved `<scratch-dir>`, and any user-supplied links. A generic prompt will
 produce unfocused research.
 
-**Tier-sensitive dispatch.** For **Tier 1** (reversible), run a single combined grounding pass: seed one subagent with `references/agents/project-grounding-scout.md` covering the candidate-specific project facts (incumbent, call-sites) on top of the cached profile at a tight read budget, and one with `references/agents/external-evidence-researcher.md`; skip the standalone precedent scout — on this tier the project-grounding scout's **prior-decision scan** (`docs/solutions/`, ADRs, design docs) is the precedent check, so it must run. For **Tier 2/3**, dispatch the full fleet in parallel:
+**Tier-sensitive dispatch.** For **Tier 1** (reversible), run a single combined evidence pass: seed one subagent with `references/agents/project-grounding-scout.md` covering the candidate-specific project facts (incumbent, call-sites) on top of the cached profile at a tight read budget, and one with `references/agents/external-evidence-researcher.md`; skip the standalone precedent scout — on this tier the project-grounding scout's **prior-decision scan** (`docs/solutions/`, ADRs, design docs) is the precedent check, so it must run. For **Tier 2/3**, dispatch the full fleet in parallel:
 
 - **project-grounding scout** — read `references/agents/project-grounding-scout.md` and seed a generic subagent with it. With the agnostic profile already loaded from the cache, this scout runs only the **candidate-specific** slice: the named incumbent for *this* candidate, its call-sites/footprint, incumbent-pain, and the license/compat check against the profile's dependency-license set. Do not re-derive stack, conventions, or structure — those are in the profile. But note the profile may *name* an incumbent dependency, and a named dep is only a **lead** — it does not satisfy the project floor (see `references/method.md`), which still requires a freshly verified call-site the cache never holds. Do not let a cache-named incumbent short-circuit the fresh touchpoint check.
 - **precedent-&-activity scout** — read `references/agents/precedent-activity-scout.md` and seed a generic subagent with it. Always run its **local-doc precedent pass** (`docs/solutions/`, ADRs, design docs — file reads, no tools needed); only its tracker/PR portion is capability-gated and degrades gracefully when those interfaces aren't reachable. Do **not** skip the whole scout for missing tracker access — that would drop the only path that surfaces a prior local adopt/reject decision.
@@ -137,7 +139,7 @@ The chat verdict (the TL;DR) is the deliverable. What you offer next is **reason
 - **Tier 1, or a Reject / Not-our-problem grade** → end with a single prose line — e.g. "Want the full write-up, or `<computed next step>`? Otherwise we're done." No blocking menu; silence means done.
 - **Tier 2/3 with an actionable grade** → ask through the shared codex-interaction contract, with the *computed* next step as the first, dynamically-labeled option:
   1. **`<computed next step>`** (e.g. "Plan the adoption with `ae-plan`") — seeded with the verdict substance, not a file pointer.
-  2. **Full write-up** — the expanded, shareable artifact.
+  2. **Full write-up** — the expanded, shareable report.
   3. **Done.**
   Add `ae-compound` as a one-line prose nudge under the menu, **not** a slot: "Want it in our decision history? say 'compound it.'" It is the least-frequent path and is never the first thing offered.
 

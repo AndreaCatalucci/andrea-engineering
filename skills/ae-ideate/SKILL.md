@@ -10,7 +10,10 @@ a ranked ideation document. It does not write requirements, plans, or code.
 Use `ae-brainstorm` when the product meaning or scope is unclear and `ae-plan`
 after the user selects a sufficiently clear software direction.
 
-Immediately before user-facing text, read `references/plain-language.md`.
+When writing text the user will read, reuse their words and the repository's
+existing names. Keep workflow labels, routing terms, and prompt terminology
+out of the result. Leave metadata keys, stable IDs, code, commands, and
+existing project terms unchanged.
 Before asking a question, read `references/codex-interaction.md`.
 
 ## Non-negotiable rules
@@ -49,7 +52,7 @@ Create one eight-hex-character run ID and a scratch directory at
 `/tmp/andrea-engineering/ae-ideate/<run-id>`. Reuse it for caches, candidate
 files, verdicts, and temporary delivery. Do not delete it on completion.
 
-Load exactly one grounding branch:
+Load exactly one evidence branch:
 
 - current repository: `references/repo-grounding.md`;
 - outside software or non-software: `references/elsewhere-grounding.md`.
@@ -58,19 +61,19 @@ If the user supplied gathered evidence, also read
 `references/research-artifacts.md`. Do not load that branch otherwise. Follow
 the named cache references only when their feature runs.
 
-Produce one compact grounding summary. Separate user directives from
+Produce one compact evidence summary. Separate user directives from
 background evidence mechanically: constraints can exclude an idea; background
 can support one but must not redirect a named focus.
 
 ## Phase 1.5: Cover the topic
 
-From the existing grounding, choose 3-5 distinct topic areas at the same level
+From the existing evidence, choose 3-5 distinct topic areas at the same level
 and in the topic's own language. Do not dispatch another agent or ask another
 question. In repository mode, add concise `file:line` evidence for each area.
 
 Skip decomposition when the topic is atomic or in surprise-me mode. Record
 `Decomposition skipped — atomic subject` or
-`Decomposition skipped — surprise-me mode` in the grounding summary.
+`Decomposition skipped — surprise-me mode` in the evidence summary.
 
 ## Phase 2: Generate candidates
 

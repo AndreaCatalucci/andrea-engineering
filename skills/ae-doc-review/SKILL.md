@@ -5,8 +5,10 @@ description: Review an existing requirements document, implementation plan, or s
 
 # Document Review
 
-Immediately before writing user-facing text, read and follow
-[`references/plain-language.md`](references/plain-language.md).
+When writing text the user will read, reuse their words and the repository's
+existing names. Keep workflow labels, routing terms, and prompt terminology
+out of the result. Leave metadata keys, stable IDs, code, commands, and
+existing project terms unchanged.
 
 Pressure-test a planning document with one core pass and only the specialists its content warrants. Apply mechanically certain Markdown corrections; report author decisions without guessing.
 

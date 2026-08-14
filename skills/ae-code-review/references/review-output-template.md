@@ -95,7 +95,7 @@ Committed: `fix(review): cover empty-format branch + tighten export perms` (work
 ### Coverage
 
 - Suppressed: 2 findings below anchor 75 (1 at anchor 50, 1 at anchor 25)
-- Removable surface: ~40 lines / 1 file across findings #5 (signal only, not a target)
+- Removable code: ~40 lines / 1 file across findings #5 (warning only, not a target)
 - Residual risks: No rate limiting on export endpoint
 - Testing gaps: No test for concurrent export requests
 
@@ -149,7 +149,7 @@ This fails because of the **box-drawing `────` separators between items*
 - **Learnings & Past Solutions section** -- strong inline matches from `docs/solutions/`, with links
 - **Agent-Native Gaps section** -- results from the `agent-native-reviewer` local prompt asset. Omit if no gaps found.
 - **Deployment Notes section** -- key checklist items from the `deployment-verification-agent` local prompt asset. Omit if the prompt did not run. Schema drift surfaces as `data-migration` findings — no separate section.
-- **Coverage section** -- suppressed count, removable surface (only when deletion-oriented maintainability findings exist; approximate net lines/files removable if applied -- a dead-weight signal, never a reduction target, omit otherwise), residual risks, testing gaps, failed reviewers
+- **Coverage section** -- suppressed count, removable code (only when deletion-oriented maintainability findings exist; approximate net lines/files removable if applied -- a dead-weight warning, never a reduction target, omit otherwise), residual risks, testing gaps, failed reviewers
 - **Summary uses blockquotes** for verdict, reasoning, and fix order
 - **Horizontal rule** (`---`) separates findings from verdict
 - **`###` headers** for each section -- never plain text headers

@@ -5,8 +5,10 @@ description: "Generate time-windowed product pulse reports from configured signa
 
 # Product Pulse
 
-Immediately before writing user-facing text, read and follow
-[`references/plain-language.md`](references/plain-language.md).
+When writing text the user will read, reuse their words and the repository's
+existing names. Keep workflow labels, routing terms, and prompt terminology
+out of the result. Leave metadata keys, stable IDs, code, commands, and
+existing project terms unchanged.
 
 `ae-product-pulse` queries the product's data sources for a given time window and produces a compact, single-page report covering usage, performance, errors, and followups. The report is saved to `docs/pulse-reports/` and the key points are surfaced in chat.
 

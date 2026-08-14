@@ -11,7 +11,7 @@ Draft from the decision ledger and verified evidence. Use these sections, omitti
 1. **What we're building** — 1–3 sentences naming the actor, outcome, and product shape.
 2. **Key decisions** — only material choices, each with its short rationale.
 3. **Scope boundaries** — meaningful exclusions or deferrals a reasonable reader might otherwise expect.
-4. **Success** — observable acceptance or outcome signals.
+4. **Success** — observable acceptance or outcome measures.
 5. **Defaults and assumptions** — minor defaults, user-supplied facts, or unverifiable premises that affect the direction.
 6. **Open non-blockers** — uncertainties that can safely remain for planning or later work.
 
@@ -54,7 +54,7 @@ Scope boundaries
 - <meaningful exclusion or deferral>
 
 Success
-- <observable signal>
+- <observable measure>
 
 Defaults and assumptions
 - <visible default or premise>

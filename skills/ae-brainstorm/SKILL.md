@@ -5,8 +5,10 @@ description: 'Turn a vague or ambitious idea into confirmed requirements. Use wh
 
 # Brainstorm a Feature or Improvement
 
-Immediately before writing user-facing text, read and follow
-[`references/plain-language.md`](references/plain-language.md).
+When writing text the user will read, reuse their words and the repository's
+existing names. Keep workflow labels, routing terms, and prompt terminology
+out of the result. Leave metadata keys, stable IDs, code, commands, and
+existing project terms unchanged.
 
 Resolve the decisions that define **what** to build. `ae-plan` later decides **how** to build it.
 
@@ -103,7 +105,7 @@ Out of scope: <only the major exclusions needed to make the boundary legible>
 
 This is a proposal, not a routine confirmation gate. When evidence strongly supports one coherent boundary, state it and continue to the highest-impact unresolved decision in the same turn. Ask the user to confirm scope only when two or more materially different boundaries remain genuinely plausible.
 
-## Ground the Proposed Scope
+## Check the proposed scope against the repository
 
 Complete enough exploration to support or revise the proposed scope before asking substantive questions.
 

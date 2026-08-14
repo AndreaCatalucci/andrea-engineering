@@ -1,8 +1,8 @@
-# Ideation Artifact Contract
+# Ideation Document
 
-Load this content contract at save time with exactly one renderer: `references/html-rendering.md` or the canonical `references/markdown-rendering.md`.
+Load these content rules at save time with exactly one renderer: `references/html-rendering.md` or the canonical `references/markdown-rendering.md`.
 
-The artifact is a ranked, critiqued candidate set plus the evidence and rejection record needed to judge it. It is not a requirements document, implementation plan, or status tracker.
+The document is a ranked, critiqued candidate set plus the evidence and rejection record needed to judge it. It is not a requirements document, implementation plan, or status tracker.
 
 ## Section order
 
@@ -29,7 +29,7 @@ Markdown uses YAML frontmatter. HTML renders the values once as visible header t
 
 ## Relevant Context
 
-Include the consolidated Phase 1 grounding that qualified the ideas. Label the content “Codebase Context” in repo mode and “Topic Context” elsewhere. Preserve concrete evidence, constraints, pain points, and opportunity signals; omit orchestration details.
+Include the consolidated Phase 1 evidence that qualified the ideas. Label the content “Codebase Context” in repo mode and “Topic Context” elsewhere. Preserve concrete evidence, constraints, pain points, and useful places to improve; omit orchestration details.
 
 ## Topic Areas
 
@@ -73,7 +73,7 @@ Before saving, verify:
 
 - Every survivor has every required field and a basis that supports its move.
 - Every rejection has a reason.
-- Grounding and areas match the run that generated the candidates.
+- Evidence and areas match the run that generated the candidates.
 - The ranked order matches the final arbitration.
 - No placeholder, process note, lifecycle state, or downstream instruction remains.
 - The renderer contains the full content; format changes presentation only.

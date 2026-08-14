@@ -35,7 +35,7 @@ In both preambles below, the "Pick a number or describe what you want." hint app
 ```
 Brainstorm complete.
 
-Plan artifact: <absolute path to requirements-only plan>  # omit line if no artifact was created
+Plan: <absolute path to requirements-only plan>  # omit line if no plan was created
 
 What would you like to do next? (Pick a number or describe what you want.)
 ```
@@ -45,7 +45,7 @@ What would you like to do next? (Pick a number or describe what you want.)
 ```
 Brainstorm paused. Planning is blocked until the remaining questions are resolved.
 
-Plan artifact: <absolute path to requirements-only plan>  # omit line if no artifact was created
+Plan: <absolute path to requirements-only plan>  # omit line if no plan was created
 
 What would you like to do next? (Pick a number or describe what you want.)
 ```
@@ -135,7 +135,7 @@ When complete and ready for planning, display:
 ```text
 Brainstorm complete!
 
-Plan artifact: <absolute path to plan>  # omit line if no artifact was created
+Plan: <absolute path to plan>  # omit line if no plan was created
 
 Key decisions:
 - [Decision 1]
@@ -149,7 +149,7 @@ If the user pauses with `Resolve Before Planning` still populated, display:
 ```text
 Brainstorm paused.
 
-Plan artifact: <absolute path to plan>  # omit line if no artifact was created
+Plan: <absolute path to plan>  # omit line if no plan was created
 
 Planning is blocked by:
 - [Blocking question 1]

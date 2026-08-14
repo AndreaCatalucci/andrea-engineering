@@ -5,8 +5,10 @@ description: "Sweep configured feedback sources (Slack, GitHub Issues; email exp
 
 # Feedback Sweep
 
-Immediately before writing user-facing text, read and follow
-[`references/plain-language.md`](references/plain-language.md).
+When writing text the user will read, reuse their words and the repository's
+existing names. Keep workflow labels, routing terms, and prompt terminology
+out of the result. Leave metadata keys, stable IDs, code, commands, and
+existing project terms unchanged.
 
 `ae-sweep` sweeps every configured feedback source for items posted since the last run: it acknowledges each at its source, analyzes any attached recordings, verifies claimed fixes actually merged to the default branch, and folds the open items into a rolling `$lfg`-ready plan. The deterministic state engine (`scripts/sweep-state.py`) is the **only** writer of sweep state; this skill drives it through its subcommands and never hand-edits the state file. Read `references/state-schema.md` for the state contract (statuses, lease semantics, status words) before touching state.
 
@@ -106,7 +108,7 @@ A failed ack write -> upsert the item as `ack_deferred` and hold the cursor (do 
 
 For each new item carrying `media`:
 - Download attachments into scratch `/tmp/andrea-engineering/ae-sweep/<run-id>/`; raw media is never committed. A download failure -> set the item `needs_download` and continue.
-- Dispatch one generic subagent per recording with `spawn_agent`, using `references/subagent-template.md` filled from `references/agents/media-analyzer.md`. Fill the template's `{skill_dir}` slot with the same absolute ae-sweep skill directory you resolve for your own `SKILL_DIR` shell calls (a fresh subagent does not inherit shell state, so it cannot run the bundled analyzer without being told the path). Pass the absolute media paths, a scratch artifact path, and the item's `sensitive` flag; collect the compact 1-2 line summary each returns. A subagent failure -> set the item `needs_analysis`, retain the media, and continue.
+- Dispatch one generic subagent per recording with `spawn_agent`, using `references/subagent-template.md` filled from `references/agents/media-analyzer.md`. Fill the template's `{skill_dir}` slot with the same absolute ae-sweep skill directory you resolve for your own `SKILL_DIR` shell calls (a fresh subagent does not inherit shell state, so it cannot run the bundled analyzer without being told the path). Pass the absolute media paths, a scratch file path, and the item's `sensitive` flag; collect the compact 1-2 line summary each returns. A subagent failure -> set the item `needs_analysis`, retain the media, and continue.
 - Track attempts on the item (a `media_attempts` count upserted on each try). After 3 failed attempts across runs (`needs_download`/`needs_analysis`), set the item `manual_stuck` and list it separately — out of the routine nag.
 
 #### 2f. Fix verification

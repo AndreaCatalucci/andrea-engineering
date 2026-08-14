@@ -40,16 +40,6 @@ for skill in "${interaction_consumers[@]}"; do
   mirror shared/codex-interaction.md "skills/$skill/references/codex-interaction.md"
 done
 
-plain_language_consumers=(
-  ae-brainstorm ae-code-review ae-commit-push-pr ae-compound
-  ae-compound-refresh ae-doc-review ae-explain ae-ideate ae-plan ae-pov
-  ae-product-pulse ae-promote ae-riffrec-feedback-analysis ae-strategy ae-sweep
-)
-
-for skill in "${plain_language_consumers[@]}"; do
-  mirror shared/plain-language.md "skills/$skill/references/plain-language.md"
-done
-
 profile_consumers=(
   ae-brainstorm ae-code-review ae-compound ae-debug
   ae-explain ae-ideate ae-optimize ae-pov

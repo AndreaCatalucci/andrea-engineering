@@ -1,14 +1,16 @@
 ---
 name: ae-strategy
-description: "Create or update STRATEGY.md. Use when starting a product, changing direction or roadmap, or when ae-ideate, ae-brainstorm, or ae-plan need upstream product grounding."
+description: "Create or update STRATEGY.md. Use when starting a product, changing direction or roadmap, or when ae-ideate, ae-brainstorm, or ae-plan need an upstream product description."
 ---
 
 # Product Strategy
 
-Immediately before writing user-facing text, read and follow
-[`references/plain-language.md`](references/plain-language.md).
+When writing text the user will read, reuse their words and the repository's
+existing names. Keep workflow labels, routing terms, and prompt terminology
+out of the result. Leave metadata keys, stable IDs, code, commands, and
+existing project terms unchanged.
 
-`ae-strategy` produces and maintains `STRATEGY.md` - a short, durable anchor document that captures what the product is, who it serves, how it succeeds, and where the team is investing. It lives at the repo root as a canonical, well-known file (peer of `README.md`). Downstream skills (`ae-ideate`, `ae-brainstorm`, `ae-plan`) read it as grounding when it exists.
+`ae-strategy` produces and maintains `STRATEGY.md` - a short, durable anchor document that captures what the product is, who it serves, how it succeeds, and where the team is investing. It lives at the repo root as a canonical, well-known file (peer of `README.md`). Downstream skills (`ae-ideate`, `ae-brainstorm`, `ae-plan`) read it when it exists.
 
 The document is short and structured on purpose. Good answers to a handful of sharp questions produce a better strategy than any amount of prose. This skill asks those questions, pushes back on weak answers, and writes the doc.
 
@@ -81,7 +83,7 @@ Write the updated doc back to `STRATEGY.md`.
 
 ### Phase 3: Downstream Handoff
 
-After writing, note in one line where the file lives and that `ae-ideate`, `ae-brainstorm`, and `ae-plan` will pick it up as grounding on their next run.
+After writing, note in one line where the file lives and that `ae-ideate`, `ae-brainstorm`, and `ae-plan` will read it on their next run.
 
 If no downstream skill has run yet on this repo, suggest `ae-ideate` or `ae-brainstorm` skills as a next step.
 

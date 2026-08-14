@@ -5,8 +5,10 @@ description: "Structured code review for bugs, regressions, tests, and standards
 
 # Code Review
 
-Immediately before writing user-facing text, read and follow
-[`references/plain-language.md`](references/plain-language.md).
+When writing text the user will read, reuse their words and the repository's
+existing names. Keep workflow labels, routing terms, and prompt terminology
+out of the result. Leave metadata keys, stable IDs, code, commands, and
+existing project terms unchanged.
 
 Review a branch, PR, or working-tree diff with one core reviewer and only the specialists justified by criticality and blast radius. Merge, independently validate, and present a single evidence-backed result.
 
@@ -90,7 +92,7 @@ Read `references/persona-catalog.md`. Always select `core-reviewer`, which cover
 
 Read the project instructions governing changed files. An inline standards finding requires both a direct rule quote and a violating line; otherwise suppress it. If `docs/solutions/` exists, search by changed modules/concepts and carry at most three strong Known Pattern notes. Historical guidance is context, not a defect.
 
-Announce the core lenses and one short reason per specialist.
+Announce the core checks and one short reason per specialist.
 
 ### 4. Dispatch review
 
@@ -124,7 +126,7 @@ failure gets one repair request; after a second failure, mark that reviewer
 failed and record the degraded path in Coverage. Only checked projections enter
 merge. Combine their `sources` maps into `source-registry.json`.
 
-Remote reviewers inspect fetched refs with `git show` or diff hunks, never stale workspace files. Subagents may write only their run artifact under `/tmp`; they never edit the project.
+Remote reviewers inspect fetched refs with `git show` or diff hunks, never stale workspace files. Subagents may write only their run files under `/tmp`; they never edit the project.
 
 ### 5. Merge findings
 

@@ -5,8 +5,10 @@ description: "Refresh docs/solutions learnings against the current codebase. Use
 
 # Compound Refresh
 
-Immediately before writing user-facing text, read and follow
-[`references/plain-language.md`](references/plain-language.md).
+When writing text the user will read, reuse their words and the repository's
+existing names. Keep workflow labels, routing terms, and prompt terminology
+out of the result. Leave metadata keys, stable IDs, code, commands, and
+existing project terms unchanged.
 
 Keep `docs/solutions/` accurate, searchable, and non-redundant as the codebase changes. Review individual learnings before any pattern documents derived from them.
 

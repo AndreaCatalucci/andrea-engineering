@@ -15,14 +15,14 @@ A great plan enables three audiences to act:
 - **The reviewer** identifies the important decisions and the boundaries
   of what's being changed in one pass.
 - **The future reader** (anyone returning months later) traces why the work
-  was done, what shaped it, and where the artifacts live.
+  was done, what shaped it, and where the files live.
 
 Sections earn their place by serving one of these audiences. Omit padding.
 
 ## Unified Plan Format
 
-`ae-plan` writes the canonical andrea-engineering plan artifact. The same
-artifact may begin as a requirements-only skeleton from `ae-brainstorm` and
+`ae-plan` writes the canonical andrea-engineering plan. The same
+plan may begin as a requirements-only skeleton from `ae-brainstorm` and
 later be enriched by `ae-plan`; it is still one plan file moving through
 readiness states, not a requirements doc plus a separate implementation doc.
 
@@ -32,7 +32,7 @@ For plans that implementation agents will consume, use:
 - **`plan_readiness`** — document completeness, not work progress. Valid
   values are:
   - `requirements-only` — What We're Building exists; planning sections are not
-    complete and the artifact is not executable.
+    complete and the plan is not executable.
   - `implementation-ready` — What We're Building, How We'll Build It,
     Work Steps, How We'll Check It, and Done When are
     complete enough for `ae-work`, `/goal`, or an equivalent executor, **and no
@@ -49,7 +49,7 @@ For plans that implementation agents will consume, use:
   non-code deliverables. This field is required.
 
 Do **not** use progress-like readiness values such as `active`,
-`in_progress`, `completed`, or `done`. Readiness answers "can the artifact be
+`in_progress`, `completed`, or `done`. Readiness answers "can the plan be
 executed?", not "has execution happened?" Plans still carry no `status` field
 and no mutable execution lifecycle.
 
@@ -89,11 +89,11 @@ registry is navigation, not a demand to fill every possible subsection.
 ### Wayfinding: map before reading (size-aware)
 
 The document does not carry a reading guide; consuming skills own the reading
-algorithm. A **short** plan — a lightweight or requirements-only artifact that
+algorithm. A **short** plan — a lightweight or requirements-only plan that
 fits in a screen or two — can just be read in full; that is cheaper and simpler
 than scanning and ranging. But an implementation-ready plan is often
 long, and HTML output (also supported) is more verbose still, so for anything
-beyond short, do **not** load the entire artifact to find your way around.
+beyond short, do **not** load the entire plan to find your way around.
 Build a section map first, then read only the ranges the task needs:
 
 - **Markdown:** scan headings to get the section and step map — e.g.
@@ -101,7 +101,7 @@ Build a section map first, then read only the ranges the task needs:
 - **HTML:** scan the heading elements (`<h1>`–`<h3>`) and their anchor ids;
   match on the section name and ignore the wrapper tags.
 
-In both formats the section **names and anchor ids are the stable contract**
+In both formats the section **names and anchor ids are the stable rules**
 from the Section ID Registry above (`Goal`/`goal`,
 `How We'll Check It`/`how-well-check-it`, `### W<N>.` steps, …). Wayfind
 against those registry names, not a brittle tag/format pattern, so the
@@ -133,7 +133,7 @@ write the plan.
   a plan is warranted.
 - There are **no scope boundaries worth pinning** in writing — the work
   scope is self-evident from the user's request.
-- **No upstream artifact** (a brainstorm with R-IDs, an incident report,
+- **No upstream document** (a brainstorm with R-IDs, an incident report,
   a deferred-follow-up item from a prior plan) needs traceability through
   this plan.
 
@@ -170,7 +170,7 @@ present. They carry the contracts downstream consumers depend on.
   avoid drifting from the plan.
 - **Source-to-Outcome summary** — within the first 25 lines, state Source,
   Input, Operation, and Outcome. For external-data work, name the exact
-  authority, artifact or endpoint, operator-facing processing surface, and
+  authority, file or endpoint, operator-facing processing page or command, and
   observable success condition. A compact
   `Source -> Import -> Transform -> Apply -> Publish -> Verify` flow may replace
   longer lifecycle prose.
@@ -178,7 +178,7 @@ present. They carry the contracts downstream consumers depend on.
   Problem, Requirements with stable R-IDs, and any material Actors, Flows,
   Examples, Success Measures, Scope, Dependencies,
   Outstanding Questions, and Sources. This replaces the separate requirements
-  artifact in new brainstorm-to-plan flows.
+  document in new brainstorm-to-plan flows.
 - **How We'll Build It** — the implementation-facing decisions: Technical
   Decisions, high-level design, assumptions, implementation constraints,
   sequencing, and research that shapes the implementation.
@@ -280,7 +280,7 @@ any catalog section, introduce a new one — don't force the content into a
 section it doesn't belong in. Content drives section choices, not vice
 versa.
 
-The agent also picks per artifact:
+The agent also picks per plan:
 
 - Whether Problem merges into Summary
 - Sub-groupings (Requirements by capability, technical decisions by component, Units phased
@@ -370,7 +370,7 @@ plan.
   intent the eventual commit message should reflect.
 - **`date`** — creation date in ISO 8601 (`YYYY-MM-DD`), ASCII digits only.
 
-Plans carry **no `status` field** — a plan is a decision artifact, not a
+Plans carry **no `status` field** — a plan is a decision record, not a
 tracked work item. `ae-work` does not mutate the plan at ship time;
 whether a plan shipped is derived from git, not stored in the doc. Do not
 add a `status` field or an `active → completed` lifecycle.
@@ -415,7 +415,7 @@ These apply regardless of rendering format.
   they break portability across machines, worktrees, teammates.
 - **No process exhaust.** No "captured at Phase X" notes, no `## Next Steps`
   pointing to the next skill, no italic provenance lines. Engineering process
-  metadata belongs in commit messages and tool output, not the artifact.
+  metadata belongs in commit messages and tool output, not the plan.
 - **Group Requirements by concern when they span distinct logical areas.**
   The trigger is distinct concerns, not item count — even four requirements
   benefit from grouping if they cover three different topics. Skip grouping

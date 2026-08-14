@@ -11,7 +11,7 @@ Produce one self-contained HTML5 file:
 - Put diagrams inline as SVG.
 - Keep all semantic content in HTML text; CSS and SVG never carry unique meaning.
 - Render metadata once as visible text. Do not mirror it in JSON, `data-*`, or metadata tags.
-- End with a visible footer containing the composition timestamp and source (`ae-ideate` plus an explicit upstream artifact when one exists).
+- End with a visible footer containing the composition timestamp and source (`ae-ideate` plus an explicit upstream document when one exists).
 
 Use UTF-8, a descriptive `<title>`, viewport metadata, and semantic HTML.
 
@@ -84,7 +84,7 @@ Make the candidate set easy to compare without flattening its reasoning:
 - Keep all cards structurally consistent even when one field is longer.
 - Let the top-ranked idea receive a subtle full-card tint or “Top pick” badge, not a radically different layout.
 
-Do not reduce the cards to dashboard metrics. The prose and basis are the artifact's value.
+Do not reduce the cards to dashboard metrics. The prose and basis are the document's value.
 
 ## Illustrative visuals
 
@@ -132,4 +132,4 @@ Before saving, inspect the source and rendered structure:
 - Text contrast, line length, card spacing, tables, and mobile layout are readable.
 - Strong text is not globally accent-colored; chips and callouts use no one-edge stripe.
 - SVG labels do not collide with arrows or shapes, and diagrams add no unique claims.
-- No placeholders, process notes, action menus, or downstream-skill instructions leaked into the artifact.
+- No placeholders, process notes, action menus, or downstream-skill instructions leaked into the document.

@@ -4,7 +4,7 @@ Use this internally after the initial research. It strengthens the proposed
 scope; it is not a visible phase, a script of questions, or a coverage
 checklist.
 
-There is no requirement to ask about every lens. Assess, research, infer, or default first. A missing detail becomes a question only when plausible answers cross the parent skill's consequential-decision threshold. Do not ask merely to make the final artifact look complete.
+There is no requirement to ask about every check. Assess, research, infer, or default first. A missing detail becomes a question only when plausible answers cross the parent skill's consequential-decision threshold. Do not ask merely to make the final plan look complete.
 
 For every candidate gap:
 
@@ -18,7 +18,7 @@ For every candidate gap:
 
 - Does this solve the actual problem?
 - Does existing behavior already cover it?
-- Is there a simpler framing with equal value?
+- Is there a simpler description with equal value?
 
 ## Standard
 
@@ -42,7 +42,7 @@ Include Standard, then check:
 - Does the direction improve the broader system rather than create a local patch?
 - Which decisions are costly to reverse?
 - Which assumptions could invalidate the direction?
-- What adjacent or inverted framing offers substantially more value without disproportionate carrying cost?
+- What adjacent or inverted description offers substantially more value without disproportionate carrying cost?
 
 ## Deep Product
 
@@ -57,9 +57,9 @@ Include Deep, then check:
 
 ## Creativity Pass
 
-For Standard and Deep work, deliberately test at least one lens before convergence:
+For Standard and Deep work, deliberately test at least one check before convergence:
 
-- **Inversion:** would the opposite framing reveal a better shape?
+- **Inversion:** would the opposite description reveal a better shape?
 - **Constraint removal:** is an assumed limitation hiding the best option?
 - **Analogy:** does another domain solve the underlying problem more cleanly?
 - **Adjacent value:** is there a low-carrying-cost addition with disproportionate upside?

@@ -5,8 +5,10 @@ description: Commit, push, and open a PR. Use when asked to ship/open a PR, or f
 
 # Git Commit, Push, and PR
 
-Immediately before writing user-facing text, read and follow
-[`references/plain-language.md`](references/plain-language.md).
+When writing text the user will read, reuse their words and the repository's
+existing names. Keep workflow labels, routing terms, and prompt terminology
+out of the result. Leave metadata keys, stable IDs, code, commands, and
+existing project terms unchanged.
 
 **Asking the user:** When this skill says "ask the user", read and follow [`references/codex-interaction.md`](references/codex-interaction.md).
 
@@ -87,15 +89,15 @@ If the working tree is clean and all commits are already pushed, this step is a 
 
 **You MUST read `references/pr-description-writing.md`** in full — the core principle at the top governs every step. The only input it needs from this skill is the PR ref, if one was identified by mode dispatch (description-only with a pasted URL, description update, or confirmed existing-PR rewrite in full workflow). If Step 1 found an existing PR, pass its URL to Step 4 when rewriting so PR mode fetches the existing body and can preserve `Related:` / `Fixes` references already present there.
 
-**Evidence decision** before composition. CE no longer owns a dedicated capture workflow; Codex provides browser, screenshot, terminal, and artifact tools. Treat evidence as user-supplied context or as validation prose, not as a separate skill dispatch.
+**Evidence decision** before composition. CE no longer owns a dedicated capture workflow; Codex provides browser, screenshot, terminal, and file tools. Treat evidence as user-supplied context or as validation prose, not as a separate skill dispatch.
 
-1. **User supplied evidence** (URL, markdown image/embed, local artifact path they want referenced) — incorporate it into the PR body as `## Demo`, `## Screenshots`, or `## Evidence`, matching the artifact type. Do not invent or upload evidence.
+1. **User supplied evidence** (URL, markdown image/embed, local file path they want referenced) — incorporate it into the PR body as `## Demo`, `## Screenshots`, or `## Evidence`, matching the file type. Do not invent or upload evidence.
 2. **User explicitly asks to include evidence but has not supplied it** — ask for the URL/markdown/path, or capture it with the relevant Codex browser or terminal tool when that is within the current task. Do not launch another CE skill.
 3. **Agent judgment on authored changes** — if you authored the commits and know the change produces no material claim a reviewer would need evidence for (internal plumbing, type-only, backend refactor without user-facing effect, inert documentation, pure refactors), skip evidence handling without asking. Classify by runtime purpose, not extension: markdown or YAML that is runtime agent instructions, configuration, generated product content, or policy code is not auto-skippable just for being markdown or YAML.
 
 Otherwise, if the branch diff changes behavior a reviewer would need evidence for (UI, CLI output, API behavior with runnable code, generated artifacts, workflow output, ranking/scoring logic, deployment or config behavior), include a concise validation note in the PR body describing what was exercised and how it behaved. If no real run was possible because of unavailable credentials, paid services, deploy-only infrastructure, hardware, or missing local setup, say that plainly in the validation section.
 
-Do not block PR creation solely because no visual artifact exists. Test output and manual validation notes are acceptable validation evidence, but do not label test output as "Demo" or "Screenshots."
+Do not block PR creation solely because no visual file exists. Test output and manual validation notes are acceptable validation evidence, but do not label test output as "Demo" or "Screenshots."
 
 **Concept teaching gate** before composition. Use the repo root gathered in Context (resolving it with `git rev-parse --show-toplevel` if you don't already have it) and read `<repo-root>/.andrea-engineering/config.local.yaml`. Only an **active (non-commented)** `pr_teaching_section:` key counts — lines starting with `#` are YAML comments, and the shipped template documents keys as commented examples; matching those would silently flip the gate. The gate is off only when the active value is exactly `false`; a missing file, missing key, or any other value means the default: **on**. The same read resolves `pr_teaching_archive:` — on only when the active value is exactly `true`, otherwise **off** — and a per-run `archive:on|off` token overrides the archive key for this invocation.
 

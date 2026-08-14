@@ -5,8 +5,10 @@ description: "Draft launch or promotion copy for a shipped feature. Use when the
 
 # $ae-promote
 
-Immediately before writing user-facing text, read and follow
-[`references/plain-language.md`](references/plain-language.md).
+When writing text the user will read, reuse their words and the repository's
+existing names. Keep workflow labels, routing terms, and prompt terminology
+out of the result. Leave metadata keys, stable IDs, code, commands, and
+existing project terms unchanged.
 
 Turn a feature that just shipped into copy-pasteable, user-facing announcement copy — right inside the engineering workflow.
 
