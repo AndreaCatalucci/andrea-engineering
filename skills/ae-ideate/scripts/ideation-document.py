@@ -16,7 +16,7 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DISPATCH_CONTRACT = ROOT / "references" / "dispatch-contract.json"
+DISPATCH_RULES = ROOT / "references" / "dispatch-rules.json"
 BASIS_PREFIXES = ("direct:", "external:", "reasoned:")
 ASSIGNMENT_KINDS = {"frame", "theme", "recovery", "universal"}
 ORIGINS = {"original", "recovery", "deduped", "synthesis"}
@@ -421,9 +421,9 @@ def seal_verdict_file(draft_path: str | Path, output_path: str | Path, candidate
     return _verdict_receipt(document, digest, output_path, candidate_path)
 
 
-def load_dispatch_contract() -> dict[str, Any]:
-    document = _load_json(DISPATCH_CONTRACT)
-    _keys(document, {"schema_version", "modes"}, set(), "dispatch contract")
+def load_dispatch_rules() -> dict[str, Any]:
+    document = _load_json(DISPATCH_RULES)
+    _keys(document, {"schema_version", "modes"}, set(), "dispatch rules")
     _require(document["schema_version"] == 1, "unsupported dispatch schema_version")
     modes = _object(document["modes"], "dispatch modes")
     required = {"default-software", "issue-tracker", "surprise-me", "go-deep", "non-software-quick", "non-software-standard", "non-software-full", "recovery"}
@@ -486,7 +486,7 @@ def main(argv: list[str] | None = None) -> int:
     receipt_verdicts = subparsers.add_parser("receipt-verdicts")
     receipt_verdicts.add_argument("path")
     receipt_verdicts.add_argument("--candidates", required=True)
-    subparsers.add_parser("dispatch-contract")
+    subparsers.add_parser("dispatch-rules")
     args = parser.parse_args(argv)
     try:
         if args.command == "seal-candidates":
@@ -506,7 +506,7 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "receipt-verdicts":
             result = verdict_receipt(args.path, args.candidates)
         else:
-            result = load_dispatch_contract()
+            result = load_dispatch_rules()
         _print(result)
         return 0
     except ArtifactError as error:

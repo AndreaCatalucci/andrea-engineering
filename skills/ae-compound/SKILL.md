@@ -48,7 +48,7 @@ Read supporting files only when their step needs them:
 - `references/schema.yaml` — canonical frontmatter fields and enums
 - `references/yaml-schema.md` — category mapping and YAML-safety rules
 - `references/concepts-vocabulary.md` — vocabulary inclusion and format rules
-- `references/grounding-validation.md` — claim adjudication and optional reviewer prompt
+- `references/claim-validation.md` — claim adjudication and optional reviewer prompt
 - `references/agents/session-historian.md` — synthesis rules for `history:true`
 - `scripts/session-history/` — discovery and extraction for `history:true`
 - `scripts/validate-frontmatter.py` — parser-safety validation
@@ -141,7 +141,7 @@ Report a manual fallback rather than silently skipping validation.
 
 ### 7. Check every durable claim against current evidence
 
-Read `references/grounding-validation.md`.
+Read `references/claim-validation.md`.
 
 First run the deterministic validator:
 
@@ -159,7 +159,7 @@ Then perform a root-agent semantic pass over the solution document and any vocab
 - Correct contradicted claims and soften or remove claims that cannot be verified.
 - Rerun deterministic validation after substantive edits.
 
-With `deep:true`, dispatch exactly one read-only generic reviewer using the semantic validator prompt from `references/grounding-validation.md`. Give it the document path, changed vocabulary entries, and relevant repository scope; do not copy the full document or source into the prompt. Adjudicate its evidence-backed findings, then rerun affected validators. The reviewer must not edit files.
+With `deep:true`, dispatch exactly one read-only generic reviewer using the semantic validator prompt from `references/claim-validation.md`. Give it the document path, changed vocabulary entries, and relevant repository scope; do not copy the full document or source into the prompt. Adjudicate its evidence-backed findings, then rerun affected validators. The reviewer must not edit files.
 
 ### 8. Finish without expanding scope
 

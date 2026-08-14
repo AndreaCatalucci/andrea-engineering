@@ -12,7 +12,7 @@ do not search for missing instructions or reconstruct paths.
 
 Read the packet in this order:
 
-1. `grounding` and any named evidence dossiers;
+1. `evidence` and any named evidence dossiers;
 2. `constraints`, which ideas must obey;
 3. `background`, which may inform but not redirect the work;
 4. `areas`, when present;

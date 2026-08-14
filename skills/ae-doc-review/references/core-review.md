@@ -1,6 +1,6 @@
 # Core Review
 
-Apply this pass to the full document. Retain only findings that meet the reviewer contract.
+Apply this pass to the full document. Retain only findings that meet the reviewer rules.
 
 ## Internal coherence
 

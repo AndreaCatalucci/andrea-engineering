@@ -1,4 +1,4 @@
-# Grounding Validation (Phase 2.45)
+# Claim Validation (Phase 2.45)
 
 Read this when Phase 2.45 runs. The doc just written becomes permanent, trusted knowledge — future agents will act on its claims without re-verifying them. This phase checks the claims against reality before they compound: a deterministic mechanical pass (bundled script) plus a semantic pass (one read-only validator subagent). Neither pass is a hard gate — every flag is adjudicated, because solution docs legitimately cite deleted paths and pre-fix states.
 
@@ -36,7 +36,7 @@ After any body edit from this step or Step 2, re-run the script until it reports
 Dispatch **one generic read-only subagent** with `spawn_agent`, using Codex's inherited model, covering the written solution doc plus any `CONCEPTS.md` entries added or edited this run (Phase 2.4's entries are claims too — a glossary entry written from a session-level summary is exactly how wrong semantics enter the vocabulary). Build its prompt from this template:
 
 ```
-You are a grounding validator for documentation about to enter a permanent
+You are a claim validator for documentation about to enter a permanent
 knowledge store. You are read-only: never edit files. Inspect with rg,
 focused file reads, non-mutating git commands, and gh when needed.
 

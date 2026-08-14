@@ -54,11 +54,11 @@ files, verdicts, and temporary delivery. Do not delete it on completion.
 
 Load exactly one evidence branch:
 
-- current repository: `references/repo-grounding.md`;
-- outside software or non-software: `references/elsewhere-grounding.md`.
+- current repository: `references/repo-evidence.md`;
+- outside software or non-software: `references/elsewhere-evidence.md`.
 
 If the user supplied gathered evidence, also read
-`references/research-artifacts.md`. Do not load that branch otherwise. Follow
+`references/research-files.md`. Do not load that branch otherwise. Follow
 the named cache references only when their feature runs.
 
 Produce one compact evidence summary. Separate user directives from
@@ -82,7 +82,7 @@ the structured dispatch table, frame definitions, fresh-context packet,
 candidate schema, receipt handling, merge, lineage, synthesis, recovery, and
 raw checkpoint.
 
-Use the selected entry in `references/dispatch-contract.json` as the only source
+Use the selected entry in `references/dispatch-rules.json` as the only source
 for fleet assignments, quotas, and evidence-read budgets. Do not restate those
 values in a dispatch prompt; copy the selected values into its structured
 assignment packet.

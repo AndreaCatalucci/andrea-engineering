@@ -15,9 +15,9 @@ This is the canonical section skeleton. Shape each finding for the reader's next
 **Intent:** Add order export endpoint with CSV and JSON format support
 **Mode:** interactive
 
-**Reviewers:** correctness, testing, maintainability, security, api-contract
+**Reviewers:** correctness, testing, maintainability, security, api
 - security -- new public endpoint accepts user-provided format parameter
-- api-contract -- new /api/orders/export route with response schema
+- api -- new /api/orders/export route with response schema
 
 ### Applied (safe, verified)
 
@@ -48,7 +48,7 @@ Committed: `fix(review): cover empty-format branch + tighten export perms` (work
 | # | File | Issue | Reviewer | Confidence |
 |---|------|-------|----------|------------|
 | 2 | `export_service.rb:87` | Loads all orders into memory -- unbounded | performance | 100 |
-| 3 | `export_service.rb:91` | No pagination contract | api-contract, performance | 75 |
+| 3 | `export_service.rb:91` | No pagination contract | api, performance | 75 |
 
 - **#2** — `Order.where(...).to_a` materializes the full result set; a large account OOMs the worker. Stream with `find_each` or paginate.
 - **#3** — the endpoint returns every row in one response; needs a cursor/page contract before GA. Design decision — see Actionable Findings.
@@ -158,9 +158,9 @@ This fails because of the **box-drawing `────` separators between items*
 
 When `mode:agent` is active, **do not** emit the markdown table report above. Emit **one parseable JSON object** as the primary response and write the same payload to `review.json` under `/tmp/andrea-engineering/ae-code-review/<run-id>/`.
 
-The contract is defined in `merge-apply-contract.md`. Minimum keys are
+The rules are defined in `merge-apply-rules.md`. Minimum keys are
 `"status"`, `"verdict"`, `"scope"`, `"intent"`, `"reviewers"`, `"findings"`,
-`"actionable_findings"`, `"artifact_path"`, and `"run_id"`.
+`"actionable_findings"`, `"result_path"`, and `"run_id"`.
 
 Key differences from the interactive markdown format:
 

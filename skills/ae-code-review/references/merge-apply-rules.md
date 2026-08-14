@@ -1,8 +1,8 @@
-# Merge, Apply, and Output Contract
+# Merge, Apply, and Output Rules
 
 ## Merge
 
-1. Accept a normal reviewer receipt only through `review-artifact.py
+1. Accept a normal reviewer receipt only through `review-result.py
    accept-review`. Accept a write failure or reviewer-side validation failure
    only through `accept-inline`. A parent-side failure gets one repair request;
    after that, mark the reviewer failed and record the reason in Coverage.
@@ -38,7 +38,7 @@ P0/P1 at confidence 50 may survive for validation rather than being silently los
 
 Before independent validation and again before final output, write a hydration
 request containing each surviving finding's `source_keys` and run
-`review-artifact.py hydrate-findings --sources source-registry.json`. Reload
+`review-result.py hydrate-findings --sources source-registry.json`. Reload
 full records from the digest-checked source files. Merge their evidence,
 reviewers, and strongest `why_it_matters` into the synthesized finding. Never
 ask a model to recreate missing detail. Inline fallback findings keep their
@@ -105,7 +105,7 @@ Emit one raw JSON object with no fence or trailing prose, and write the same pay
   "residual_risks": [],
   "testing_gaps": [],
   "coverage": {},
-  "artifact_path": "/tmp/andrea-engineering/ae-code-review/<run-id>/",
+  "result_path": "/tmp/andrea-engineering/ae-code-review/<run-id>/",
   "run_id": "<run-id>"
 }
 ```
@@ -114,7 +114,7 @@ Finding objects carry stable `#`, title, severity, file, line, confidence, routi
 
 Use `status:failed` with a reason for setup failure, `status:skipped` for scope skip, and `status:degraded` when all reviewers fail.
 
-## Run artifacts
+## Run files
 
 Always write under `/tmp/andrea-engineering/ae-code-review/<run-id>/`:
 
@@ -126,4 +126,4 @@ Always write under `/tmp/andrea-engineering/ae-code-review/<run-id>/`:
 - `report.md` or `review.json`;
 - `metadata.json` with run ID, branch, head SHA at dispatch, verdict, and completion timestamp.
 
-In default mode, finish with a compact Actionable Findings summary containing stable number, severity, `file:line`, title, route, suggested-fix presence, confidence, and artifact path. State `Actionable findings: none.` explicitly when empty.
+In default mode, finish with a compact Actionable Findings summary containing stable number, severity, `file:line`, title, route, suggested-fix presence, confidence, and result path. State `Actionable findings: none.` explicitly when empty.

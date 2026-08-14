@@ -77,7 +77,7 @@ This change does not combine reviewers, alter risk classification, introduce a f
 
 **Goal:** Prove R1, R6, and R7 across the rest of the review pipeline.
 
-**Affected area:** `skills/ae-code-review/references/merge-apply-contract.md`, `skills/ae-code-review/references/validator-template.md`.
+**Affected area:** `skills/ae-code-review/references/merge-apply-rules.md`, `skills/ae-code-review/references/validator-template.md`.
 
 **Constraints:** Preserve source keys through filtering, corroboration, and deduplication, then load full records before validation and output. Do not change confidence, severity, routing, numbering, validation selection, or protected-artifact behavior. Validators use fresh context and inspect independently.
 
@@ -85,7 +85,7 @@ This change does not combine reviewers, alter risk classification, introduce a f
 
 ## How We'll Check It
 
-- `python3 -m unittest discover -s tests -p 'test_review_artifact.py'`
+- `python3 -m unittest discover -s tests -p 'test_review_result.py'`
 - Run the new helper against valid and invalid reviewer fixtures and confirm stable JSON plus non-zero fail-closed errors.
 - Measure the assembled shared reviewer packet with `wc -w`; it must be at most 1,500 words.
 - Confirm every selected reviewer and validator dispatch explicitly uses fresh context and receives the required packet fields.

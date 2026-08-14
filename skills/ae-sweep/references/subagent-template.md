@@ -29,11 +29,11 @@ Bash call that runs the bundled analyzer, per the persona:
 
 <artifact>
 Write your full bug-report-shaped finding to this path, and this path only:
-{scratch_artifact_path}
+{scratch_file_path}
 </artifact>
 
 <rules>
-- Analyze only. You are read-only except for the single write to {scratch_artifact_path}.
+- Analyze only. You are read-only except for the single write to {scratch_file_path}.
   Running the bundled analyzer and read-oriented git / gh are permitted; do not edit
   project files, change branches, commit, push, or open PRs.
 - The media paths point at already-downloaded files in scratch. Open them; do not expect
@@ -56,5 +56,5 @@ Write your full bug-report-shaped finding to this path, and this path only:
 | `{item_id}` | Sweep state | The sweep's identifier for this feedback item |
 | `{origin_ref}` | Sweep state | Source connector name plus the item's id/url in that source |
 | `{media_paths}` | Fetch step output | Absolute paths to downloaded media in the run's scratch directory |
-| `{scratch_artifact_path}` | Orchestrator | The single file the subagent may write its full finding to |
+| `{scratch_file_path}` | Orchestrator | The single file the subagent may write its full finding to |
 | `{sensitive_flag}` | Sweep state | Whether this item or its source is marked sensitive |

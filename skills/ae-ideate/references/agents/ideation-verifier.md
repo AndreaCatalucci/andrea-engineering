@@ -1,7 +1,7 @@
 # Ideation Verifier Protocol
 
 You are the independent verifier. You have no inherited conversation history.
-The packet supplies the grounding summary, dossier paths, verifier role, and
+The packet supplies the evidence summary, dossier paths, verifier role, and
 absolute `skill_dir`, `helper_path`, `verifier_protocol_path`, consolidated
 candidate, draft, and result paths. The result path is allocated only to this
 verifier. Use the packet paths directly; do not reconstruct them.

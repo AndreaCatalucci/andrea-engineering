@@ -61,7 +61,7 @@ material is mandatory.
 ## Focus, volume, and depth
 
 Separate the subject from an optional focus, path, constraint, research file,
-or volume request. Read default candidate quotas from `dispatch-contract.json`
+or volume request. Read default candidate quotas from `dispatch-rules.json`
 and keep 5-7 final survivors. Honor requests such as “top 3,” “100 ideas,” or
 “raise the bar” by adjusting bucket or survivor quotas deliberately.
 

@@ -7,8 +7,8 @@ from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "skills" / "ae-ideate" / "scripts" / "ideation-artifact.py"
-SPEC = importlib.util.spec_from_file_location("ideation_artifact", SCRIPT)
+SCRIPT = ROOT / "skills" / "ae-ideate" / "scripts" / "ideation-document.py"
+SPEC = importlib.util.spec_from_file_location("ideation_document", SCRIPT)
 MODULE = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader is not None
 SPEC.loader.exec_module(MODULE)
@@ -343,9 +343,9 @@ class IdeationArtifactTest(unittest.TestCase):
             with self.assertRaisesRegex(MODULE.ArtifactError, "areas do not match"):
                 MODULE.seal_consolidated_file(valid_draft, sealed, wrong_areas_sources)
 
-    def test_dispatch_contract_uses_small_default_fleet(self):
-        contract = MODULE.load_dispatch_contract()
-        modes = contract["modes"]
+    def test_dispatch_rules_uses_small_default_fleet(self):
+        rules = MODULE.load_dispatch_rules()
+        modes = rules["modes"]
         self.assertEqual(len(modes["default-software"]["agents"]), 3)
         self.assertEqual(sum(len(agent) for agent in modes["default-software"]["agents"]), 6)
         self.assertEqual(len(modes["surprise-me"]["agents"]), 4)
@@ -370,7 +370,7 @@ class IdeationArtifactTest(unittest.TestCase):
         self.assertEqual(len(assignments) * modes["default-software"]["candidate_quota"][0], 36)
 
     def test_every_dispatch_mode_seals_its_declared_minimum(self):
-        modes = MODULE.load_dispatch_contract()["modes"]
+        modes = MODULE.load_dispatch_rules()["modes"]
         with tempfile.TemporaryDirectory() as directory:
             for mode_name in (
                 "default-software",
@@ -432,9 +432,9 @@ class IdeationArtifactTest(unittest.TestCase):
         skill = (ROOT / "skills" / "ae-ideate" / "SKILL.md").read_text(encoding="utf-8")
         for reference in (
             "intake-and-routing.md",
-            "repo-grounding.md",
-            "elsewhere-grounding.md",
-            "research-artifacts.md",
+            "repo-evidence.md",
+            "elsewhere-evidence.md",
+            "research-files.md",
             "divergent-ideation.md",
             "post-ideation-workflow.md",
         ):

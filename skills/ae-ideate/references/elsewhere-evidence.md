@@ -1,4 +1,4 @@
-# Elsewhere Grounding
+# Elsewhere Evidence
 
 Read this only when the ideation subject is outside the current repository.
 

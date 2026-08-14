@@ -16,7 +16,7 @@ The core rubric always covers all three lenses. Do not split them into separate 
 |---|---|
 | `security` | Auth, public input, permissions, secrets, or trust boundaries |
 | `performance` | Queries, heavy transforms, caching, or concurrency with performance risk |
-| `api-contract` | Routes, serializers, events, exported types, or versioned contracts |
+| `api` | Routes, serializers, events, exported types, or versioned interfaces |
 | `data-migration` | Migration/schema artifacts or explicit backfills/data transforms |
 | `reliability` | Retries, timeouts, background jobs, error recovery, or health behavior |
 | `adversarial` | High-criticality or wide-blast-radius behavior: auth, payments, durable data mutation, external integrations, cross-component failure propagation, or a guard that could silently pass while production fails |

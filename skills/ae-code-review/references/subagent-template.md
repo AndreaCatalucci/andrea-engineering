@@ -16,7 +16,7 @@ The packet contains:
   "persona_path": "/absolute/.../personas/core-reviewer.md",
   "scope_rules_path": "/absolute/.../diff-scope.md",
   "schema_path": "/absolute/.../findings-schema.json",
-  "helper_path": "/absolute/.../review-artifact.py",
+  "helper_path": "/absolute/.../review-result.py",
   "run_id": "...",
   "reviewer": "core",
   "intent": "...",

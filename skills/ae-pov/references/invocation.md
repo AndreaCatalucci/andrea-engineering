@@ -20,7 +20,7 @@ So every input is labeled by provenance, and only verified buckets satisfy the g
 | Conversation claims | No — frame and hypotheses until a scout corroborates |
 | Unconfirmed assumptions | No — surfaced for the user to confirm or deny |
 
-If the conversation says "we have 40 call-sites on X," the project-grounding scout must confirm that against the codebase before it counts. **Warm adds no evidentiary weight** — it surfaces the question and hypotheses; the scouts still do the independent grounding. Same invalidation rule, no warm exemption.
+If the conversation says "we have 40 call-sites on X," the project-evidence scout must confirm that against the codebase before it counts. **Warm adds no evidentiary weight** — it surfaces the question and hypotheses; the scouts still do the independent grounding. Same invalidation rule, no warm exemption.
 
 ## Establishing the question (frame gate)
 

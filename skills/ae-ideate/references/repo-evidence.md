@@ -1,4 +1,4 @@
-# Repository Grounding
+# Repository Evidence
 
 Read this only for a topic in the current repository.
 
@@ -14,7 +14,7 @@ Keep the subject-specific scan shallow but concrete. Find conventions, pain
 points, workarounds, and useful places to improve. Fully read a root Markdown
 file only when the user named it; treat its contents as constraints. Give other
 root Markdown files one-line background gists. Named evidence exports follow
-`research-artifacts.md`, not this path.
+`research-files.md`, not this path.
 
 Search `docs/solutions/` directly for relevant past decisions. Run web research
 for prior art, adjacent solutions, market evidence, and analogies unless the

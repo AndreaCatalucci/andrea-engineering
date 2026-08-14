@@ -4,7 +4,7 @@ Read this only at Phase 2. Generation must finish before critique begins.
 
 ## Dispatch the smallest complete fleet
 
-Read `dispatch-contract.json`; it is authoritative for agent assignments,
+Read `dispatch-rules.json`; it is authoritative for agent assignments,
 candidate quotas, and evidence-read budgets. Use these rules when applying it:
 
 - Issue themes replace named frames and use the contract's round-robin rule. If
@@ -25,7 +25,7 @@ slot opens. Recovery starts only after the whole initial fleet is accepted.
 
 Spawn each agent with no inherited turns and supply:
 
-1. `grounding`: the byte-identical summary and dossier paths;
+1. `evidence`: the byte-identical summary and dossier paths;
 2. `constraints`: the user prompt, focus, and named directive files;
 3. `background`: codebase, learnings, external evidence, and research gists;
 4. `areas`: the declared area list, or an empty list;

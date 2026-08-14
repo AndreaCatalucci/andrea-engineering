@@ -42,7 +42,7 @@ Completion criterion: the document type and provenance are explicit inputs to ev
 
 Read and apply [`references/core-review.md`](references/core-review.md). The main agent owns this pass; do not create a coherence or scope subagent.
 
-Completion criterion: every applicable core check was tested against the full document, and every retained finding has quoted evidence, an observable consequence, and one disposition from the reviewer contract.
+Completion criterion: every applicable core check was tested against the full document, and every retained finding has quoted evidence, an observable consequence, and one disposition from the reviewer rules.
 
 ## 4. Select specialists
 
@@ -61,11 +61,11 @@ Read only the selected files from `references/specialists/`. Give each specialis
 
 - the document path, type, provenance, and relevant content;
 - its specialist file;
-- [`references/reviewer-contract.md`](references/reviewer-contract.md).
+- [`references/reviewer-rules.md`](references/reviewer-rules.md).
 
 Dispatch selected specialists in parallel when capacity permits. Treat capacity limits as backpressure and run the remainder sequentially. A failed specialist does not fail the review; record the missing coverage.
 
-Completion criterion: every triggered specialist either returned contract-shaped findings or appears in missing coverage.
+Completion criterion: every triggered specialist either returned rule-shaped findings or appears in missing coverage.
 
 ## 5. Synthesize once
 

@@ -84,7 +84,7 @@ Make the verifier consume consolidated candidates by path and emit one verdict f
 
 ## How We'll Check It
 
-- `python3 -m unittest discover -s tests -p 'test_ideation_artifact.py'`
+- `python3 -m unittest discover -s tests -p 'test_ideation_document.py'`
 - Word-budget and routing fixtures for the root and assembled agent protocols.
 - Sealed-context comparisons across every dispatch mode.
 - `scripts/sync-shared-skill-assets --check`

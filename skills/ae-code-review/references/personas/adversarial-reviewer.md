@@ -77,7 +77,7 @@ Use the anchored confidence rubric in the subagent template. Persona-specific gu
 - **Performance anti-patterns** (N+1 queries, missing indexes, unbounded allocations) -- performance-reviewer owns these
 - **Code style, naming, structure, dead code** -- the core reviewer's maintainability lens owns these
 - **Test coverage gaps** or weak assertions -- the core reviewer's testing lens owns these. *Exception:* when the test infrastructure, harness, or mock is itself the change and could mask production failure, that fidelity concern is yours.
-- **API contract breakage** (changed response shapes, removed fields) -- api-contract-reviewer owns these
+- **API contract breakage** (changed response shapes, removed fields) -- api-reviewer owns these
 - **Migration safety** (missing rollback, data integrity, schema drift) -- data-migration-reviewer owns these
 
 Your territory is the *space between* these reviewers -- problems that emerge from combinations, assumptions, sequences, and emergent behavior that no single-pattern reviewer catches.

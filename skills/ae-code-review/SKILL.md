@@ -119,7 +119,7 @@ or documented inline fallback. Let every reviewer use the parent model. Respect
 the active-agent limit with a bounded queue; capacity is backpressure, not
 reviewer failure.
 
-Save each returned receipt and run `scripts/review-artifact.py accept-review`
+Save each returned receipt and run `scripts/review-result.py accept-review`
 against the parent-allocated result path, reviewer name, and schema. For an
 inline fallback, save it and run `accept-inline`. A parent-side acceptance
 failure gets one repair request; after a second failure, mark that reviewer
@@ -130,7 +130,7 @@ Remote reviewers inspect fetched refs with `git show` or diff hunks, never stale
 
 ### 5. Merge findings
 
-Read `references/merge-apply-contract.md` and run its merge stage. It owns
+Read `references/merge-apply-rules.md` and run its merge stage. It owns
 checked handoff handling, source lineage, evidence gates, deduplication,
 confidence/corroboration, pre-existing separation, mode-aware demotion, stable
 numbering, triage groups, plan completeness, and protected-artifact filtering.
@@ -142,7 +142,7 @@ If every reviewer fails, return a degraded result with the reason. Otherwise con
 Directly verify confidence-100 P2/P3 findings only when the cited line itself mechanically proves the issue. Runtime, cross-file, security, concurrency, performance, auth, and contract judgments never qualify.
 
 Before validation, hydrate source-backed findings through
-`scripts/review-artifact.py hydrate-findings`; do not reconstruct full evidence
+`scripts/review-result.py hydrate-findings`; do not reconstruct full evidence
 from compact projections. For all P0/P1 and other surviving consequential
 findings, read `references/validator-template.md`, write its complete
 `validator-packet.json`, and dispatch one validator with `fork_turns="none"`.
@@ -152,7 +152,7 @@ marked degraded and drop unvalidated P2/P3. Prune triage groups after drops.
 
 ### 7. Apply fixes in default mode
 
-Skip entirely in `mode:agent` or remote scope. Otherwise follow the apply stage in `references/merge-apply-contract.md`:
+Skip entirely in `mode:agent` or remote scope. Otherwise follow the apply stage in `references/merge-apply-rules.md`:
 
 - apply clear, bounded, reversible improvements;
 - do not apply design calls, disputed findings, or changes requiring product/security authority;
@@ -164,7 +164,7 @@ Never push.
 
 ### 8. Present and persist
 
-Read `references/review-output-template.md` and the output stage of `references/merge-apply-contract.md`.
+Read `references/review-output-template.md` and the output stage of `references/merge-apply-rules.md`.
 
 - **Default:** ASCII-safe markdown report plus a final compact Actionable Findings summary.
 - **`mode:agent`:** one raw JSON object and nothing after it.
@@ -195,10 +195,10 @@ After output, stop. Do not offer push/PR actions or run post-review triage.
 | `references/persona-catalog.md` | Reviewer selection |
 | `references/subagent-template.md` | Lean reviewer protocol and packet |
 | `references/diff-scope.md` | Shared scope rules for reviewers |
-| `references/findings-schema.json` | Reviewer JSON contract |
-| `scripts/review-artifact.py` | Result validation, receipt acceptance, hydration |
+| `references/findings-schema.json` | Reviewer JSON schema |
+| `scripts/review-result.py` | Result validation, receipt acceptance, hydration |
 | `references/validator-template.md` | Single batched validation pass |
-| `references/merge-apply-contract.md` | Merge, apply, JSON, artifacts |
+| `references/merge-apply-rules.md` | Merge, apply, JSON, result files |
 | `references/review-output-template.md` | Markdown report skeleton |
 
 Read only selected persona prompt files under `references/personas/`.

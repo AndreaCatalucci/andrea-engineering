@@ -137,7 +137,7 @@
     },
     "return_tiers": {
       "description": "The reviewer writes one full checked file and normally returns only its receipt. The parent derives compact merge fields deterministically and reloads full details from source lineage before validation and output.",
-      "merge_tier": "Derived by review-artifact.py after parent acceptance: title, severity, file, line, confidence, autofix_class, owner, requires_verification, pre_existing, optional suggested_fix, first_evidence for anchor 75/100, reviewers, and source_keys.",
+      "merge_tier": "Derived by review-result.py after parent acceptance: title, severity, file, line, confidence, autofix_class, owner, requires_verification, pre_existing, optional suggested_fix, first_evidence for anchor 75/100, reviewers, and source_keys.",
       "detail_tier": "Stored only in the digest-checked reviewer file: why_it_matters and full evidence. hydrate-findings reloads these records from source-registry.json before validation and final output. The compact inline return exists only as a degraded write or validation fallback."
     }
   }

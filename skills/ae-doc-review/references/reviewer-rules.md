@@ -1,4 +1,4 @@
-# Reviewer Contract
+# Reviewer Rules
 
 Return only this JSON shape:
 

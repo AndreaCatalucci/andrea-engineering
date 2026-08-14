@@ -7,9 +7,9 @@ from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "skills" / "ae-code-review" / "scripts" / "review-artifact.py"
+SCRIPT = ROOT / "skills" / "ae-code-review" / "scripts" / "review-result.py"
 SCHEMA = ROOT / "skills" / "ae-code-review" / "references" / "findings-schema.json"
-SPEC = importlib.util.spec_from_file_location("review_artifact", SCRIPT)
+SPEC = importlib.util.spec_from_file_location("review_result", SCRIPT)
 MODULE = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader is not None
 SPEC.loader.exec_module(MODULE)
@@ -19,7 +19,7 @@ def finding(**overrides):
     value = {
         "title": "Rejects valid empty review",
         "severity": "P1",
-        "file": "skills/ae-code-review/scripts/review-artifact.py",
+        "file": "skills/ae-code-review/scripts/review-result.py",
         "line": 42,
         "why_it_matters": "A valid reviewer result is discarded, so the final report silently loses review coverage.",
         "autofix_class": "gated_auto",
@@ -28,7 +28,7 @@ def finding(**overrides):
         "suggested_fix": "Accept an empty findings array while preserving reviewer coverage.",
         "confidence": 75,
         "evidence": [
-            "skills/ae-code-review/scripts/review-artifact.py:42 -- findings = document['findings']"
+            "skills/ae-code-review/scripts/review-result.py:42 -- findings = document['findings']"
         ],
         "pre_existing": False,
     }
@@ -106,7 +106,7 @@ class ReviewArtifactTest(unittest.TestCase):
                 finding(
                     line=4,
                     evidence=[
-                        "skills/ae-code-review/scripts/review-artifact.py:42 -- wrong line"
+                        "skills/ae-code-review/scripts/review-result.py:42 -- wrong line"
                     ],
                 )
             ]
@@ -229,8 +229,8 @@ class ReviewArtifactTest(unittest.TestCase):
             )
             api_finding = finding(
                 evidence=[
-                    "skills/ae-code-review/scripts/review-artifact.py:42 -- findings = document['findings']",
-                    "tests/test_review_artifact.py:1 -- regression coverage",
+                    "skills/ae-code-review/scripts/review-result.py:42 -- findings = document['findings']",
+                    "tests/test_review_result.py:1 -- regression coverage",
                 ]
             )
             api_output, api_receipt = self.seal(
@@ -336,7 +336,7 @@ class ReviewArtifactTest(unittest.TestCase):
 
     def test_merge_validator_and_agent_output_keep_existing_guards(self):
         merge = (
-            ROOT / "skills" / "ae-code-review" / "references" / "merge-apply-contract.md"
+            ROOT / "skills" / "ae-code-review" / "references" / "merge-apply-rules.md"
         ).read_text(encoding="utf-8")
         validator = (
             ROOT / "skills" / "ae-code-review" / "references" / "validator-template.md"
@@ -367,7 +367,7 @@ class ReviewArtifactTest(unittest.TestCase):
             '"reviewers"',
             '"findings"',
             '"actionable_findings"',
-            '"artifact_path"',
+            '"result_path"',
             '"run_id"',
         ):
             self.assertIn(field, output)
