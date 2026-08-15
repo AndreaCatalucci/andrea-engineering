@@ -5,14 +5,14 @@ description: Produce the shortest implementation plan that settles consequential
 
 # Plan
 
-Plan enough for implementation to begin without reopening an important decision.
+Settle the consequential decisions that let implementation begin.
 
 1. Read the request or requirements and inspect the smallest relevant part of the repository.
 2. Identify choices whose wrong answer would cause meaningful rework. Resolve them from evidence or ask one focused question when the user must decide.
 3. Prefer existing seams and delete unnecessary abstraction from the proposed approach.
-4. Write 2-4 outcome-sized work steps. Name affected areas only when they help the implementer start.
+4. Write 2-4 outcome-sized work steps and name useful starting areas.
 
-Keep the plan under 700 words unless the user explicitly asks for depth. Include:
+Default to 700 words or fewer, with additional depth available on request. Include:
 
 - goal;
 - confirmed requirements;
@@ -20,6 +20,4 @@ Keep the plan under 700 words unless the user explicitly asks for depth. Include
 - work steps;
 - a short completion condition.
 
-Omit review workflows, validation frameworks, test matrices, diagrams, appendices, source bureaucracy, and exhaustive file lists unless one is essential to the requested change.
-
-For atomic work, answer inline instead of creating a document. Otherwise write or update one canonical file under `docs/plans/`. Do not implement the plan or invoke another skill automatically.
+Answer atomic work inline. Write multi-step work to one canonical file under `docs/plans/`. The plan itself is the deliverable.

@@ -6,7 +6,7 @@
         "skills": [
           {
             "name": "ae-ideate",
-            "description": "Generate and evaluate grounded options without questioning the user."
+            "description": "Generate and evaluate grounded options for open-ended exploration."
           },
           {
             "name": "ae-brainstorm",

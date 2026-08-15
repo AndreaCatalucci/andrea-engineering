@@ -1,7 +1,7 @@
 {
   "name": "andrea-engineering",
   "version": "3.19.0-fork.3",
-  "description": "Eight concise engineering skills from ideation through durable learning",
+  "description": "Eight engineering skills from ideation through durable learning",
   "author": {
     "name": "Andrea Catalucci"
   },
@@ -10,7 +10,7 @@
   "interface": {
     "displayName": "Andrea Engineering",
     "shortDescription": "Personal engineering workflows",
-    "longDescription": "Andrea Engineering provides eight small, human-readable workflows for ideation, requirements, planning, implementation, debugging, review, shipping, and durable learning. Packaged for Codex, Claude Code, and Grok Build.",
+    "longDescription": "Andrea Engineering provides eight human-readable workflows for ideation, requirements, planning, implementation, debugging, review, shipping, and durable learning. Packaged for Codex, Claude Code, and Grok Build.",
     "developerName": "Andrea Catalucci",
     "category": "Coding",
     "capabilities": [

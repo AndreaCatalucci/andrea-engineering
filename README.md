@@ -1,10 +1,10 @@
 # Andrea Engineering
 
-Eight small engineering skills for Codex, Claude Code, and Grok Build.
+Eight engineering skills for Codex, Claude Code, and Grok Build.
 
 | Skill | Purpose |
 |---|---|
-| `ae-ideate` | Explore options without asking questions. |
+| `ae-ideate` | Explore and compare grounded options. |
 | `ae-brainstorm` | Turn an unclear idea into confirmed requirements. |
 | `ae-plan` | Write the shortest useful implementation plan. |
 | `ae-work` | Implement a request or plan. |
@@ -13,7 +13,7 @@ Eight small engineering skills for Codex, Claude Code, and Grok Build.
 | `ae-ship` | Commit, push, open or update PRs, and monitor them. |
 | `ae-learn` | Capture one reusable lesson or explicitly garden existing ones. |
 
-Each `SKILL.md` contains the complete default workflow. Optional behavior lives in a short `recipes/` file and is loaded only when requested. There are no compatibility aliases or shared workflow framework.
+Each `SKILL.md` contains the complete default workflow. Branch-specific behavior lives in a short `recipes/` file and loads when the request matches it.
 
 ## Install this checkout
 
@@ -60,7 +60,7 @@ Natural language controls optional behavior. For example, asking `ae-work` for a
 
 ## Change a skill
 
-Edit its `skills/<name>/SKILL.md`. Keep the entrypoint short and put optional behavior in one plainly named file under `recipes/`. Avoid adding shared abstractions, schemas, validators, or generated copies.
+Edit its `skills/<name>/SKILL.md`. Keep the entrypoint focused and put branch-specific behavior in one plainly named file under `recipes/`.
 
 Plugin metadata lives under `.codex-plugin/`, `.claude-plugin/`, `.grok-plugin/`, and `.agents/plugins/`.
 

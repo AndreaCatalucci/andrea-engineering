@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "andrea-engineering",
-      "description": "Eight concise engineering skills from ideation through durable learning",
+      "description": "Eight engineering skills from ideation through durable learning",
       "version": "3.19.0-fork.3",
       "author": {
         "name": "Andrea Catalucci"
