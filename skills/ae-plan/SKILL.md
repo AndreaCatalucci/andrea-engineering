@@ -1,6 +1,6 @@
 ---
 name: ae-plan
-description: Produce the shortest implementation plan that settles consequential choices. Use for multi-step work or to turn confirmed requirements into executable steps.
+description: Produce the simplest implementation plan that settles consequential choices. Use for multi-step work or to turn confirmed requirements into executable steps.
 ---
 
 # Plan
@@ -18,6 +18,6 @@ Default to 700 words or fewer, with additional depth available on request. Inclu
 - confirmed requirements;
 - consequential technical decisions;
 - work steps;
-- a short completion condition.
+- a clear completion condition.
 
 Answer atomic work inline. Write multi-step work to one canonical file under `docs/plans/`. The plan itself is the deliverable.

@@ -6,14 +6,14 @@ Eight engineering skills for Codex, Claude Code, and Grok Build.
 |---|---|
 | `ae-ideate` | Explore and compare grounded options. |
 | `ae-brainstorm` | Turn an unclear idea into confirmed requirements. |
-| `ae-plan` | Write the shortest useful implementation plan. |
+| `ae-plan` | Write the simplest useful implementation plan. |
 | `ae-work` | Implement a request or plan. |
 | `ae-debug` | Find and fix the cause of failing behavior. |
 | `ae-review` | Report material problems in code or another artifact. |
 | `ae-ship` | Commit, push, open or update PRs, and monitor them. |
 | `ae-learn` | Capture one reusable lesson or explicitly garden existing ones. |
 
-Each `SKILL.md` contains the complete default workflow. Branch-specific behavior lives in a short `recipes/` file and loads when the request matches it.
+Each `SKILL.md` contains the complete default workflow. Branch-specific behavior lives in a simple `recipes/` file and loads when the request matches it.
 
 ## Install this checkout
 

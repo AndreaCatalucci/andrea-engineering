@@ -14,7 +14,7 @@
           },
           {
             "name": "ae-plan",
-            "description": "Produce the shortest implementation plan that settles consequential choices."
+            "description": "Produce the simplest implementation plan that settles consequential choices."
           },
           {
             "name": "ae-work",
