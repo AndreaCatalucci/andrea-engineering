@@ -11,8 +11,8 @@
     {
       "name": "andrea-engineering",
       "source": "./",
-      "description": "Andrea Engineering skill suite: strategy, ideation, planning, implementation, debugging, review, and shipping",
-      "version": "3.19.0-fork.2",
+      "description": "Eight engineering skills from ideation through durable learning",
+      "version": "3.19.0-fork.3",
       "author": {
         "name": "Andrea Catalucci"
       },

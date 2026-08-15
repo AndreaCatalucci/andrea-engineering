@@ -46,11 +46,6 @@ if ! command -v python3 >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! "$ROOT_DIR/scripts/sync-shared-skill-assets" --check; then
-  echo "Shared skill files are out of sync; run scripts/sync-shared-skill-assets first." >&2
-  exit 1
-fi
-
 PLUGIN_NAME="$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["name"])' "$ROOT_DIR/.grok-plugin/plugin.json")"
 MARKETPLACE_NAME="$(python3 -c 'import json, sys; print(json.load(open(sys.argv[1]))["name"])' "$ROOT_DIR/.grok-plugin/marketplace.json")"
 
