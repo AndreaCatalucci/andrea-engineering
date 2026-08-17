@@ -15,4 +15,4 @@ Find the smallest explanation that accounts for the failure.
 
 Inspect persisted state before logs when the product stores workflow state. Keep secrets and unrelated production data out of output.
 
-Keep the scope centered on the causal defect. Report the cause, evidence, fix if any, and remaining uncertainty in at most 200 words by default.
+Keep the scope centered on the causal defect. Report the cause, evidence, fix if any, and remaining uncertainty.

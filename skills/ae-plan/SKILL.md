@@ -12,7 +12,7 @@ Settle the consequential decisions that let implementation begin.
 3. Prefer existing seams and delete unnecessary abstraction from the proposed approach.
 4. Write 2-4 outcome-sized work steps and name useful starting areas.
 
-Default to 700 words or fewer, with additional depth available on request. Include:
+Include:
 
 - goal;
 - confirmed requirements;
