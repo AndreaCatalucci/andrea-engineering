@@ -17,4 +17,4 @@ Anchor ideas in observed project facts when a repository is available. Distingui
 
 Work inline by default. Use parallel exploration when requested. End with the ideas and recommendation.
 
-Default to chat and at most 700 words. Create an artifact on request.
+Default to chat. Create an artifact on request.
