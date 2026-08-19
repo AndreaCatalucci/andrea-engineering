@@ -10,7 +10,7 @@ description: Edit prose for clarity, precision, economy, and consistency while p
 1. Read the text before editing.
 2. Scan for the problems below.
 3. Rewrite only the flagged text. Preserve meaning, tone, terminology, and formality.
-4. Self-audit: did each edit fix a named problem? Revert ones that didn't.
+4. Finish with the final pass below.
 
 Each check below flags a specific problem. Apply it only when a sentence actually has that problem.
 
@@ -25,8 +25,6 @@ Instead, find what the sentence is actually missing (usually a named actor, mech
 Remove a word or phrase when it adds no meaning, precision, tone, or useful rhythm. Examples: "in order to" -> "to", "due to the fact that" -> "because", "it is important to note that" -> delete, "has the ability to" -> "can", "at this point in time" -> "now".
 
 Bad: "It is important to note that the service can restart automatically." Better: "The service can restart automatically."
-
-Shorten a sentence only when it fixes a specific problem.
 
 ## Replace vague claims with useful information
 
@@ -72,11 +70,11 @@ Warning signs: coordination, optimization, orchestration, enablement, improvemen
 
 Keep an abstraction when it is the subject itself.
 
-Not flagged: "The service exposes a management API for rotating credentials." "Management" names the subject itself here, not a vague benefit.
+Not flagged: "The service exposes a management API for rotating credentials." "Management" names the subject itself here.
 
 ## Replace abstract jargon nouns with plain words
 
-Flag jargon nouns that sound technical but stand in for a plainer word. Examples: substrate, vector, primitive (as a noun), surface (as in "API surface"), bedrock, paradigm, north star, flywheel.
+Flag jargon nouns that sound technical but can be replaced with a plainer word. Examples: substrate, vector, primitive (as a noun), surface (as in "API surface"), bedrock, paradigm, north star, flywheel.
 
 Bad: "The team is exploring a new vector for onboarding." Better: "The team is exploring a new way to onboard."
 
@@ -86,7 +84,7 @@ Keep the jargon term when it is the term practitioners actually use and a plaine
 
 ## Remove clauses that only restate an implication
 
-Flag appended clauses that claim a benefit without adding evidence or mechanism. Examples: highlighting..., showcasing..., underscoring..., ensuring..., reflecting..., fostering..., demonstrating..., improving....
+Flag appended clauses that claim a benefit without adding evidence or mechanism. Examples: highlighting, showcasing, underscoring, ensuring, reflecting, fostering, demonstrating, improving.
 
 Bad: "The service retries failed requests, improving reliability." Better: "The service retries failed requests up to three times."
 
