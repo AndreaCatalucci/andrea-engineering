@@ -22,6 +22,6 @@ Track product-shaping decisions:
 
 Challenge contradictions and unnecessary scope directly. Conclude questioning when a competent planner can proceed with the product decisions settled.
 
-Finish with confirmed requirements and clearly marked remaining blockers.
+Finish with confirmed requirements and marked remaining blockers.
 
 Stay in chat by default. Preserve the result under `docs/plans/` on request. Write or update `STRATEGY.md` when requested.
