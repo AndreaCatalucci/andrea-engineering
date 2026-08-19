@@ -122,8 +122,32 @@ if [[ -z "$configured_root" ]]; then
   run "$GROK_CLI" plugin marketplace add "$ROOT_DIR"
 fi
 
-echo "Installing or refreshing $PLUGIN_NAME from this checkout:"
-run "$GROK_CLI" plugin install "$ROOT_DIR" --trust
+plugin_list="$("$GROK_CLI" plugin list --json)"
+already_installed="$(printf '%s' "$plugin_list" | python3 -c '
+import json, os, sys
+
+name = sys.argv[1]
+root = os.path.realpath(sys.argv[2])
+payload = json.load(sys.stdin)
+plugins = payload if isinstance(payload, list) else payload.get("installed", payload.get("plugins", []))
+for plugin in plugins:
+    plugin_name = plugin.get("name") or plugin.get("id") or ""
+    if plugin_name.split("/")[-1].split("@")[0] != name and plugin_name != name:
+        continue
+    source = plugin.get("source") or ""
+    if source and os.path.realpath(source) == root:
+        print("yes")
+        raise SystemExit(0)
+print("no")
+' "$PLUGIN_NAME" "$ROOT_DIR")"
+
+if [[ "$already_installed" == "yes" ]]; then
+  echo "Refreshing $PLUGIN_NAME (already installed from this checkout):"
+  run "$GROK_CLI" plugin update "$PLUGIN_NAME"
+else
+  echo "Installing $PLUGIN_NAME from this checkout:"
+  run "$GROK_CLI" plugin install "$ROOT_DIR" --trust
+fi
 
 plugin_list="$("$GROK_CLI" plugin list --json)"
 if ! printf '%s' "$plugin_list" | python3 -c '
