@@ -9,6 +9,8 @@ Help the user decide what to build.
 
 First read the request and relevant project context. Bring discoverable facts into the conversation.
 
+When a hypothesis is cheap to check, check it instead of speculating: curl a public API to see its real response shape, auth, and rate limits; fetch a site's terms or pricing page to check licensing; run a quick snippet to confirm a claim. Bring the result into the conversation as a verified fact, not a guess.
+
 Ask one useful question at a time. Prefer concrete alternatives with a recommendation when the choice is bounded. Use free-form questions when fixed choices would hide the real decision.
 
 Track product-shaping decisions:
