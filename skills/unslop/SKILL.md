@@ -1,30 +1,22 @@
 ---
 name: unslop
-description: Edit prose for clarity, precision, economy, and consistency while preserving meaning and tone.
+description: Edit prose for clarity, precision, economy, and consistency while preserving meaning and tone. Must always apply.
 ---
 
 # Unslop
 
-Every edit must fix a specific problem.
-
-Before changing a sentence, identify what is wrong with it. If none of the checks below applies, leave it unchanged.
-
-Preserve meaning, tone, terminology, and level of formality unless the task asks you to change them.
-
 ## Process
 
 1. Read the text before editing.
-2. Identify specific problems using the checks below.
-3. Rewrite only the affected text.
-4. Prefer the smallest change that fixes the problem.
-5. Re-read the edited passage in context.
-6. Stop when no remaining change has a clear reason.
+2. Scan for the problems below.
+3. Rewrite only the flagged text. Preserve meaning, tone, terminology, and formality.
+4. Self-audit: did each edit fix a named problem? Revert ones that didn't.
 
-Do not treat these checks as a style template. They identify problems, not features every sentence should have.
+Each check below flags a specific problem. Apply it only when a sentence actually has that problem.
 
 ## Resolve overlapping checks
 
-A sentence can trip several checks at once. Treat that as one underlying problem, not several fixes applied in sequence — patching the weak modifier, then the abstract noun, then the trailing clause leaves a sentence rewritten three times over, each pass justified alone.
+A sentence can trip several checks at once. Treat that as one underlying problem, not several fixes applied in sequence: patching the weak modifier, then the abstract noun, then the trailing clause leaves a sentence rewritten three times over, each pass justified alone.
 
 Instead, find what the sentence is actually missing (usually a named actor, mechanism, or number) and rewrite once. Re-read before checking whether any originally flagged problem remains.
 
@@ -34,7 +26,7 @@ Remove a word or phrase when it adds no meaning, precision, tone, or useful rhyt
 
 Bad: "It is important to note that the service can restart automatically." Better: "The service can restart automatically."
 
-Do not shorten a sentence merely because a shorter version exists.
+Shorten a sentence only when it fixes a specific problem.
 
 ## Replace vague claims with useful information
 
@@ -46,7 +38,7 @@ Bad: "The API provides a seamless developer experience." Better: "The API return
 
 Bad: "Startup is significantly faster." Better: "Startup time falls from 4.2 seconds to 1.8 seconds."
 
-Do not invent evidence. If the text does not support a stronger statement, keep an appropriately qualified claim or remove it.
+Use only evidence present in the text. If it doesn't support a stronger statement, keep an appropriately qualified claim or remove it.
 
 Not flagged: "The API is fast enough for interactive use." No number is available, and the claim is honestly scoped to "fast enough," not "fast."
 
@@ -78,7 +70,7 @@ Bad: "The system provides concurrency control." Better: "Each worker can hold on
 
 Warning signs: coordination, optimization, orchestration, enablement, improvement, enhancement, alignment, management, handling, support.
 
-Do not replace an abstraction when the abstraction itself is the subject.
+Keep an abstraction when it is the subject itself.
 
 Not flagged: "The service exposes a management API for rotating credentials." "Management" names the subject itself here, not a vague benefit.
 
@@ -118,7 +110,7 @@ Keep the contrast when correcting a likely misunderstanding or distinguishing tw
 
 Not flagged: "This isn't a cache. It's the system of record." The distinction is real: callers who assumed they could lose this data without consequence need to know they're wrong.
 
-## Do not manufacture groups
+## Size groups to the content
 
 Flag lists whose structure appears driven by cadence rather than content. Symptoms: adding a third adjective to complete a trio, forcing three benefits where only two are supported, splitting one idea into three near-synonyms.
 
@@ -126,7 +118,7 @@ Bad: "The change makes the system faster, cleaner, and more efficient." Better: 
 
 Use however many items the content requires.
 
-## Do not invent false ranges
+## Keep ranges on a real scale
 
 Flag "from X to Y" phrasing when X and Y don't sit on a meaningful scale.
 
@@ -152,7 +144,7 @@ Bad: "Types remain closely aligned with the schema." Better: "Renaming a column 
 
 Bad: "The system provides robust concurrency control." Better: "A worker must acquire the lease before processing the task."
 
-Test: could this sentence appear unchanged in documentation for many unrelated products? If yes, check whether a project-specific fact can replace it. Do not force specificity when the text is intentionally describing a general concept.
+Test: could this sentence appear unchanged in documentation for many unrelated products? If yes, check whether a project-specific fact can replace it. Keep the general statement when the text is intentionally describing a general concept.
 
 ## Use active voice when it clarifies responsibility
 
@@ -160,7 +152,15 @@ Flag passive voice when naming the actor would make the sentence clearer.
 
 Bad: "Queries are validated before execution." Better: "The compiler validates queries before execution."
 
-Keep passive voice when the actor is unknown, the actor does not matter, the receiver is the subject readers care about, or naming the actor makes the sentence worse. Do not convert passive voice mechanically.
+Keep passive voice when the actor is unknown, the actor does not matter, the receiver is the subject readers care about, or naming the actor makes the sentence worse.
+
+## Frame instructions positively
+
+Flag a prohibition ("do not X", "never X", "don't X") when a positive instruction states the same rule.
+
+Bad: "Do not commit directly to main." Better: "Open a pull request for changes to main."
+
+Keep the negative form when no positive instruction covers the same ground, or when it warns against a specific failure mode.
 
 ## Replace weak modifiers when the text can be more exact
 
@@ -178,7 +178,7 @@ Not flagged: "The rollout was easy for us, but each team should judge that for t
 
 Flag a sentence when its subject changes unnoticed, several clauses compete for attention, qualifications bury the main point, a pronoun has an unclear referent, or the reader must re-read it to understand the structure.
 
-Split or reorder only enough to fix the problem. Do not split a sentence merely because it is long. Do not enforce one idea per sentence — related ideas can share a sentence when their relationship is clear.
+Split or reorder only enough to fix the problem. Related ideas can share one sentence, even a long one, when their relationship is clear.
 
 ## Remove canned conversational language
 
@@ -186,9 +186,9 @@ Flag stock phrases that add politeness, enthusiasm, or structure without adding 
 
 Bad: "Great question. Here's a breakdown of how the cache works." Better: "The cache stores each result for five minutes."
 
-Keep conversational language when it serves the relationship, tone, or task. Do not replace one stock phrase with another.
+Keep conversational language when it serves the relationship, tone, or task. Otherwise replace it with real content.
 
-## Do not invent personality
+## Match personality to the source
 
 Flag additions that introduce a stance or manner the writer did not express. Examples: opinions, jokes, irritation, enthusiasm, skepticism, slang, first-person commentary, deliberate roughness, filler such as "honestly", "frankly", "actually", or "kind of".
 
@@ -198,7 +198,7 @@ Keep personality already present in the source unless it conflicts with the requ
 
 ## Preserve useful repetition
 
-Do not remove repetition automatically. Keep it when it makes a reference unambiguous, reinforces an intentional point, preserves rhythm, avoids a worse synonym, or keeps technical terminology consistent. Flag repetition only when it repeats information without helping the reader.
+Keep repetition when it makes a reference unambiguous, reinforces an intentional point, preserves rhythm, avoids a worse synonym, or keeps technical terminology consistent. Flag it only when it repeats information without helping the reader.
 
 ## Remove conclusions that add no new information
 
@@ -212,21 +212,21 @@ If the previous sentence already completes the point, end there.
 
 Flag structure that makes simple material harder to read. Examples: an introduction before a short answer, headings for one or two sentences, a summary that repeats the body, numbered lists where order does not matter, automatic pros-and-cons sections, equal space for points of unequal importance, deep bullet nesting, labels that repeat the sentence after them, excessive boldface.
 
-Do not remove structure that helps the reader scan, compare, follow steps, or find information.
+Keep structure that helps the reader scan, compare, follow steps, or find information.
 
 ## Use punctuation for syntax, not decoration
 
-Do not ban em dashes, parentheses, colons, semicolons, or fragments. Flag punctuation when the same construction repeats often, punctuation substitutes for a clearer sentence structure, an aside interrupts the main point, or emphasis depends on punctuation rather than wording. Keep punctuation when it is the clearest way to express the sentence.
+Allow em dashes, parentheses, colons, semicolons, and fragments. Flag punctuation when the same construction repeats often, punctuation substitutes for a clearer sentence structure, an aside interrupts the main point, or emphasis depends on punctuation rather than wording. Keep punctuation when it is the clearest way to express the sentence.
 
 ## Preserve uncertainty when it matters
 
-Do not strengthen a claim merely to make the prose sound cleaner. Keep words such as may, likely, approximately, usually, appears, suggests when they represent real uncertainty. Flag hedging only when several qualifiers express the same uncertainty.
+Preserve a claim's original strength while tightening prose. Keep words such as may, likely, approximately, usually, appears, suggests when they represent real uncertainty. Flag hedging only when several qualifiers express the same uncertainty.
 
 Bad: "This could potentially possibly cause delays." Better: "This could cause delays."
 
 ## Preserve distinctions
 
-Do not replace precise terms with simpler words if doing so changes the meaning.
+Keep a precise term when a simpler word would change the meaning.
 
 Bad edit: "The function is idempotent." to "The function is safe." "Safe" is broader and less precise.
 
@@ -249,11 +249,11 @@ Revert edits that do not have a clear answer to the first question. Stop when ev
 
 Source (a draft PR description): "It is important to note that the new scheduler significantly improves coordination between workers, ensuring robust concurrency control. The system leverages a lease-based mechanism to facilitate task ownership, effectively preventing duplicate execution. The lease is idempotent, so a retried acquisition after a timeout returns the same owner. This isn't just an optimization, it's a fundamental rearchitecture of how the platform handles distributed work. Validation failures are surfaced clearly, and the framework serves as a testament to the team's engineering rigor. The migration is extremely simple and can be completed in a few steps."
 
-The specifics missing from it (lease timing, the status code, the config value) already exist elsewhere in the source material the drafter had open — the edit's job is to pull them in, not invent them.
+The specifics missing from it (lease timing, the status code, the config value) already exist elsewhere in the source material the drafter had open: the edit's job is to pull them in, not invent them.
 
-1. Sentence 1 trips four checks at once (empty framing, unmeasured modifier, abstract noun, restating clause) — treat as one problem: no mechanism has been named. Fix once by naming it.
+1. Sentence 1 trips four checks at once (empty framing, unmeasured modifier, abstract noun, restating clause). Treat as one problem: no mechanism has been named. Fix once by naming it.
 2. Sentence 2 restates the mechanism sentence 1 now names. Cut it; the fix for a redundant sentence is deletion, not a better sentence.
-3. Sentence 3 has no problem. "Idempotent" is the precise term. Leave it — not every sentence in a flawed paragraph needs an edit.
+3. Sentence 3 has no problem. "Idempotent" is the precise term. Leave it. Not every sentence in a flawed paragraph needs an edit.
 4. Sentence 4's contrast doesn't correct a misconception the reader is likely to have; it manufactures one for emphasis. Replace it with the actual change.
 5. Sentence 5 has a vague, passive claim joined to a puffery clause with no information to recover. Name the actor and the behavior; cut the puffery outright.
 6. Sentence 6 stacks an unmeasured modifier with a vague quantifier. Replace both with the actual number.
