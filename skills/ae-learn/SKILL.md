@@ -20,3 +20,5 @@ Use ordinary Markdown and the project's language, centered on reusable project k
 Run learning from an explicit request and keep capture scoped to the nearest solution document.
 
 Load [`garden.md`](recipes/garden.md) for an explicit `garden [scope]` request. A normal learning may recommend a narrow garden scope for a future run.
+
+Before finishing, run the `unslop` skill on the written document.

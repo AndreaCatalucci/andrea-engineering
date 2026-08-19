@@ -7,7 +7,7 @@ description: Perform a requested Git or pull-request action. Use for commits, pu
 
 Perform the Git or PR state change the user requested.
 
-Before writing, inspect the branch, working tree, diff, and remote. Preserve unrelated changes and stage the intended change set. Use a concise commit message and PR description focused on value.
+Before writing, inspect the branch, working tree, diff, and remote. Preserve unrelated changes and stage the intended change set. Use a concise commit message and PR description focused on value. Run the `unslop` skill on the PR description before posting it.
 
 Commit requests use this core flow. Broader actions load the matching recipe:
 

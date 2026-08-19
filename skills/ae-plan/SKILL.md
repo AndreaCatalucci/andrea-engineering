@@ -21,3 +21,5 @@ Include:
 - a clear completion condition.
 
 Answer atomic work inline. Write multi-step work to one canonical file under `docs/plans/`. The plan itself is the deliverable.
+
+Before finishing, run the `unslop` skill on the written plan.

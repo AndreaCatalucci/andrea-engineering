@@ -24,4 +24,4 @@ Challenge contradictions and unnecessary scope directly. Conclude questioning wh
 
 Finish with confirmed requirements and marked remaining blockers.
 
-Stay in chat by default. Preserve the result under `docs/plans/` on request. Write or update `STRATEGY.md` when requested.
+Before finishing, run the `unslop` skill on the summary.
