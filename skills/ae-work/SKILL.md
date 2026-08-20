@@ -11,8 +11,9 @@ Implement the requested outcome with the least process that keeps the change sou
 2. If a missing product decision would materially change the result, ask. Otherwise make the smallest reasonable assumption and state it briefly.
 3. Implement the complete requested behavior using existing patterns. Remove complexity when that is simpler than extending it.
 4. Run existing checks directly relevant to the changed behavior.
-5. Report what changed, what was checked, and any real limitation.
-6. Run ae-review on the changes. Skip only trivial changes.
+5. If a Delivery Map (from `ae-plan`, under `docs/plans/`) guided this work, mark the slices or done criteria just completed as done in that file.
+6. Report what changed, what was checked, and any real limitation.
+7. Run ae-review on the changes. Skip only trivial changes.
 
 The user's request defines which adjacent actions—planning, review, browser work, and Git operations—join implementation. A trajectory change is a lesson.
 
