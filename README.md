@@ -19,25 +19,10 @@ Each `SKILL.md` contains the complete default workflow. Branch-specific behavior
 
 ## Install this checkout
 
-Install or refresh every supported CLI on your `PATH`:
+Install via [`npx skills`](https://www.npmjs.com/package/skills):
 
 ```bash
-scripts/install
-```
-
-Limit the hosts or preview commands:
-
-```bash
-scripts/install --codex --claude --grok
-scripts/install --dry-run
-```
-
-Dedicated installers are also available:
-
-```bash
-scripts/install-codex-plugin
-scripts/install-claude-plugin
-scripts/install-grok-plugin
+npx skills add AndreaCatalucci/andrea-engineering
 ```
 
 Restart the agent or begin a new session after refreshing. Existing sessions keep skills already loaded into their context.
