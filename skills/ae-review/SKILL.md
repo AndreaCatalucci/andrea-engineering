@@ -22,6 +22,6 @@ Apply fixes when the user requests them.
 
 Load at most one matching recipe:
 
-- [`document.md`](recipes/document.md) for requirements, plans, or specifications;
+- [`document.md`](recipes/document.md) for an Opportunity Brief, Concept Notebook, Delivery Map, or other specification;
 - [`browser.md`](recipes/browser.md) for a real web flow;
 - [`xcode.md`](recipes/xcode.md) for an Apple project.

@@ -4,14 +4,16 @@ Eight engineering skills for Codex, Claude Code, and Grok Build.
 
 | Skill | Purpose |
 |---|---|
-| `ae-ideate` | Explore and compare grounded options. |
-| `ae-brainstorm` | Turn an unclear idea into confirmed requirements. |
-| `ae-plan` | Write the simplest useful implementation plan. |
+| `ae-ideate` | A problem with no solution yet. Generate ideas. |
+| `ae-challenge` | A candidate solution that needs challenging. |
+| `ae-plan` | Problem and solution are settled enough. See how it lands in this codebase. |
 | `ae-work` | Implement a request or plan. |
 | `ae-debug` | Find and fix the cause of failing behavior. |
 | `ae-review` | Report material problems in code or another artifact. |
 | `ae-ship` | Commit, push, open or update PRs, and monitor them. |
 | `ae-learn` | Capture a lesson when the trajectory changes, or garden existing ones. |
+
+Reach for the skill that matches the current question. A problem with no solution starts at `ae-ideate`. A candidate that needs challenging starts at `ae-challenge`. A settled solution starts at `ae-plan`. A trivial change can start at `ae-work`. An exploration that ends in no still leaves an Opportunity Brief.
 
 Each `SKILL.md` contains the complete default workflow. Branch-specific behavior lives in a simple `recipes/` file and loads when the request matches it.
 
@@ -45,10 +47,10 @@ Restart the agent or begin a new session after refreshing. Existing sessions kee
 Codex uses `$skill-name`; Claude Code and Grok Build use `/skill-name` or `/andrea-engineering:skill-name`.
 
 ```text
-$ae-ideate ways to simplify this feature
-$ae-brainstorm help me define this idea
-$ae-plan plan the confirmed change
-$ae-work perform the plan
+$ae-work add a timeout to the retry helper
+$ae-challenge does this idea hold
+$ae-ideate is this worth doing
+$ae-plan slice the leading concept
 $ae-debug find this regression
 $ae-review review the current diff
 $ae-ship open a PR

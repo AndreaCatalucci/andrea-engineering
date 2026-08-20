@@ -6,15 +6,15 @@
         "skills": [
           {
             "name": "ae-ideate",
-            "description": "Generate and evaluate grounded options for open-ended exploration."
+            "description": "Generate ideas for an unsolved problem."
           },
           {
-            "name": "ae-brainstorm",
-            "description": "Turn an unclear idea into confirmed requirements through interactive questions."
+            "name": "ae-challenge",
+            "description": "Challenge a candidate solution against the current product."
           },
           {
             "name": "ae-plan",
-            "description": "Produce the simplest implementation plan that settles consequential choices."
+            "description": "See how a settled solution lands in this codebase."
           },
           {
             "name": "ae-work",
