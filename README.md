@@ -9,7 +9,7 @@ Eight engineering skills for Codex, Claude Code, and Grok Build.
 | `ae-plan` | Problem and solution are settled enough. See how it lands in this codebase. |
 | `ae-work` | Implement a request or plan. |
 | `ae-debug` | Find and fix the cause of failing behavior. |
-| `ae-review` | Report material problems in code or another artifact. |
+| `ae-review` | Report material problems in code or another artifact using independent reviewers. |
 | `ae-ship` | Commit, push, open or update PRs, and monitor them. |
 | `ae-learn` | Capture a lesson when the trajectory changes, or garden existing ones. |
 
