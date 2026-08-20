@@ -29,7 +29,7 @@ Restart the agent or begin a new session after refreshing. Existing sessions kee
 
 ## Use
 
-Codex uses `$skill-name`; Claude Code and Grok Build use `/skill-name` or `/andrea-engineering:skill-name`.
+Codex uses `$skill-name`; Claude Code and Grok Build use `/skill-name`.
 
 ```text
 $ae-work add a timeout to the retry helper
@@ -48,8 +48,6 @@ Natural language controls optional behavior. For example, asking `ae-work` for a
 ## Change a skill
 
 Edit its `skills/<name>/SKILL.md`. Keep the entrypoint focused and put branch-specific behavior in one plainly named file under `recipes/`.
-
-Plugin metadata lives under `.codex-plugin/`, `.claude-plugin/`, `.grok-plugin/`, and `.agents/plugins/`.
 
 ## License
 

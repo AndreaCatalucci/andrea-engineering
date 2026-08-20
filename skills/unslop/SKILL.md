@@ -9,10 +9,10 @@ description: Edit prose for clarity, precision, economy, and consistency. Run on
 
 1. Inventory every user-visible string this turn created or changed. Chat is one item. Templates, empty states, help panels, button labels, and test assertions of copy are others. If you unslopped the wrap-up and not the h1, you failed.
 2. Scan each item for the problems below.
-3. Rewrite only the flagged text.
+3. Rewrite only the flagged text. Pull in an actor, mechanism, or number already known from this turn or the surrounding text; do not invent one.
 4. Stop after the final pass.
 
-Each check below flags a specific problem. Apply it only when a sentence actually has that problem.
+Each check below flags a specific problem. Apply it only when a sentence actually has that problem. Extra words are one class of problem. Compression is another: a verdict, diagnosis, or contrast that omits the fact the reader needs.
 
 ## Resolve overlapping checks
 
@@ -30,13 +30,13 @@ Bad: "It is important to note that the service can restart automatically." Bette
 
 Flag a claim when it describes quality without telling the reader what causes it, what changed, or how large the effect is. Examples: seamless, robust, powerful, intuitive, efficient, significant, substantial, flexible, scalable.
 
-Replace the claim with a fact, mechanism, example, or number when the text provides one.
+Replace the claim with a fact, mechanism, example, or number when one is already known.
 
 Bad: "The API provides a seamless developer experience." Better: "The API returns typed errors and exposes the generated SQL through `.toSQL()`."
 
 Bad: "Startup is significantly faster." Better: "Startup time falls from 4.2 seconds to 1.8 seconds."
 
-Use only evidence present in the text. If it doesn't support a stronger statement, keep an appropriately qualified claim or remove it.
+If no such fact is known, keep an appropriately qualified claim or remove it.
 
 Not flagged: "The API is fast enough for interactive use." No number is available, and the claim is honestly scoped to "fast enough," not "fast."
 
@@ -106,7 +106,17 @@ Bad: "This isn't just a cache. It's a coordination layer." Better: "The cache al
 
 Keep the contrast when correcting a likely misunderstanding or distinguishing two real alternatives.
 
-Not flagged: "This isn't a cache. It's the system of record." The distinction is real: callers who assumed they could lose this data without consequence need to know they're wrong.
+Not flagged: "This isn't a cache you can drop: deleting it loses customer records." The distinction is real, and the sentence names the consequence that makes it true.
+
+## Qualify a verdict with the fact that makes it true
+
+Flag a conclusion, diagnosis, or contrast when it names the verdict without the fact that distinguishes it from the likely alternative. The terms can be specific and the contrast real; the sentence is still unqualified if a reader cannot tell why the named verdict is true rather than the alternative.
+
+Common forms: "That's X, not Y", "This is expected", "This is working as designed", a label applied to an observation.
+
+Bad: "That is the leak guard working, not a failed inject." Better: "That's not a failed inject: the injection worked, but the child leaked the value into its own output, so the leak guard caught it and shut the process down."
+
+Keep a short verdict when this sentence is only labeling evidence the reader just produced. If the sentence is correcting a misreading, it needs the distinguishing fact even when a nearby sentence describes the behavior.
 
 ## Size groups to the content
 
@@ -223,7 +233,7 @@ Review each edit and ask:
 1. What specific problem did this edit fix?
 2. Did the new wording preserve the original meaning?
 3. Did it preserve the writer's tone?
-4. Did it add any claim, opinion, or detail that was not present?
+4. Did it invent a claim, opinion, or detail that was not in this turn's work or the surrounding text?
 5. Is the new wording more precise or easier to understand?
 6. Did a rule trigger the change, or did I change it because I preferred another style?
 
@@ -235,18 +245,21 @@ This turn produced:
 
 - h1: "Research support — not a broker"
 - empty state: "You place the trades. Watchlists stay on this device."
+- error copy: "That is the device lock, not a sign-in failure."
 - chat wrap-up: "Added the empty-state copy."
 
 Unslopping only the wrap-up fails the inventory.
 
 1. The h1 trips two checks: an em dash used for emphasis, and a contrast that does not correct a likely misunderstanding. Rewrite once: "Research support."
 2. "You place the trades" restates the heading. Cut it. Keep "Watchlists stay on this device."
-3. The wrap-up has no problem.
+3. The error copy's contrast is real, but the verdict has no distinguishing fact. The surrounding help text already says the device locks after three failed unlocks. Pull that in: "That's not a sign-in failure: the device locked after three failed unlocks."
+4. The wrap-up has no problem.
 
 Edited:
 
 - h1: "Research support"
 - empty state: "Watchlists stay on this device."
+- error copy: "That's not a sign-in failure: the device locked after three failed unlocks."
 - chat wrap-up: "Added the empty-state copy."
 
-Copy lived in files. Checks that fired: punctuation used for emphasis; contrast that does not correct a misunderstanding; repetition that does not help the reader.
+Copy lived in files. Checks that fired: punctuation used for emphasis; contrast that does not correct a misunderstanding; repetition that does not help the reader; a verdict without the fact that distinguishes it.
