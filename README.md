@@ -5,7 +5,7 @@ Eight engineering skills for Codex, Claude Code, and Grok Build.
 | Skill | Purpose |
 |---|---|
 | `ae-ideate` | A problem with no solution yet. Generate ideas. |
-| `ae-challenge` | A candidate solution that needs challenging. |
+| `ae-explore` | A solution direction. Explore how it could work. |
 | `ae-plan` | Problem and solution are settled enough. See how it lands in this codebase. |
 | `ae-work` | Implement a request or plan. |
 | `ae-debug` | Find and fix the cause of failing behavior. |
@@ -13,7 +13,7 @@ Eight engineering skills for Codex, Claude Code, and Grok Build.
 | `ae-ship` | Commit, push, open or update PRs, and monitor them. |
 | `ae-learn` | Capture a lesson when the trajectory changes, or garden existing ones. |
 
-Reach for the skill that matches the current question. A problem with no solution starts at `ae-ideate`. A candidate that needs challenging starts at `ae-challenge`. A settled solution starts at `ae-plan`. A trivial change can start at `ae-work`. An exploration that ends in no still leaves an Opportunity Brief.
+Reach for the skill that matches the current question. A problem with no solution starts at `ae-ideate`. A solution direction to open up starts at `ae-explore`. A settled solution starts at `ae-plan`. A trivial change can start at `ae-work`. An exploration that ends in no still leaves an Opportunity Brief.
 
 Each `SKILL.md` contains the complete default workflow. Branch-specific behavior lives in a simple `recipes/` file and loads when the request matches it.
 
@@ -48,7 +48,7 @@ Codex uses `$skill-name`; Claude Code and Grok Build use `/skill-name` or `/andr
 
 ```text
 $ae-work add a timeout to the retry helper
-$ae-challenge does this idea hold
+$ae-explore this solution
 $ae-ideate is this worth doing
 $ae-plan slice the leading concept
 $ae-debug find this regression

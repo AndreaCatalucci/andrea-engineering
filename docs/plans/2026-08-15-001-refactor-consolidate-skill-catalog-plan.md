@@ -12,7 +12,7 @@ execution: code
 
 ## Goal
 
-Replace the 30-skill catalog with eight small, human-readable skills: `ae-ideate`, `ae-challenge`, `ae-plan`, `ae-work`, `ae-debug`, `ae-review`, `ae-ship`, and `ae-learn`.
+Replace the 30-skill catalog with eight small, human-readable skills: `ae-ideate`, `ae-explore`, `ae-plan`, `ae-work`, `ae-debug`, `ae-review`, `ae-ship`, and `ae-learn`.
 
 **Source:** Confirmed catalog and simplification decisions.
 **Input:** Current skills, packaging, and README.
@@ -36,7 +36,7 @@ Replace the 30-skill catalog with eight small, human-readable skills: `ae-ideate
 | Skill | Keep only | Default output budget |
 |---|---|---:|
 | `ae-ideate` | Inspect context, generate distinct options, compare, recommend. No questions. | 700 words |
-| `ae-challenge` | Ask one useful question at a time, resolve decisions, summarize confirmed requirements. | 100 words per turn; 500 final |
+| `ae-explore` | Ask one useful question at a time, resolve decisions, summarize confirmed requirements. | 100 words per turn; 500 final |
 | `ae-plan` | Inspect the relevant code, settle consequential choices, write 2-4 outcome steps. | 700 words |
 | `ae-work` | Read the request or plan, implement it, run only directly relevant existing checks, report. Autonomous work may include plan and ship when requested. | 60-word updates; 150 final |
 | `ae-debug` | Reproduce, isolate the cause, fix when authorized, run the narrow regression check, report cause and result. | 200 words |
@@ -44,7 +44,7 @@ Replace the 30-skill catalog with eight small, human-readable skills: `ae-ideate
 | `ae-ship` | Perform only the requested commit, push, PR, feedback, or watch action and return its state or URL. | 120 words |
 | `ae-learn` | Capture one reusable lesson. Run `garden [scope]` only when explicitly requested to merge, prune, or refresh existing lessons. | 600-word lesson; 300-word garden report |
 
-Project-fit exploration belongs to `ae-ideate`. Product-direction questions belong to `ae-challenge`. `ae-challenge` writes `STRATEGY.md` only when asked.
+Project-fit exploration belongs to `ae-ideate`. Product-direction questions belong to `ae-explore`. `ae-explore` writes `STRATEGY.md` only when asked.
 
 Absorb `lfg`, optimize, simplify, polish, dogfood, and worktree into `ae-work`; document, browser, and Xcode review into `ae-review`; commit, PR feedback, and PR watching into `ae-ship`; and compound refresh into `ae-learn garden`. Delete explain, POV, product pulse, promote, Proof, Riffrec analysis, setup, strategy, and sweep.
 
