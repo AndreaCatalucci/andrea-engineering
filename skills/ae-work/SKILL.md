@@ -12,6 +12,7 @@ Implement the requested outcome with the least process that keeps the change sou
 3. Implement the complete requested behavior using existing patterns. Remove complexity when that is simpler than extending it.
 4. Run existing checks directly relevant to the changed behavior.
 5. Report what changed, what was checked, and any real limitation.
+6. Run ae-review on the changes performed. Skip this step only in case of trivial changes.
 
 The user's request defines which adjacent actions—planning, review, browser work, and Git operations—join implementation. A trajectory change is a lesson.
 
