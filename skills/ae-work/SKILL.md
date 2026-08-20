@@ -1,6 +1,6 @@
 ---
 name: ae-work
-description: Implement a concrete request or plan end to end. Use for building or changing code; use ae-debug when the main problem is discovering why something fails.
+description: Implement a concrete request or plan. Use for building or changing code; use ae-debug when the main problem is discovering why something fails.
 ---
 
 # Work
@@ -13,7 +13,7 @@ Implement the requested outcome with the least process that keeps the change sou
 4. Run existing checks directly relevant to the changed behavior.
 5. Report what changed, what was checked, and any real limitation.
 
-The user's request defines which adjacent actions—planning, review, browser work, learning, and Git operations—join implementation.
+The user's request defines which adjacent actions—planning, review, browser work, and Git operations—join implementation. A trajectory change is a lesson.
 
 Load at most one matching file from `recipes/` before acting:
 
@@ -24,4 +24,4 @@ Load at most one matching file from `recipes/` before acting:
 - [`dogfood.md`](recipes/dogfood.md) for real-flow product use;
 - [`worktree.md`](recipes/worktree.md) for isolation.
 
-Add another recipe when the request genuinely crosses that boundary. Recipes refine this loop within the user's granted authority.
+Load another recipe only when the request actually crosses that boundary.

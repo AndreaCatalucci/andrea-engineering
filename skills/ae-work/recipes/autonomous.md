@@ -9,4 +9,4 @@ Determine the requested finish line from their words: local implementation, comm
 3. Fix clear failures within scope. Product decisions, unsafe external changes, missing authority, and repeated non-convergence pause the run for user direction.
 4. Ship to the finish line the user requested. Monitor CI or feedback when included in the request.
 
-Use the stages required by the request. Keep progress updates focused on decisions, blockers, and the final state.
+Keep progress updates focused on decisions, blockers, and the final state.

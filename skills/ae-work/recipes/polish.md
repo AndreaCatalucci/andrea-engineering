@@ -6,4 +6,4 @@ Start the existing development environment and open the affected surface. Focus 
 
 Extend the product's existing design language across the requested surface.
 
-Complete the pass when the requested surface feels coherent or further change needs a product decision. Report the visible improvements and any unresolved decision in a few lines.
+Complete the pass when a second pass would only reshuffle taste, or further change needs a product decision. Run the `unslop` skill. Report the visible improvements and any unresolved decision in a few lines.

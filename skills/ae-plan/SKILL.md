@@ -8,8 +8,8 @@ description: Produce the simplest implementation plan that settles consequential
 Settle the consequential decisions that let implementation begin.
 
 1. Read the request or requirements and inspect the smallest relevant part of the repository.
-2. Identify choices whose wrong answer would cause meaningful rework. Resolve them from evidence or ask one focused question when the user must decide.
-3. Prefer existing seams and delete unnecessary abstraction from the proposed approach.
+2. Identify choices whose wrong answer would cause meaningful rework. Resolve them from evidence, or ask one focused question when the user must decide.
+3. Prefer existing seams and the least abstraction that fits.
 4. Write 2-4 outcome-sized work steps and name useful starting areas.
 
 Include:
@@ -22,4 +22,4 @@ Include:
 
 Answer atomic work inline. Write multi-step work to one canonical file under `docs/plans/`. The plan itself is the deliverable.
 
-Before finishing, run the `unslop` skill on the written plan.
+Before finishing, run the `unslop` skill.

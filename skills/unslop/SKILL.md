@@ -1,16 +1,16 @@
 ---
 name: unslop
-description: Edit prose for clarity, precision, economy, and consistency while preserving meaning and tone. Must always apply.
+description: Edit prose for clarity, precision, economy, and consistency. Run on every string a human will read this turn before you show it, and when the user says unslop.
 ---
 
 # Unslop
 
 ## Process
 
-1. Read the text before editing.
-2. Scan for the problems below.
-3. Rewrite only the flagged text. Preserve meaning, tone, terminology, and formality.
-4. Finish with the final pass below.
+1. Inventory every user-visible string this turn created or changed. Chat is one item. Templates, empty states, help panels, button labels, and test assertions of copy are others. If you unslopped the wrap-up and not the h1, you failed.
+2. Scan each item for the problems below.
+3. Rewrite only the flagged text.
+4. Stop after the final pass.
 
 Each check below flags a specific problem. Apply it only when a sentence actually has that problem.
 
@@ -100,7 +100,7 @@ Keep framing when it supplies context the reader actually needs.
 
 ## Use contrast only when the contrast matters
 
-Flag constructions that create emphasis by inventing an unnecessary opposition. Common forms: "This isn't just X. It's Y.", "Not only X, but Y.", "Rather than X, Y.", "It's less about X and more about Y."
+Flag constructions that create emphasis by inventing an unnecessary opposition. Common forms: "This isn't just X. It's Y.", "Not only X, but Y.", "Rather than X, Y.", "It's less about X and more about Y.", "It's X, not Y."
 
 Bad: "This isn't just a cache. It's a coordination layer." Better: "The cache also coordinates ownership between workers."
 
@@ -186,14 +186,6 @@ Bad: "Great question. Here's a breakdown of how the cache works." Better: "The c
 
 Keep conversational language when it serves the relationship, tone, or task. Otherwise replace it with real content.
 
-## Match personality to the source
-
-Flag additions that introduce a stance or manner the writer did not express. Examples: opinions, jokes, irritation, enthusiasm, skepticism, slang, first-person commentary, deliberate roughness, filler such as "honestly", "frankly", "actually", or "kind of".
-
-Bad, when the source expressed no judgment: "I find it pretty unsettling that the process keeps running." Better: "The process keeps running after the interface closes."
-
-Keep personality already present in the source unless it conflicts with the requested tone.
-
 ## Preserve useful repetition
 
 Keep repetition when it makes a reference unambiguous, reinforces an intentional point, preserves rhythm, avoids a worse synonym, or keeps technical terminology consistent. Flag it only when it repeats information without helping the reader.
@@ -214,13 +206,7 @@ Keep structure that helps the reader scan, compare, follow steps, or find inform
 
 ## Use punctuation for syntax, not decoration
 
-Allow em dashes, parentheses, colons, semicolons, and fragments. Flag punctuation when the same construction repeats often, punctuation substitutes for a clearer sentence structure, an aside interrupts the main point, or emphasis depends on punctuation rather than wording. Keep punctuation when it is the clearest way to express the sentence.
-
-## Preserve uncertainty when it matters
-
-Preserve a claim's original strength while tightening prose. Keep words such as may, likely, approximately, usually, appears, suggests when they represent real uncertainty. Flag hedging only when several qualifiers express the same uncertainty.
-
-Bad: "This could potentially possibly cause delays." Better: "This could cause delays."
+Flag punctuation when the same construction repeats often, punctuation substitutes for a clearer sentence structure, an aside interrupts the main point, or emphasis depends on punctuation rather than wording. Keep punctuation when it is the clearest way to express the sentence.
 
 ## Preserve distinctions
 
@@ -245,17 +231,22 @@ Revert edits that do not have a clear answer to the first question. Stop when ev
 
 ## Worked example
 
-Source (a draft PR description): "It is important to note that the new scheduler significantly improves coordination between workers, ensuring robust concurrency control. The system leverages a lease-based mechanism to facilitate task ownership, effectively preventing duplicate execution. The lease is idempotent, so a retried acquisition after a timeout returns the same owner. This isn't just an optimization, it's a fundamental rearchitecture of how the platform handles distributed work. Validation failures are surfaced clearly, and the framework serves as a testament to the team's engineering rigor. The migration is extremely simple and can be completed in a few steps."
+This turn produced:
 
-The specifics missing from it (lease timing, the status code, the config value) already exist elsewhere in the source material the drafter had open: the edit's job is to pull them in, not invent them.
+- h1: "Research support — not a broker"
+- empty state: "You place the trades. Watchlists stay on this device."
+- chat wrap-up: "Added the empty-state copy."
 
-1. Sentence 1 trips four checks at once (empty framing, unmeasured modifier, abstract noun, restating clause). Treat as one problem: no mechanism has been named. Fix once by naming it.
-2. Sentence 2 restates the mechanism sentence 1 now names. Cut it; the fix for a redundant sentence is deletion, not a better sentence.
-3. Sentence 3 has no problem. "Idempotent" is the precise term. Leave it. Not every sentence in a flawed paragraph needs an edit.
-4. Sentence 4's contrast doesn't correct a misconception the reader is likely to have; it manufactures one for emphasis. Replace it with the actual change.
-5. Sentence 5 has a vague, passive claim joined to a puffery clause with no information to recover. Name the actor and the behavior; cut the puffery outright.
-6. Sentence 6 stacks an unmeasured modifier with a vague quantifier. Replace both with the actual number.
+Unslopping only the wrap-up fails the inventory.
 
-Edited: "The new scheduler assigns each worker a lease before it starts a task, so two workers can't claim the same task at once. The lease is idempotent, so a retried acquisition after a timeout returns the same owner. The scheduler also changes how the platform tracks distributed work: workers report status through the lease instead of a central queue. When validation fails, the process exits with status 1 and prints the failing field. The migration requires changing one configuration value."
+1. The h1 trips two checks: an em dash used for emphasis, and a contrast that does not correct a likely misunderstanding. Rewrite once: "Research support."
+2. "You place the trades" restates the heading. Cut it. Keep "Watchlists stay on this device."
+3. The wrap-up has no problem.
 
-Final pass: every sentence traces to a named problem (sentence 3's is "none found," which is valid); meaning, tone, and claims stay within what the source material supports; nothing is a rewrite for cadence alone.
+Edited:
+
+- h1: "Research support"
+- empty state: "Watchlists stay on this device."
+- chat wrap-up: "Added the empty-state copy."
+
+Copy lived in files. Checks that fired: punctuation used for emphasis; contrast that does not correct a misunderstanding; repetition that does not help the reader.

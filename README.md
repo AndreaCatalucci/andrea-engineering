@@ -11,7 +11,7 @@ Eight engineering skills for Codex, Claude Code, and Grok Build.
 | `ae-debug` | Find and fix the cause of failing behavior. |
 | `ae-review` | Report material problems in code or another artifact. |
 | `ae-ship` | Commit, push, open or update PRs, and monitor them. |
-| `ae-learn` | Capture one reusable lesson or explicitly garden existing ones. |
+| `ae-learn` | Capture a lesson when the trajectory changes, or garden existing ones. |
 
 Each `SKILL.md` contains the complete default workflow. Branch-specific behavior lives in a simple `recipes/` file and loads when the request matches it.
 
