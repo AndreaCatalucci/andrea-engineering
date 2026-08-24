@@ -1,0 +1,6 @@
+interface:
+  display_name: "Coordinate Delivery"
+  short_description: "Coordinate plans across focused agent chats"
+  default_prompt: "Use $ae-coordinate to coordinate this delivery across focused chats."
+policy:
+  allow_implicit_invocation: false
