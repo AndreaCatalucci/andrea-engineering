@@ -118,14 +118,6 @@ Bad: "That is the leak guard working, not a failed inject." Better: "That's not 
 
 Keep a short verdict when this sentence is only labeling evidence the reader just produced. If the sentence is correcting a misreading, it needs the distinguishing fact even when a nearby sentence describes the behavior.
 
-## Size groups to the content
-
-Flag lists whose structure appears driven by cadence rather than content. Symptoms: adding a third adjective to complete a trio, forcing three benefits where only two are supported, splitting one idea into three near-synonyms.
-
-Bad: "The change makes the system faster, cleaner, and more efficient." Better: "The change cuts startup time and removes the extra configuration file."
-
-Use however many items the content requires.
-
 ## Keep ranges on a real scale
 
 Flag "from X to Y" phrasing when X and Y don't sit on a meaningful scale.
@@ -162,14 +154,6 @@ Bad: "Queries are validated before execution." Better: "The compiler validates q
 
 Keep passive voice when the actor is unknown, the actor does not matter, the receiver is the subject readers care about, or naming the actor makes the sentence worse.
 
-## Frame instructions positively
-
-Flag a prohibition ("do not X", "never X", "don't X") when a positive instruction states the same rule.
-
-Bad: "Do not commit directly to main." Better: "Open a pull request for changes to main."
-
-Keep the negative form when no positive instruction covers the same ground, or when it warns against a specific failure mode.
-
 ## Replace weak modifiers when the text can be more exact
 
 Flag modifiers that claim degree without showing it. Examples: significantly, substantially, dramatically, effectively, efficiently, easily, simply, clearly, obviously, extremely.
@@ -181,24 +165,6 @@ Bad: "The migration is extremely simple." Better: "The migration requires changi
 Keep the modifier when it carries meaning that the text cannot state more precisely.
 
 Not flagged: "The rollout was easy for us, but each team should judge that for their own setup." "Easy" reports a subjective experience explicitly scoped to "us"; no number would make it more precise without changing the claim.
-
-## Split sentences that make the reader backtrack
-
-Flag a sentence when its subject changes unnoticed, several clauses compete for attention, qualifications bury the main point, a pronoun has an unclear referent, or the reader must re-read it to understand the structure.
-
-Split or reorder only enough to fix the problem. Related ideas can share one sentence, even a long one, when their relationship is clear.
-
-## Remove canned conversational language
-
-Flag stock phrases that add politeness, enthusiasm, or structure without adding content. Examples: "Of course!", "Certainly!", "Great question.", "You're absolutely right.", "Here's a breakdown.", "The key takeaway is...", "Let's dive in.", "Let's unpack this.", "I hope this helps.", "Let me know if you'd like...".
-
-Bad: "Great question. Here's a breakdown of how the cache works." Better: "The cache stores each result for five minutes."
-
-Keep conversational language when it serves the relationship, tone, or task. Otherwise replace it with real content.
-
-## Preserve useful repetition
-
-Keep repetition when it makes a reference unambiguous, reinforces an intentional point, preserves rhythm, avoids a worse synonym, or keeps technical terminology consistent. Flag it only when it repeats information without helping the reader.
 
 ## Remove conclusions that add no new information
 
@@ -217,14 +183,6 @@ Keep structure that helps the reader scan, compare, follow steps, or find inform
 ## Use punctuation for syntax, not decoration
 
 Flag punctuation when the same construction repeats often, punctuation substitutes for a clearer sentence structure, an aside interrupts the main point, or emphasis depends on punctuation rather than wording. Keep punctuation when it is the clearest way to express the sentence.
-
-## Preserve distinctions
-
-Keep a precise term when a simpler word would change the meaning.
-
-Bad edit: "The function is idempotent." to "The function is safe." "Safe" is broader and less precise.
-
-Plain language is useful only when it remains accurate.
 
 ## Final pass
 
@@ -245,6 +203,7 @@ This turn produced:
 
 - h1: "Research support — not a broker"
 - empty state: "You place the trades. Watchlists stay on this device."
+- surrounding text: "The device fails after three failed unlocks."
 - error copy: "That is the device lock, not a sign-in failure."
 - chat wrap-up: "Added the empty-state copy."
 
@@ -252,14 +211,15 @@ Unslopping only the wrap-up fails the inventory.
 
 1. The h1 trips two checks: an em dash used for emphasis, and a contrast that does not correct a likely misunderstanding. Rewrite once: "Research support."
 2. "You place the trades" restates the heading. Cut it. Keep "Watchlists stay on this device."
-3. The error copy's contrast is real, but the verdict has no distinguishing fact. The surrounding help text already says the device locks after three failed unlocks. Pull that in: "That's not a sign-in failure: the device locked after three failed unlocks."
+3. The error copy's contrast is real, but the verdict has no distinguishing fact. The surrounding help text already says the device locks after three failed unlocks. Pull that in: "The device locked after three failed unlocks."
 4. The wrap-up has no problem.
 
 Edited:
 
 - h1: "Research support"
 - empty state: "Watchlists stay on this device."
-- error copy: "That's not a sign-in failure: the device locked after three failed unlocks."
+- error copy: "The device locked after three failed unlocks."
+- surrounding text: gone
 - chat wrap-up: "Added the empty-state copy."
 
-Copy lived in files. Checks that fired: punctuation used for emphasis; contrast that does not correct a misunderstanding; repetition that does not help the reader; a verdict without the fact that distinguishes it.
+hecks that fired: punctuation used for emphasis; contrast that does not correct a misunderstanding; repetition that does not help the reader; a verdict without the fact that distinguishes it.
