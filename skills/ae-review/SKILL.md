@@ -10,7 +10,7 @@ Dispatch independent perspectives. They start with no inherited conversation, so
 1. Resolve the target and state the intended change in one or two sentences. Read the file list and diff only far enough to select perspectives. An empty target is a clean review; skip to the report.
 2. Load at most one matching recipe:
 
-- [`document.md`](recipes/document.md) for an Opportunity Brief, Concept Notebook, Delivery Map, or other specification;
+- [`document.md`](recipes/document.md) for an Opportunity Brief, Concept Notebook, Implementation Plan, Delivery Map, or other specification;
 - [`browser.md`](recipes/browser.md) for a real web flow;
 - [`xcode.md`](recipes/xcode.md) for an Apple project;
 - [`perspectives.md`](recipes/perspectives.md) for code, including the current diff.
