@@ -1,11 +1,11 @@
 # Code perspectives
 
-A request for a thorough review matches every row.
+A request for a thorough review matches every row whose trigger is present in the target or requested change.
 
 | Perspective | Trigger |
 |---|---|
-| correctness | always |
-| simplicity | always |
+| correctness | behavior-changing code, a bug fix, or an open-ended code review |
+| simplicity | a refactor, new abstraction, duplicated mechanism, or architecture change |
 | security | auth, secrets, untrusted input, permissions, cryptography, or a moved trust boundary |
 | tests | test files in the target |
 | concurrency | shared mutable state, locks, async races, or cancellation |

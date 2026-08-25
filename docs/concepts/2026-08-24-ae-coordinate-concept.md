@@ -83,12 +83,13 @@ Hypothesis: fewer maintained diagrams, but every coordinator chat spends context
 
 ## Leading concept
 
-Prototype B: a delivery coordinator with a persistent Delivery Map. On each turn it emits every independent work packet on the current frontier.
+Prototype B: a delivery coordinator with a persistent Delivery Map. On each turn it emits the smallest useful set of independent work packets on the current frontier.
 
 ## Decisions
 
 - Keep one compact Delivery Map for the input plans. It preserves cross-plan state without turning each Implementation Plan into a coordination ledger.
-- Emit every independent, ready `ae-work` packet together. The user chooses which chats to start and may run them in parallel.
+- Prefer one cohesive `ae-work` packet. Emit multiple ready packets only when their ownership and write scopes are independent and separate chats materially help delivery. The user chooses which chats to start and may run compatible packets in parallel.
+- Give each work packet an explicit review disposition. Ordinary checks and coordinator verification need no separate review; request the single best perspective only for a named material risk, and add perspectives only for separate risks.
 - The coordinator may update plan evidence and status, split or reorder slices, and add gap slices while preserving the agreed milestone outcome. A change to product behavior or milestone scope remains a user decision.
 - Reconcile each report against the repository and plans. `Reported` is an executor claim; `verified` names the coordinator-inspected check or primary artifact, revision, and result; `stale` records invalidated proof; `blocked` means proof is missing.
 - Require a work report containing the outcome, changed files or commits, checks and results, plan updates, deviations, gaps, and user-visible behavior. Prefer references and exact result summaries over copied logs.
@@ -124,7 +125,7 @@ Prototype B: a delivery coordinator with a persistent Delivery Map. On each turn
 
 ### Work packet
 
-Each packet is a copyable prompt with a stable identifier, the relevant plan paths and slices, expected write scope, compatible packets, and authorization boundaries. It tells `ae-work` to inspect the cited plans and code, complete the bounded behavior, improve the plans when implementation exposes a gap, and return the work report below.
+Each packet is a copyable prompt with a stable identifier, the relevant plan paths and slices, expected write scope, compatible packets, authorization boundaries, and an explicit review disposition. It tells `ae-work` to inspect the cited plans and code, complete the bounded behavior, improve the plans when implementation exposes a gap, and return the work report below.
 
 The packet points to plan content instead of repeating it. Its completion condition is every cited slice complete with current plan evidence, or a concrete blocker returned.
 

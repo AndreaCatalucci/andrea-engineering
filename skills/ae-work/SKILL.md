@@ -14,7 +14,7 @@ Implement the requested outcome with the least process that keeps the change sou
 5. Run existing checks directly relevant to the changed behavior and architecture artifacts.
 6. If an Implementation Plan (from `ae-plan`, under `docs/plans/`) guided this work, mark the slices or done criteria just completed as done and record the architecture result.
 7. Report what changed, what was checked, which architecture artifacts changed, and any real limitation.
-8. Run ae-review on the changes. Skip only trivial changes.
+8. Follow the request's review disposition. If it has none, run `ae-review` only when a named material risk remains after the direct checks: a trust or security boundary, irreversible data change, concurrency, a public compatibility contract, a broad cross-module refactor, or conflicting evidence. Skip review for low-risk, well-covered changes.
 
 The user's request defines which adjacent actions—planning, review, browser work, and Git operations—join implementation. A trajectory change is a lesson.
 
