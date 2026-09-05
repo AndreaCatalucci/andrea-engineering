@@ -5,7 +5,7 @@ description: Perform a requested Git or pull-request action. Use for commits, pu
 
 # Ship
 
-Perform the Git or PR state change the user requested.
+Perform the Git or PR state change the user requested. Deployment belongs to the user; hand off any required deployment steps.
 
 Before writing, inspect the branch, working tree, diff, and remote. Preserve unrelated changes and stage the intended change set. Use a concise commit message and PR description focused on value. Run the `unslop` skill before posting.
 

@@ -7,10 +7,10 @@ description: See how a settled solution lands in this codebase. Use for multi-st
 
 Problem and solution are settled enough. See how the solution lands in this codebase.
 
-1. Read the request and inspect the smallest relevant part of the repository until the current seams are visible.
+1. Read the request, relevant project lessons, and affected code until the current seams are visible.
 2. Name the desired outcome and the gap between that codebase and it.
 3. Identify choices whose wrong answer would cause meaningful rework. Resolve them from evidence, or ask one focused question when the user must decide. Leave the rest deferred.
-4. Shape a walking skeleton on existing seams with the least abstraction that fits, then 2-4 vertical delivery slices. Name useful starting areas and any spike that would cheaply retire a bet.
+4. Use the fewest vertical slices that deliver observable behavior on existing seams. Start with a walking skeleton when no end-to-end path exists. Give each slice acceptance criteria and the cheapest meaningful verification. Name a spike only when its result could change the implementation.
 5. Write an Implementation Plan covering:
 
 - desired outcome;

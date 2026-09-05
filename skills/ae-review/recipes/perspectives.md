@@ -12,7 +12,7 @@ A request for a thorough review matches every row whose trigger is present in th
 
 ## correctness
 
-Read the diff and enough surrounding code to understand its effects. Report bugs, regressions, unsafe assumptions, missing failure handling, broken contracts, and new behavior with no test pin.
+Read the diff and enough surrounding code to understand its effects. Report bugs, regressions, unsafe assumptions, missing failure handling, broken contracts, and changed behavior whose verification cannot detect a named failure.
 
 ## simplicity
 

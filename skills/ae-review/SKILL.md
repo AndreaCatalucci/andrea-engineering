@@ -7,7 +7,7 @@ description: Review code or another requested artifact for material problems. Us
 
 Dispatch independent perspectives. They start with no inherited conversation, so they are not anchored on the author's rationale.
 
-1. Resolve the target, intended change, and concrete review question in one or two sentences. Read the file list and diff only far enough to select perspectives. An empty target is a clean review; skip to the report.
+1. Resolve the target, intended change, and concrete review question. Reuse current review evidence for unchanged scope; review changes and unresolved risks. For a diff-only request with an empty diff, report no changes and stop; that does not establish product correctness.
 2. Load at most one matching recipe:
 
 - [`document.md`](recipes/document.md) for an Opportunity Brief, Concept Notebook, Implementation Plan, Delivery Map, or other specification;

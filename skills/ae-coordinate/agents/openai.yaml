@@ -1,6 +1,6 @@
 interface:
   display_name: "Coordinate Delivery"
-  short_description: "Coordinate plans across focused agent chats"
-  default_prompt: "Use $ae-coordinate to coordinate this delivery across focused chats."
+  short_description: "Preview execution chats and ask before creation"
+  default_prompt: "Use $ae-coordinate to reconcile this delivery, output the next complete execution prompt, preview its checkout and model settings, and ask before creating the chat."
 policy:
   allow_implicit_invocation: false

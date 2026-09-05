@@ -7,10 +7,10 @@ description: Find the cause of failing behavior and fix it when requested. Use f
 
 Find the smallest explanation that accounts for the failure.
 
-1. Read the exact symptom, error, or failing check. Reproduce it when practical.
+1. Read the exact symptom and relevant project lessons. Reuse a current reproduction or reproduce the failure when practical.
 2. Trace the real execution path and compare failing behavior with expected behavior.
 3. Form one concrete hypothesis and test the cheapest discriminating observation. Revise it when evidence disagrees. A trajectory change is a lesson.
-4. State the root cause and causal chain.
+4. State the root cause and causal chain supported by the observations. Stop investigating when the evidence distinguishes it from plausible alternatives; name any remaining uncertainty.
 5. A fix request leads to the smallest causal change and a narrow regression check. A diagnosis request ends with the findings.
 
 Inspect stored state before logs when the product persists it. Redact secrets and unrelated production data.

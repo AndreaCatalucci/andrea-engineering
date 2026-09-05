@@ -7,7 +7,7 @@ description: Capture one reusable project lesson. Use when a failed experiment o
 
 Preserve one lesson that will materially help future work in this repository.
 
-Search `docs/solutions/` for a direct duplicate, then create or update the nearest document with:
+Search `docs/solutions/` for a direct duplicate. If it already captures the lesson accurately, cite it and stop. Otherwise create or update the nearest document with:
 
 - the belief, experiment, or assumption;
 - what reality showed;
