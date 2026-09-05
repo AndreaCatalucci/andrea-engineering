@@ -10,7 +10,7 @@ Nine engineering skills for Codex, Claude Code, and Grok Build.
 | `ae-coordinate` | Track delivery state and delegate work with prompts and model recommendations. |
 | `ae-work` | Implement a request or plan. |
 | `ae-debug` | Find and fix the cause of failing behavior. |
-| `ae-review` | Report material problems using risk-selected independent perspectives. |
+| `ae-review` | Report material problems; use independent perspectives when requested or useful. |
 | `ae-ship` | Commit, push, open or update PRs, and monitor them. |
 | `ae-learn` | Capture a lesson when the trajectory changes, or garden existing ones. |
 

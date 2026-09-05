@@ -16,11 +16,10 @@ Problem and solution are settled enough. See how the solution lands in this code
 - desired outcome;
 - relevant current codebase;
 - gap;
-- walking skeleton;
 - vertical delivery slices;
-- technical bets or spikes;
-- deferred decisions;
 - done criteria.
+
+Include a walking skeleton, technical bets or spikes, and deferred decisions only when they affect the work. Omit irrelevant sections rather than filling them with placeholders.
 
 Every plan includes an Architecture section with current `docs/architecture/` references or `None`, intended boundary or relationship changes, affected invariants, and artifacts `ae-work` must update or create. State `No architecture change` when applicable. A material change may include a target Mermaid C4 diagram; repository architecture artifacts continue to describe verified current state.
 

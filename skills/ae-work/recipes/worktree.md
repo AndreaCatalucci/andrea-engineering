@@ -1,7 +1,7 @@
 # Worktree
 
-First detect whether the current checkout is already a worktree. Continue there when isolated; otherwise preserve the current working tree and choose the requested ref or repository default branch.
+Identify the requested starting revision and the code, plans, and local changes this task needs. Reuse an existing worktree only when it contains those inputs. Honor the requested ref; otherwise choose a revision containing the required code, using the repository default branch when sufficient.
 
-Create a meaningfully named branch using the repository or host convention and a sibling worktree with plain Git. Attach an existing PR or branch ref directly.
+When a new worktree is needed, create a meaningfully named branch using the repository or host convention and a sibling worktree with plain Git. Attach an existing PR or branch ref directly.
 
-Protect dirty files by leaving them in place. Permission and checkout conflicts end with a clear report of the blocked ref.
+Preserve original dirty files. Where required inputs are uncommitted, carry only those inputs into the isolated checkout using the available workflow. Verify the destination contains the intended revision and inputs before implementation. If that starting state cannot be reproduced, report the missing input or conflict instead of silently substituting another state.
