@@ -15,7 +15,7 @@ Search `docs/solutions/` for a direct duplicate. If it already captures the less
 - where it applies and its boundaries;
 - the most useful code or documentation pointers.
 
-Use ordinary Markdown and the project's language, centered on reusable project knowledge.
+Use ordinary Markdown and the project's language.
 
 Keep capture scoped to the nearest solution document. One trajectory change is one lesson.
 

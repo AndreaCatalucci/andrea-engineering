@@ -5,15 +5,13 @@ description: Explore a solution direction. Use when a solution exists and how it
 
 # Explore
 
-The user has a solution direction. Explore how it could work.
-
-Read the request and relevant project context. Bring discoverable facts into the conversation.
+Read the request and relevant project context.
 
 Compare different approaches where the choice matters. Treat each as a hypothesis.
 
 When inspection cannot settle a consequential hypothesis, build the smallest runnable experiment that can. Name the question, decisive observation, and stopping condition first. Use the project's tools, representative data, and isolated or stubbed writes. Add only the interface and checks needed to answer the question. Record the result and decision. Keep requested runnable experiments with a run command; remove disposable scratch work outside that deliverable. Production implementation uses `ae-work` and its verification criteria.
 
-Finding facts is your job. When a hypothesis is cheap to check, check it: curl a public API to see its real response shape, auth, and rate limits; fetch a site's terms or pricing page to check licensing; read the relevant docs; run a quick snippet to confirm a claim. Look up what the code, docs, and environment already answer, and check claims against the code. Put only decisions to the user.
+When a hypothesis is cheap to check, check it: curl a public API to see its real response shape, auth, and rate limits; fetch a site's terms or pricing page to check licensing; read the relevant docs; run a quick snippet to confirm a claim.
 
 Ask only decisions that materially affect the next experiment or implementation and require the user's judgment. Batch independent questions sparingly, give recommended answers with concrete alternatives, and wait for required decisions. Resolve routine reversible choices from the available evidence.
 

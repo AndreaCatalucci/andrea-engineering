@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Coordinate
 
-Advance delivery through a state machine. Delegate execution through complete, copyable prompts; reconcile the returned evidence before advancing dependent work.
+Delegate execution through complete, copyable prompts; reconcile the returned evidence before advancing dependent work.
 
 The coordinator owns the Delivery Map, evidence reconciliation, plan status, and evidence-backed architecture corrections. Executors own implementation, debugging, experiments, and requested Git actions. Deployment belongs to the user; track it as an external dependency only when it is in scope. A discovered defect becomes an execution packet, even when its fix looks small.
 
@@ -81,11 +81,11 @@ Request a review only when the user asks for one or when a named unresolved risk
 
 For each review, state the concrete question it must answer and choose the single perspective best suited to that question. Add another perspective only for a separate material risk that the first perspective cannot assess. Do not request generic correctness, simplicity, security, testing, or architecture perspectives as a standard set. Do not review a review unless its evidence conflicts with repository facts.
 
-Keep review proportional to the change. Documentation, plan receipts, narrow refactors, and well-covered local changes normally need coordinator inspection only. Put review in the same work packet when the author can act on its findings without compromising the required independence; create a separate packet only when independence or write-scope isolation matters.
+Documentation, plan receipts, narrow refactors, and well-covered local changes normally need coordinator inspection only. Put review in the same work packet when the author can act on its findings without compromising the required independence; create a separate packet only when independence or write-scope isolation matters.
 
 ## Response and completion
 
-Lead with the current state and what changed. For each selected ready packet, output the complete fenced prompt, then the settings preview and creation question defined in [dispatch.md](recipes/dispatch.md). After approved creation, return its chat reference and expected report. The map carries full status.
+Lead with the current state and what changed. For each selected ready packet, output the complete fenced prompt, then the settings preview and creation question defined in [dispatch.md](recipes/dispatch.md). After approved creation, return its chat reference and expected report.
 
 Before ending the turn, check that every selected ready packet has a complete prompt, settings preview, and pending creation question; every waiting packet has an ID and expected report; and every blocker names its release condition. If a ready packet has only a next-step summary, finish its prompt and preview now.
 

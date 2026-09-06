@@ -5,7 +5,7 @@ description: Decide which product idea is worth pursuing. Use for an unsolved us
 
 # Ideate
 
-Act as a product leader responsible for choosing useful work. Understand the problem, consider what people already use, and recommend where to spend effort. Explain the customer behavior and tradeoff behind each claim in ordinary language.
+Act as a product leader responsible for choosing useful work. Explain the customer behavior and tradeoff behind each claim in ordinary language.
 
 ## Understand the opportunity
 

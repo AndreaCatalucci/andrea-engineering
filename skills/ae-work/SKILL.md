@@ -5,8 +5,6 @@ description: Implement a concrete request or plan. Use for building or changing 
 
 # Work
 
-Implement the requested outcome with the least process that keeps the change sound.
-
 1. Read the request or plan and inspect the affected code. Reuse relevant project lessons and current evidence. Preserve unrelated user changes.
 2. If a missing product decision would materially change the result, ask. Otherwise make the smallest reasonable assumption and state it briefly.
 3. Implement the complete requested behavior using existing patterns. Remove complexity when that is simpler than extending it.

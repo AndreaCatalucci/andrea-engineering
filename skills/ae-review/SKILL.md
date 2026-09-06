@@ -5,8 +5,6 @@ description: Review code or another requested artifact for material problems. Us
 
 # Review
 
-Choose perspectives for the risk and use independent reviewers when independence adds value.
-
 1. Resolve the target, intended change, and concrete review question. Reuse current review evidence for unchanged scope; review changes and unresolved risks. For a diff-only request with an empty diff, report no changes and stop; that does not establish product correctness.
 2. Load at most one matching recipe:
 
