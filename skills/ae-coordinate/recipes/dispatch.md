@@ -41,6 +41,14 @@ If availability or effort support cannot be verified, prepare the prompt and mar
 
 Recommendations become launch settings only when the user approves the exact preview.
 
+## Keep task addresses
+
+Carry `threadId` and `hostId` for both coordinator and executor alongside the packet ID. Titles are display labels; use the IDs as message destinations. Resolve the coordinator once from verified current-task context and retain it in the Delivery Map. For reuse, take the executor address from the packet ledger or a verified host result. For a new chat, its address is unknown until creation: put `resolve from your current-task context at startup` in the executor field, then record the actual address returned by the host in the ledger. Keep a queued `clientThreadId` separate until the host provides a ready `threadId`.
+
+Every prompt and returned report carries the same address fields. The coordinator already receives the executor address from creation, so no separate registration ping is needed. Use the stored address directly for messaging, reading, and waiting; list or search chats only when an address is missing, fails to resolve, or conflicts with current host evidence. After a move or replacement, verify the new address and retain the predecessor for late-report reconciliation. A title match alone cannot repair an address.
+
+If a task cannot establish its own address, mark it `unresolved` and continue authorized work. The coordinator can fill that field from its creation receipt or verified host context. If the destination cannot be established, leave the message copyable for manual delivery; never guess an ID or assume the recipient is on the sender's host. Omit an unavailable `hostId` only when the tool's documented default is known to reach the intended task. Knowing an address does not authorize a message.
+
 ## Write the prompt
 
 Output one complete fenced text block per packet, followed by its launch preview. Fill every field below with concrete values; use `None` where appropriate. Use the host's skill invocation syntax. Keep launch settings outside the prompt so executors do not mistake them for runtime controls.
@@ -59,7 +67,15 @@ Write scope: <expected code, plan, and architecture paths>
 Dependencies and compatibility: <satisfied prerequisites; compatible or conflicting packet IDs>
 Authorization: <inherited permissions; requested local or Git stopping point; deployment handoff to the user if needed>
 Review: <none, or concrete questions with selected perspectives>
-Coordinator: <verified originating task reference and host, or manual return destination>
+Coordinator: threadId=<verified coordinator ID>; hostId=<verified host ID, or unresolved>; title=<display title>
+Executor: threadId=<verified existing task ID, or resolve from your current-task context at startup>; hostId=<verified host ID, or unresolved>
+
+Resolve your own Executor address from verified current-task context at startup.
+Keep both addresses with the packet ID in every report, blocker, or question
+returned to the coordinator. Use the Coordinator threadId and hostId directly
+for approved messages; do not search by title when the address is known. If an
+address cannot be established, mark it unresolved. An unresolved destination
+requires manual delivery; it does not prevent authorized local work.
 
 Inspect the cited context and affected code. Complete this bounded outcome,
 including adjacent changes necessary for it. Record discovered gaps in the
@@ -71,7 +87,7 @@ evidence. Stop once they are met. If an authorization boundary or concrete
 blocker prevents completion, return the unmet criteria and what would unblock
 them. Completing the listed activities alone does not establish success.
 
-Return packet ID, goal status (achieved or unmet), evidence against each Done
+Return packet ID, both task addresses, goal status (achieved or unmet), evidence against each Done
 when criterion, changed files or commits, exact checks and results,
 architecture verification where applicable, updated plan sections or produced
 decision artifacts, and deviations, gaps, or blockers. Provide evidence
@@ -84,7 +100,7 @@ approve the return message. If declined or messaging is unavailable, leave the
 report copyable for manual return. Never infer authorization from silence.
 ```
 
-Resolve the coordinator's return destination from the originating task's verified host context before writing the prompt. If its task reference cannot be established, name a manual return destination instead of guessing an ID. Keep the authorization-to-ping instruction as the final paragraph of every individual prompt, including planning, exploration, diagnosis, review, and follow-up packets.
+If the coordinator's address is unresolved, include a named manual return destination in its field. In Codex prompts, specify `send_message_to_thread` with the Coordinator `threadId` and verified `hostId`, omitting model and effort overrides. Keep the authorization-to-ping instruction as the final paragraph of every individual prompt, including planning, exploration, diagnosis, review, and follow-up packets.
 
 For `ae-plan` and `ae-explore`, name the question, required artifact path, and decision or planning boundary instead of inventing implementation slices. For `ae-debug`, state whether the executor should diagnose only or also fix. Preserve the work-packet Architecture requirements for `ae-work`.
 
@@ -120,8 +136,8 @@ After the prompt and preview, ask the matching question: “Create a new chat fo
 
 Recheck availability, source state, and write-scope compatibility. If the approved destination, setup, or prompt must change, show the revised preview and ask again. Otherwise call the creation or messaging tool once with exactly the approved values; an unchanged approved dispatch needs no second confirmation. Approval of a preview naming a specific model or local-copy source is the explicit request for that setting.
 
-For reuse in Codex, discover `send_message_to_thread`, verify the destination, and send the approved prompt with model and effort overrides omitted. Record successful delivery as `issued` against the existing chat reference. Follow its report through the same waiting and reconciliation path as a new chat.
+For reuse in Codex, discover `send_message_to_thread`, use the ledger's Executor `threadId` and verified `hostId`, and send the approved prompt with model and effort overrides omitted. Record successful delivery as `issued` against that address. Follow its report through the same waiting and reconciliation path as a new chat.
 
 For Codex, discover `list_projects` and `create_thread`. Use the returned project ID and `isGitRepository` to choose the preview. Map direct checkout to `environment.type=local`; map isolation to `worktree`. Omit `startingState` for the default branch, use `working-tree` for the approved local copy, or `branch` for an approved exact ref. Pass the approved model and effort explicitly; leave launch pending if either is unresolved. Verify the current tool schema before calling.
 
-Record a successful creation reference as `issued` and follow setup or completion through supported host tools. A queued client ID is not a ready thread ID. Return the host's created-chat link or directive and collect the executor report before verification. A failure or uncertain response is not proof of no creation or delivery: inspect host state before retrying to avoid duplicates. If the required tools or settings are unavailable, keep the full prompt available and explain the manual option; never claim dispatch succeeded.
+Record a successful creation reference as `issued`, save both task addresses, and follow setup or completion through supported host tools. A queued client ID is not a ready thread ID. Return the host's created-chat link or directive with the packet ID and both task addresses so manual handoffs preserve them. Collect the executor report before verification. A failure or uncertain response is not proof of no creation or delivery: inspect host state before retrying to avoid duplicates. If the required tools or settings are unavailable, keep the full prompt available and explain the manual option; never claim dispatch succeeded.

@@ -29,7 +29,7 @@ Planning and exploration are executable frontier work: unresolved implementation
 
 A displayed prompt is `proposed`; successful chat creation, follow-up delivery, or the user's choice to launch it manually makes it `issued`, not completed. Keep its ID for unchanged work with the same executor. A replacement executor or changed goal gets a new ID; link replaced unfinished work as superseded while retaining verified predecessors. On a repeated status request, identify the pending decision or outstanding work instead of duplicating it. Reproduce the full prompt when requested. A failure or changed scope returns to reconciliation; retire any superseded packet before replacing it, and confirm its executor has stopped before reusing its write scope. Never infer approval or completion from silence.
 
-Match each returned report to its packet ID, issued scope, and implementation basis. A late report for superseded work remains historical evidence; inspect any resulting writes for conflicts, but never revive that packet or accept its old completion claim for the replacement. Independently verify any evidence reused for current scope.
+Match each returned report to its packet ID, coordinator and executor addresses, issued scope, and implementation basis. Resolve missing or conflicting addresses against the ledger and host evidence before assigning the report to an executor. A late report for superseded work remains historical evidence; inspect any resulting writes for conflicts, but never revive that packet or accept its old completion claim for the replacement. Independently verify any evidence reused for current scope.
 
 ## Map delivery
 
@@ -40,8 +40,8 @@ Keep this operational index:
 - delivery outcome and Implementation Plan paths, statuses, and in-scope slices or gaps;
 - end-to-end behaviors and invariants with verified, reported, stale, or blocked evidence;
 - current architecture references and intended architecture deltas with plan coverage;
-- current state, frontier, and decisions;
-- a packet ledger with packet ID, outcome-based goal, covered slices or gap, status, reuse-or-fresh choice and reason, predecessor if replaced, previewed destination and settings, user decision, and evidence or chat references.
+- current state, frontier, decisions, and the coordinator's verified `threadId` and `hostId`;
+- a packet ledger with packet ID, outcome-based goal, covered slices or gap, status, reuse-or-fresh choice and reason, predecessor if replaced, executor `threadId` and `hostId` (or pending creation reference), previewed destination and settings, user decision, and evidence references. Use the address lifecycle in [dispatch.md](recipes/dispatch.md).
 
 Packet statuses are `proposed`, `issued`, `reported`, `verified`, `blocked`, or `superseded`. Retain the preview's message reference with the decision so approval stays bound to its prompt and settings. Only reconciliation marks a reported result verified. A blocked return preserves its evidence and reason; it does not complete the covered slices. Keep partial slice completion in the referenced plan.
 
@@ -66,6 +66,7 @@ Each `ae-work` prompt contains a stable ID, plan paths and slices, bounded behav
 
 The executor completes the packet only when its goal and all completion criteria, including every cited slice, have current evidence. An authorization boundary or concrete blocker can end execution with the goal unmet; report the remaining criteria explicitly. Require a copyable report containing:
 
+- packet ID and both coordinator and executor addresses (`threadId` and `hostId`);
 - goal status (achieved or unmet), outcome, and evidence against each completion criterion;
 - changed files or commits;
 - checks with exact commands and summarized results;
