@@ -10,7 +10,7 @@ Delegate execution through complete, copyable prompts; reconcile the returned ev
 
 The coordinator owns the Delivery Map, evidence reconciliation, plan status, and evidence-backed architecture corrections. Executors own implementation, debugging, experiments, and requested Git actions. Deployment belongs to the user; track it as an external dependency only when it is in scope. A discovered defect becomes an execution packet, even when its fix looks small.
 
-Use the fewest chats that preserve clear ownership and independent write scopes. After each ready prompt, preview its launch settings and proactively ask whether to create that chat programmatically. Every creation requires an explicit answer approving the displayed prompt and settings. General requests to coordinate or run autonomously are not approval for future chats. Keep the copyable prompt available for manual launch; never substitute a subagent to bypass the creation decision.
+Choose deliberately between continuing an existing chat and starting fresh for each ready packet, using [dispatch.md](recipes/dispatch.md). Preserve useful context while giving stalled or reframed work a clean start. Preview the destination, settings, and exact prompt, then ask for explicit approval to create the chat or send the follow-up. General requests to coordinate or run autonomously are not approval for future dispatches. Keep the prompt copyable for manual use; never substitute a subagent to bypass the decision.
 
 ## Advance state
 
@@ -20,14 +20,14 @@ On every turn, load the active map and reconcile new input. Derive the state fro
 |---|---|---|
 | `reconcile` | New scope, report, decision, failure, or invalidated evidence needs inspection | Inspect the relevant primary evidence, update the map, and select the next state in this turn. |
 | `complete` | Every scoped completion criterion below is verified | Archive the map and return final evidence references. |
-| `ready` | Useful work has satisfied prerequisites and compatible write scope, with no existing proposal or handoff | Load [dispatch.md](recipes/dispatch.md). Output the complete prompt, preview settings, and ask to create the chat. Record it as `proposed`, then enter `approval`. A description of the next step does not complete this transition. |
-| `approval` | A displayed proposal awaits a decision or its approved launch | Wait for explicit input before creation. Approval of the exact preview permits creation through the host's tool; record the returned reference and enter `waiting`. Changed settings or prompt require a new preview and decision. |
+| `ready` | Useful work has satisfied prerequisites and compatible write scope, with no existing proposal or handoff | Load [dispatch.md](recipes/dispatch.md). Choose reuse or fresh, output the complete prompt, preview the destination and settings, and ask to dispatch. Record it as `proposed`, then enter `approval`. A description of the next step does not complete this transition. |
+| `approval` | A displayed proposal awaits a decision or its approved dispatch | Wait for explicit input before creation or sending. Approval of the exact preview permits that action through the host's tool; record the returned reference and enter `waiting`. Changed destination, settings, or prompt require a new preview and decision. |
 | `waiting` | Issued work can still advance delivery, with no additional independent work worth starting | Identify outstanding packet IDs and required reports. Collect results from created chats through the host's supported waiting mechanism or accept user-returned reports. A new report returns to `reconcile`. |
 | `blocked` | No useful work can proceed without a decision, access, or external change | Name the exact blocker and the input that releases it. Route actionable investigation or planning through `ready`; resume reconciliation when the input arrives. |
 
 Planning and exploration are executable frontier work: unresolved implementation detail produces an `ae-plan` packet; a consequential choice produces an `ae-explore` packet. Uncertain failure causes produce `ae-debug`; known repairs produce `ae-work`. Block only dependent work. Reconciliation that verifies one packet and unlocks another must issue the next prompt in the same response.
 
-A displayed prompt is `proposed`; successful chat creation or the user's choice to launch it manually makes it `issued`, not completed. Reuse its ID while its scope is unchanged. On a repeated status request, identify the pending decision or outstanding work instead of duplicating it. Reproduce the full prompt when requested. A failure or changed scope returns to reconciliation; retire any superseded packet before replacing it, and confirm its executor has stopped before reusing its write scope. Never infer approval or completion from silence.
+A displayed prompt is `proposed`; successful chat creation, follow-up delivery, or the user's choice to launch it manually makes it `issued`, not completed. Keep its ID for unchanged work with the same executor. A replacement executor or changed goal gets a new ID; link replaced unfinished work as superseded while retaining verified predecessors. On a repeated status request, identify the pending decision or outstanding work instead of duplicating it. Reproduce the full prompt when requested. A failure or changed scope returns to reconciliation; retire any superseded packet before replacing it, and confirm its executor has stopped before reusing its write scope. Never infer approval or completion from silence.
 
 Match each returned report to its packet ID, issued scope, and implementation basis. A late report for superseded work remains historical evidence; inspect any resulting writes for conflicts, but never revive that packet or accept its old completion claim for the replacement. Independently verify any evidence reused for current scope.
 
@@ -41,7 +41,7 @@ Keep this operational index:
 - end-to-end behaviors and invariants with verified, reported, stale, or blocked evidence;
 - current architecture references and intended architecture deltas with plan coverage;
 - current state, frontier, and decisions;
-- a packet ledger with packet ID, outcome-based goal, covered slices or gap, status, previewed launch settings, user decision, and evidence or chat references.
+- a packet ledger with packet ID, outcome-based goal, covered slices or gap, status, reuse-or-fresh choice and reason, predecessor if replaced, previewed destination and settings, user decision, and evidence or chat references.
 
 Packet statuses are `proposed`, `issued`, `reported`, `verified`, `blocked`, or `superseded`. Retain the preview's message reference with the decision so approval stays bound to its prompt and settings. Only reconciliation marks a reported result verified. A blocked return preserves its evidence and reason; it does not complete the covered slices. Keep partial slice completion in the referenced plan.
 
@@ -87,9 +87,9 @@ Documentation, plan receipts, narrow refactors, and well-covered local changes n
 
 ## Response and completion
 
-Lead with the current state and what changed. For each selected ready packet, output the complete fenced prompt, then the settings preview and creation question defined in [dispatch.md](recipes/dispatch.md). After approved creation, return its chat reference and expected report.
+Lead with the current state and what changed. For each selected ready packet, output the complete fenced prompt, then the destination and settings preview and approval question defined in [dispatch.md](recipes/dispatch.md). After approved dispatch, return its chat reference and expected report.
 
-Before ending the turn, check that every selected ready packet has a complete prompt, settings preview, and pending creation question; every waiting packet has an ID and expected report; and every blocker names its release condition. If a ready packet has only a next-step summary, finish its prompt and preview now.
+Before ending the turn, check that every selected ready packet has a complete prompt, destination and settings preview, and pending approval question; every waiting packet has an ID and expected report; and every blocker names its release condition. If a ready packet has only a next-step summary, finish its prompt and preview now.
 
 Delivery completes when every in-scope plan slice is complete; every in-scope behavior and invariant has current verified evidence; every affected current-state C4 artifact matches the verified implementation; and every issued packet is reconciled or explicitly retired with its executor confirmed stopped. Retire unused proposals and withdraw unlaunched manual handoffs before closure. Mark the map complete with final evidence references, then move it to `docs/delivery-maps/archive/`.
 
