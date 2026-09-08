@@ -41,7 +41,7 @@ Keep this operational index:
 - end-to-end behaviors and invariants with verified, reported, stale, or blocked evidence;
 - current architecture references and intended architecture deltas with plan coverage;
 - current state, frontier, and decisions;
-- a packet ledger with packet ID, covered slices or gap, status, previewed launch settings, user decision, and evidence or chat references.
+- a packet ledger with packet ID, outcome-based goal, covered slices or gap, status, previewed launch settings, user decision, and evidence or chat references.
 
 Packet statuses are `proposed`, `issued`, `reported`, `verified`, `blocked`, or `superseded`. Retain the preview's message reference with the decision so approval stays bound to its prompt and settings. Only reconciliation marks a reported result verified. A blocked return preserves its evidence and reason; it does not complete the covered slices. Keep partial slice completion in the referenced plan.
 
@@ -60,11 +60,13 @@ Unplanned work stays visible and gets an `ae-plan` prompt. The coordinator appli
 
 ## Work packets
 
+Every packet, including planning, exploration, diagnosis, review, and follow-up work, starts with `Goal:`. State the concrete outcome and why it matters in plain language: what a user can do, what behavior will hold, or what uncertainty will be resolved to enable a decision. Bound it to the packet's authorized scope. Write a goal the user can understand without opening the plan; a task label, file list, or instruction to execute slices is insufficient. Derive the deliverables and checkable completion criteria from that goal using [dispatch.md](recipes/dispatch.md).
+
 Each `ae-work` prompt contains a stable ID, plan paths and slices, bounded behavior, expected write scope, compatible packets, authorization boundaries, and an explicit review disposition: `none` or one or more concrete questions with their selected perspectives. Before dispatch, ensure each cited plan's Architecture section names the starting artifacts or `None`, intended delta, invariants, and artifacts to update or create. Point to that section instead of copying its architecture context or target diagrams, and keep the Delivery Map out of executor prompts. The expected write scope still names every affected architecture file so parallel-safety is inspectable. A missing planned view is a gap that blocks closure. Permit adjacent changes required for the behavior and require plan updates for discovered gaps.
 
-The executor returns when every cited slice has current completion evidence or a concrete blocker prevents further progress. Require a copyable report containing:
+The executor completes the packet only when its goal and all completion criteria, including every cited slice, have current evidence. An authorization boundary or concrete blocker can end execution with the goal unmet; report the remaining criteria explicitly. Require a copyable report containing:
 
-- outcome and user-visible behavior;
+- goal status (achieved or unmet), outcome, and evidence against each completion criterion;
 - changed files or commits;
 - checks with exact commands and summarized results;
 - architecture artifacts and their verification result;

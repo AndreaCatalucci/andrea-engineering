@@ -28,15 +28,18 @@ Recommendations become launch settings only when the user approves the exact pre
 Output one complete fenced text block per packet, followed by its launch preview. Fill every field below with concrete values; use `None` where appropriate. Use the host's skill invocation syntax. Keep launch settings outside the prompt so executors do not mistake them for runtime controls.
 
 ```text
-$<execution-skill> <bounded outcome>
+Goal: <concrete outcome and why it matters, understandable without the plan>
+
+Use $<execution-skill>.
 
 Packet: <stable ID>
 Repository: <source project path; work in the checkout assigned to the new chat>
 Read: <repository-relative plan paths and exact slices/sections, or scope and evidence for an unplanned gap; resolve paths in the assigned checkout>
-Deliver: <observable behavior or decision artifact; acceptance criteria or exact reference>
+Deliver: <behavior changes or artifacts needed to achieve the goal>
+Done when: <observable conditions and required evidence proving the goal; include exact references for detailed slice criteria>
 Write scope: <expected code, plan, and architecture paths>
 Dependencies and compatibility: <satisfied prerequisites; compatible or conflicting packet IDs>
-Authorization and finish line: <inherited permissions; requested local or Git stopping point; deployment handoff to the user if needed>
+Authorization: <inherited permissions; requested local or Git stopping point; deployment handoff to the user if needed>
 Review: <none, or concrete questions with selected perspectives>
 Coordinator: <verified originating task reference and host, or manual return destination>
 
@@ -45,9 +48,13 @@ including adjacent changes necessary for it. Record discovered gaps in the
 cited plan. While other packets are outstanding, return any proposed expansion
 beyond the declared write scope before making those edits; the coordinator
 must reconcile ownership first. Continue independent work within your scope.
-Stop at the stated finish line or return a concrete blocker.
+Declare success only when the goal and every Done when criterion have current
+evidence. Stop once they are met. If an authorization boundary or concrete
+blocker prevents completion, return the unmet criteria and what would unblock
+them. Completing the listed activities alone does not establish success.
 
-Return packet ID, outcome, changed files or commits, exact checks and results,
+Return packet ID, goal status (achieved or unmet), evidence against each Done
+when criterion, changed files or commits, exact checks and results,
 architecture verification where applicable, updated plan sections or produced
 decision artifacts, and deviations, gaps, or blockers. Provide evidence
 references the coordinator can inspect; distinguish observations from claims.
@@ -62,6 +69,8 @@ report copyable for manual return. Never infer authorization from silence.
 Resolve the coordinator's return destination from the originating task's verified host context before writing the prompt. If its task reference cannot be established, name a manual return destination instead of guessing an ID. Keep the authorization-to-ping instruction as the final paragraph of every individual prompt, including planning, exploration, diagnosis, review, and follow-up packets.
 
 For `ae-plan` and `ae-explore`, name the question, required artifact path, and decision or planning boundary instead of inventing implementation slices. For `ae-debug`, state whether the executor should diagnose only or also fix. Preserve the work-packet Architecture requirements for `ae-work`.
+
+Make `Done when` prove the leading goal. For example, a diagnosis-only goal can be “Establish why expired sessions cause a blank page so a repair can be chosen”; its criteria require a reproduced failure, evidence identifying the cause, and a bounded repair recommendation. Implementation success instead requires evidence of the intended behavior. Keep goals achievable within the authorized boundary; a local implementation packet cannot claim a production outcome. If the intended outcome is unclear, use a planning or exploration goal that resolves the specific uncertainty.
 
 When writing the packet:
 
