@@ -20,18 +20,17 @@ Resetting conversation context does not mean discarding code or evidence. Inspec
 
 ## Recommend settings
 
-Use only GPT-5.6 Luna, GPT-5.6 Terra, GPT-5.6 Sol, or GPT-6 Astra. Choose the model and reasoning effort once, before creating a new chat; both remain fixed for that chat, including follow-up messages. Recommend one supported combination for the whole packet, with a sentence tying it to the known scope, constraints, and acceptance criteria. Respect the user's choice within this set. Verify availability and supported efforts through the execution host's current catalog or tool metadata; API availability does not establish host availability. Reuse that check within the session until the host or availability changes.
+For new chats, use only GPT-6 Luna, GPT-6 Sol, or GPT-6 Astra. Choose the model and reasoning effort once, before creating a new chat; both remain fixed for that chat, including follow-up messages. Recommend one supported combination for the whole packet, with a sentence tying it to the known scope, constraints, and acceptance criteria. Respect the user's choice within this set. Verify availability and supported efforts through the execution host's current catalog or tool metadata; API availability does not establish host availability. Reuse that check within the session until the host or availability changes.
 
-For reuse, verify and retain the chat's existing settings. For a fresh replacement, select settings from the newly bounded brief; a failed attempt alone does not justify a more expensive model.
+For reuse, verify and retain the chat's existing settings, including an older model if it still fits the packet. If the fixed model no longer fits, propose a fresh chat. For a fresh replacement, select settings from the newly bounded brief; a failed attempt alone does not justify a more expensive model.
 
-Choose the least expensive model suited to the packet's anticipated complexity and required verification. The relative costs below are derived from the user's supplied pricing, with Luna as 1×. They compare equal token usage; the ranges reflect input versus output mix. Actual task cost also depends on reasoning, caching, and retries.
+Choose the least expensive model suited to the packet's anticipated complexity and required verification. The relative costs below use [OpenAI API list prices](https://developers.openai.com/api/docs/models) for equal input and output token usage, with Luna as 1×. They are a comparison aid, not Codex host pricing; actual task cost also depends on reasoning, caching, and retries.
 
 | Model | Relative cost | Good fit | Effort at chat creation |
 |---|---:|---|---|
-| GPT-5.6 Luna (`gpt-5.6-luna`) | 1× | Mechanical edits, scoped documentation, small fixes with a known approach and decisive checks | `low`; `medium` for several local constraints |
-| GPT-5.6 Terra (`gpt-5.6-terra`) | 10× | Bounded features and refactoring on known seams with interacting requirements | `medium` |
-| GPT-5.6 Sol (`gpt-5.6-sol`) | About 17–20× | Multi-module implementation, diagnosis with competing hypotheses, planning that requires sustained synthesis | `medium`; `high` when the brief requires reasoning across several interacting modules or competing explanations |
-| GPT-6 Astra (`gpt-6-astra`) | About 42–50× | Difficult evidence reconciliation, complex design tradeoffs, long workflows with many dependent decisions | `medium`; `high` when the brief contains deeply coupled constraints |
+| GPT-6 Luna (`gpt-6-luna`) | 1× | Mechanical edits, scoped documentation, small fixes with a known approach and decisive checks | `low`; `medium` for several local constraints |
+| GPT-6 Sol (`gpt-6-sol`) | 20× | Bounded features or refactoring with interacting requirements; multi-module implementation, diagnosis with competing hypotheses, and sustained planning | `medium`; `high` when several modules or explanations interact |
+| GPT-6 Astra (`gpt-6-astra`) | 100× | Difficult evidence reconciliation, complex design tradeoffs, long workflows with many dependent decisions | `medium`; `high` when the brief contains deeply coupled constraints |
 
 Justify a premium model or higher effort with facts available before launch: scope, interacting constraints, ambiguity in the brief, and the depth of analysis required. Labels such as security or architecture alone are insufficient. Do not base the choice on failures or bottlenecks that would only become observable during execution.
 
