@@ -20,17 +20,20 @@ Resetting conversation context does not mean discarding code or evidence. Inspec
 
 ## Recommend settings
 
-For new chats, use only GPT-6 Luna, GPT-6 Sol, or GPT-6 Astra. Choose the model and reasoning effort once, before creating a new chat; both remain fixed for that chat, including follow-up messages. Recommend one supported combination for the whole packet, with a sentence tying it to the known scope, constraints, and acceptance criteria. Respect the user's choice within this set. Verify availability and supported efforts through the execution host's current catalog or tool metadata; API availability does not establish host availability. Reuse that check within the session until the host or availability changes.
+For new chats, use only GPT-6 Luna, GPT-6.1 Sol, GPT-6 Sol, or GPT-6 Astra. Prefer GPT-6.1 Sol over GPT-6 Sol for new packets unless the user selects GPT-6 Sol or inspected task evidence favors it. Choose the model and reasoning effort once, before creating a new chat; both remain fixed for that chat, including follow-up messages. Recommend one supported combination for the whole packet, with a sentence tying it to the known scope, constraints, and acceptance criteria. Respect the user's choice within this set. Verify availability and supported efforts through the execution host's current catalog or tool metadata; API availability does not establish host availability. Reuse that check within the session until the host or availability changes.
 
 For reuse, verify and retain the chat's existing settings, including an older model if it still fits the packet. If the fixed model no longer fits, propose a fresh chat. For a fresh replacement, select settings from the newly bounded brief; a failed attempt alone does not justify a more expensive model.
 
-Choose the least expensive model suited to the packet's anticipated complexity and required verification. The relative costs below use [OpenAI API list prices](https://developers.openai.com/api/docs/models) for equal input and output token usage, with Luna as 1×. They are a comparison aid, not Codex host pricing; actual task cost also depends on reasoning, caching, and retries.
+Choose the least expensive model suited to the packet's anticipated complexity and required verification. The relative costs below use [OpenAI API list prices](https://developers.openai.com/api/docs/models), checked on 2026-10-07, for equal uncached input and output token usage, with Luna as 1×. Luna costs $0.10/$0.50 per million input/output tokens, both Sol models $2/$10, and Astra $10/$50. They are a comparison aid, not Codex host pricing; actual task cost also depends on reasoning, caching, and retries. Refresh the comparison from current official prices when using it in a later session.
 
 | Model | Relative cost | Good fit | Effort at chat creation |
 |---|---:|---|---|
 | GPT-6 Luna (`gpt-6-luna`) | 1× | Mechanical edits, scoped documentation, small fixes with a known approach and decisive checks | `low`; `medium` for several local constraints |
-| GPT-6 Sol (`gpt-6-sol`) | 20× | Bounded features or refactoring with interacting requirements; multi-module implementation, diagnosis with competing hypotheses, and sustained planning | `medium`; `high` when several modules or explanations interact |
+| GPT-6.1 Sol (`gpt-6.1-sol`) | 20× | Complex coding and agentic work: bounded features or refactoring with interacting requirements, multi-module implementation, diagnosis with competing hypotheses, and sustained planning | `medium`; `high` when several modules or explanations interact |
+| GPT-6 Sol (`gpt-6-sol`) | 20× | Previous Sol generation when explicitly selected or favored by inspected task evidence | `medium`; `high` when several modules or explanations interact |
 | GPT-6 Astra (`gpt-6-astra`) | 100× | Difficult evidence reconciliation, complex design tradeoffs, long workflows with many dependent decisions | `medium`; `high` when the brief contains deeply coupled constraints |
+
+The effort column recommends starting settings; it does not list every supported effort. Use the host's catalog for launch support, including host-specific settings such as `ultra`. [GPT-6.1 Sol's API](https://developers.openai.com/api/docs/models/gpt-6.1-sol) supports `low`, `medium`, `high`, `xhigh`, and `max`; it does not support `none` or `minimal`. Keep API limits separate from verified Codex host controls.
 
 Justify a premium model or higher effort with facts available before launch: scope, interacting constraints, ambiguity in the brief, and the depth of analysis required. Labels such as security or architecture alone are insufficient. Do not base the choice on failures or bottlenecks that would only become observable during execution.
 
